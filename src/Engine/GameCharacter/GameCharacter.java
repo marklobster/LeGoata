@@ -8,29 +8,13 @@ public abstract class GameCharacter {
 	
 	private String lastName;
 	
-	// health properities
+	private StatManager statManager;
 	
-	private int health;
-	
-	private int maxHealth;
 	
 	// readiness properties
 	
 	private int delayState;
 	
-	// base stat properties
-	
-	private int strength;
-	
-	private int dexterity;
-	
-	private int initiative;
-	
-	private int agility;
-	
-	private int awareness;
-	
-	private int resolve;
 	
 	// identity methods
 	
@@ -42,28 +26,8 @@ public abstract class GameCharacter {
 		return lastName;
 	}
 	
-	// health methods
-	
-	public int getHealth() {
-		return health;
-	}
-	
-	public int getMaxHealth() {
-		return maxHealth;
-	}
-	
-	public int addHealth(int points) {
-		health += points;
-		if (health > maxHealth) {
-			health = maxHealth;
-		}
-		return health;
-	}
-	
-	// misc stat methods
-	
-	public int getCarryingCapacity() {
-		return strength * 3 + dexterity + resolve;
+	public StatManager getStats() {
+		return statManager;
 	}
 	
 	// readiness methods
