@@ -10,6 +10,8 @@ public abstract class GameCharacter {
 	
 	private StatManager statManager;
 	
+	private EquipmentManager equipment;
+	
 	
 	// readiness properties
 	
@@ -28,6 +30,10 @@ public abstract class GameCharacter {
 	
 	public StatManager getStats() {
 		return statManager;
+	}
+	
+	public EquipmentManager getEquipment() {
+		return equipment;
 	}
 	
 	// readiness methods
