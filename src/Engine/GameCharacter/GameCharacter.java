@@ -2,8 +2,6 @@ package Engine.GameCharacter;
 
 public abstract class GameCharacter {
 	
-	// identity properties
-	
 	private String firstName;
 	
 	private String lastName;
@@ -11,14 +9,6 @@ public abstract class GameCharacter {
 	private StatManager statManager;
 	
 	private EquipmentManager equipment;
-	
-	
-	// readiness properties
-	
-	private int delayState;
-	
-	
-	// identity methods
 	
 	public String getFirstName() {
 		return firstName;
@@ -28,30 +18,18 @@ public abstract class GameCharacter {
 		return lastName;
 	}
 	
+	public String getFullName() {
+		if (lastName == null || lastName == "") {
+			return firstName;
+		}
+		return String.join(" ", firstName, lastName);
+	}
+	
 	public StatManager getStats() {
 		return statManager;
 	}
 	
 	public EquipmentManager getEquipment() {
 		return equipment;
-	}
-	
-	// readiness methods
-	
-	public int getDelayState() {
-		return delayState;
-	}
-	
-	public int performAction(int cost) {
-		delayState += cost;
-		return delayState;
-	}
-	
-	public int recoverFromAction(int time) {
-		delayState -= time;
-		if (delayState < 0) {
-			delayState = 0;
-		}
-		return delayState;
 	}
 }

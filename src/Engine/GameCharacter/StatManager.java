@@ -71,4 +71,9 @@ public class StatManager {
 	public int getCarryingCapacity() {
 		return strength * 3 + dexterity + resolve;
 	}
+	
+	public int getInitiative() {
+		return 0;
+	}
+	
 }
