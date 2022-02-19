@@ -1,6 +1,6 @@
 package Engine.GameCharacter;
 
-public abstract class GameCharacter {
+public class GameCharacter {
 	
 	private String firstName;
 	
@@ -9,6 +9,16 @@ public abstract class GameCharacter {
 	private StatManager statManager;
 	
 	private EquipmentManager equipment;
+	
+	private ActionManager actionManager;
+	
+	public GameCharacter(CharacterInitializer initializer) {
+		this.firstName = initializer.getFirstName();
+		this.lastName = initializer.getLastName();
+		this.statManager = initializer.getStatManager();
+		this.equipment = initializer.getEquipment();
+		this.actionManager = initializer.getActionManager();
+	}
 	
 	public String getFirstName() {
 		return firstName;
@@ -31,5 +41,9 @@ public abstract class GameCharacter {
 	
 	public EquipmentManager getEquipment() {
 		return equipment;
+	}
+	
+	public ActionManager getActionManager() {
+		return actionManager;
 	}
 }
