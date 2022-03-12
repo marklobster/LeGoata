@@ -1,0 +1,66 @@
+package Engine.Incident;
+
+import java.util.ArrayList;
+
+import Engine.GameCharacter.GameCharacter;
+
+public class Battle {
+	private ArrayList<GameCharacter> goodies;
+	private ArrayList<GameCharacter> baddies;
+	private TurnTracker turnTracker = new TurnTracker();
+	
+	public Battle(ArrayList<GameCharacter> heroes, ArrayList<GameCharacter> enemies) {
+		goodies = heroes;
+		baddies = enemies;
+	}
+	
+	public void run() throws Exception {
+		for (GameCharacter gChar : goodies) {
+			turnTracker.addGameCharacter(gChar);
+		}
+		for (GameCharacter gChar : baddies) {
+			turnTracker.addGameCharacter(gChar);
+		}
+		
+		ArrayList<GameCharacter> winners = null;
+		while (winners == null) {
+			GameCharacter nextUp = turnTracker.getNextUp();
+			winners = getVictor();
+		}
+		
+		System.out.println("The winner is... " + (winners == goodies ? "you!!" : "the bad guys!!"));
+	}
+	
+	private ArrayList<GameCharacter> getVictor() throws Exception {
+		boolean goodTeamRemains = false;
+		for (GameCharacter member : goodies) {
+			if (member.getHealth() > 0) {
+				goodTeamRemains = true;
+				break;
+			}
+		}
+		
+		boolean badTeamRemains = false;
+		for (GameCharacter member : baddies) {
+			if (member.getHealth() > 0) {
+				badTeamRemains = true;
+				break;
+			}
+		}
+		
+		if (goodTeamRemains && !badTeamRemains) {
+			return goodies;
+		}
+		
+		if (!goodTeamRemains && badTeamRemains)
+		{
+			return baddies;
+		}
+		
+		if (!goodTeamRemains && !badTeamRemains) {
+			throw new Exception("Everyone is dead :(");
+		}
+		
+		return null;
+	}
+}
