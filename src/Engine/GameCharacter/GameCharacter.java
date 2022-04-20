@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import Engine.Equipment.Equipment;
 import Engine.Equipment.Shield;
 import Engine.Equipment.Weapon;
+import Engine.Utility.Utils;
 
 public class GameCharacter {
 	
@@ -15,6 +16,8 @@ public class GameCharacter {
 	private ArrayList<Equipment> equipment;
 	
 	private Weapon weapon;
+	
+	private Weapon defaultWeapon;
 	
 	private Shield shield;
 	
@@ -37,6 +40,24 @@ public class GameCharacter {
 	public GameCharacter(CharacterInitializer initializer) {
 		this.firstName = initializer.getFirstName();
 		this.lastName = initializer.getLastName();
+		this.equipment = new ArrayList<Equipment>();
+		Weapon weapon = initializer.getWeapon();
+		if (weapon != null) {
+			this.addItem(weapon);
+			this.equipWeapon(weapon);
+		}
+		if (initializer.getShield() != null) {
+			this.equipShield(initializer.getShield());
+		}
+		this.defaultWeapon = initializer.getDefaultWeapon();
+		this.maxHealth = initializer.getMaxHealth();
+		this.health = this.maxHealth;
+		this.strength = initializer.getStrength();
+		this.dexterity = initializer.getDexterity();
+		this.quickness = initializer.getQuickness();
+		this.agility = initializer.getAgility();
+		this.awareness = initializer.getAwareness();
+		this.resolve = initializer.getResolve();
 	}
 	
 	// Name
@@ -68,7 +89,17 @@ public class GameCharacter {
 		return removal;
 	}
 	
+	public Weapon getWeapon() {
+		if (this.weapon == null) {
+			return defaultWeapon;
+		}
+		return this.weapon;
+	}
+	
 	public boolean equipShield(Shield shield) {
+		if (weapon != null && weapon.isTwoHanded()) {
+			return false;
+		}
 		this.shield = shield;
 		return true;
 	}
@@ -77,6 +108,10 @@ public class GameCharacter {
 		Shield removal = shield;
 		shield = null;
 		return removal;
+	}
+	
+	public Shield getShield() {
+		return this.shield;
 	}
 	
 	public boolean canCarry(Equipment item) {
@@ -152,6 +187,11 @@ public class GameCharacter {
 		return resolve;
 	}
 	
+	// derived stats
+	public boolean isFallen() {
+		return health == 0;
+	}
+	
 	public int getCarryingCapacity() {
 		return strength * 3 + dexterity + resolve;
 	}
@@ -165,12 +205,33 @@ public class GameCharacter {
 	}
 	
 	public int getInitiative() {
-		return 0;
+		int init = Utils.getRandom(-5, 5) + awareness;
+		if (init < 0) {
+			init = 0;
+		}
+		return init;
+	}
+	
+	public int calculateDamageSent() {
+		int damage = getWeapon().getPower() + strength + dexterity + Utils.getRandom(-3, 3);
+		if (damage < 0) {
+			damage = 0;
+		}
+		return damage;
+	}
+	
+	public int calculateDamageReduction() {
+		int reduction = Utils.getRandom(-4, 4) + strength + resolve / 2;
+		if (reduction < 0) {
+			reduction = 0;
+		}
+		return reduction;
 	}
 
 	// Attempts
 	public boolean attemptMeleeStrike() {
-		return false;
+		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
+		return strikeAttempt > 8;
 	}
 	public boolean attemptCriticalMeleeStrike() {
 		return false;
@@ -182,9 +243,25 @@ public class GameCharacter {
 		return false;
 	}
 	public boolean attemptDodge() {
-		return false;
+		int dodgeAttempt = Utils.getRandom(-4, 4) + awareness + agility + quickness;
+		return dodgeAttempt > 28;
 	}
 	public boolean attemptDeflection() {
-		return false;
+		if (this.shield == null) {
+			return false;
+		}
+		int deflectionAttempt = Utils.getRandom(-5, 5) + dexterity * 2 + awareness + agility + quickness;
+		return deflectionAttempt > 42;
+	}
+	
+	// Select target
+	public GameCharacter selectTarget(ArrayList<GameCharacter> opponents) {
+		ArrayList<GameCharacter> livingOpponents = new ArrayList<GameCharacter>();
+		for (GameCharacter gc : opponents) {
+			if (!gc.isFallen()) {
+				livingOpponents.add(gc);
+			}
+		}
+		return Utils.pickRandom(livingOpponents);
 	}
 }

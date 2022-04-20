@@ -5,13 +5,18 @@ import Engine.Equipment.Shield;
 import Engine.Equipment.Weapon;
 import Engine.GameCharacter.CharacterInitializer;
 import Engine.GameCharacter.GameCharacter;
+import Engine.Incident.Battle;
+import Engine.Utility.Utils;
 
 public class Main {
 	
 	private static int counter = 0;
 
 	public static void main(String[] args) {
-		System.out.print("Hello Goats!");
+		
+		System.out.println("Hello Goats!  Let's get battlin'!");
+		
+		// build teams
 		ArrayList<GameCharacter> goodies = new ArrayList<GameCharacter>();
 		goodies.add(getTestCharacter("Mark", "Aardvark"));
 		goodies.add(getTestCharacter("Matt", "Oats"));
@@ -22,6 +27,14 @@ public class Main {
 		baddies.add(getTestCharacter("Rusty", "Fork"));
 		baddies.add(getTestCharacter("Snappy", "Fingers"));
 		baddies.add(getTestCharacter("Grunt", "Ugly"));
+		
+		Battle battle = new Battle(goodies, baddies);
+		try {
+			battle.run();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static GameCharacter getTestCharacter(String firstName, String lastName) {
@@ -41,11 +54,11 @@ public class Main {
 		} else {
 			init.setWeapon(new Weapon(6, true, 5, "Heavy Sword", "Maybe for real combat."));
 		}
+		init.setDefaultWeapon(new Weapon(1, false, 0, "Fists", "Punch"));
 		return new GameCharacter(init);
 	}
 	
 	private static int getStatValue() {
-		Random rand = new Random();
-		return rand.nextInt(11) + 4;
+		return 7 + Utils.getRandom(-4, 4);
 	}
 }

@@ -11,9 +11,9 @@ public class CharacterInitializer {
 	
 	private Weapon weapon;
 	
-	private Shield shield;
+	private Weapon defaultWeapon;
 	
-	private int health;
+	private Shield shield;
 	
 	private int maxHealth;
 	
@@ -52,6 +52,14 @@ public class CharacterInitializer {
 	public void setWeapon(Weapon weapon) {
 		this.weapon = weapon;
 	}
+	
+	public Weapon getDefaultWeapon() {
+		return defaultWeapon;
+	}
+	
+	public void setDefaultWeapon(Weapon weapon) {
+		defaultWeapon = weapon;
+	}
 
 	public Shield getShield() {
 		return shield;
@@ -59,14 +67,6 @@ public class CharacterInitializer {
 
 	public void setShield(Shield shield) {
 		this.shield = shield;
-	}
-
-	public int getHealth() {
-		return health;
-	}
-
-	public void setHealth(int health) {
-		this.health = health;
 	}
 
 	public int getMaxHealth() {

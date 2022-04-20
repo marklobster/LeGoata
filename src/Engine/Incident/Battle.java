@@ -2,6 +2,7 @@ package Engine.Incident;
 
 import java.util.ArrayList;
 
+import Engine.Actions.MeleeAttack;
 import Engine.GameCharacter.GameCharacter;
 
 public class Battle {
@@ -25,6 +26,16 @@ public class Battle {
 		ArrayList<GameCharacter> winners = null;
 		while (winners == null) {
 			GameCharacter nextUp = turnTracker.getNextUp();
+			ArrayList<GameCharacter> opponents = goodies.contains(nextUp) ? baddies : goodies;
+			GameCharacter target = nextUp.selectTarget(opponents);
+			MeleeAttack action = new MeleeAttack();
+			action.setActionPerformer(nextUp);
+			action.setTarget(target);
+			action.performAction(System.out);
+			if (target.isFallen()) {
+				turnTracker.removeGameCharacter(target);
+			}
+			turnTracker.payActionCost(nextUp, action.getCost());
 			winners = getVictor();
 		}
 		
