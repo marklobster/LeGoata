@@ -31,8 +31,17 @@ public class Main {
 		Battle battle = new Battle(goodies, baddies);
 		try {
 			battle.run();
+			System.out.println("");
+			System.out.println("The stats:");
+			System.out.println("");
+			for (GameCharacter gc : goodies) {
+				gc.printStats(System.out);
+			}
+			for (GameCharacter gc : baddies) {
+				gc.printStats(System.out);
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			System.out.println("Here comes Tony Hawk gettin' some big error!");
 			e.printStackTrace();
 		}
 	}

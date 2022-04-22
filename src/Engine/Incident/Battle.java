@@ -15,7 +15,7 @@ public class Battle {
 		baddies = enemies;
 	}
 	
-	public void run() throws Exception {
+	public void run() throws IllegalStateException {
 		for (GameCharacter gChar : goodies) {
 			turnTracker.addGameCharacter(gChar);
 		}
@@ -42,7 +42,7 @@ public class Battle {
 		System.out.println("The winner is... " + (winners == goodies ? "you!!" : "the bad guys!!"));
 	}
 	
-	private ArrayList<GameCharacter> getVictor() throws Exception {
+	private ArrayList<GameCharacter> getVictor() throws IllegalStateException {
 		boolean goodTeamRemains = false;
 		for (GameCharacter member : goodies) {
 			if (member.getHealth() > 0) {
@@ -69,7 +69,7 @@ public class Battle {
 		}
 		
 		if (!goodTeamRemains && !badTeamRemains) {
-			throw new Exception("Everyone is dead :(");
+			throw new IllegalStateException("Everyone is dead :(");
 		}
 		
 		return null;

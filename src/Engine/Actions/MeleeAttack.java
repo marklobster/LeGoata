@@ -33,6 +33,9 @@ public class MeleeAttack extends TargetingAction {
 		// do damage
 		int damage = this.getActionPerformer().calculateDamageSent()
 				- this.getTarget().calculateDamageReduction();
+		if (damage < 0) {
+			damage = 0;
+		}
 		sysOut.println(damage + " damage!");
 		this.getTarget().loseHealth(damage);
 		sysOut.println(targetName + " has " + this.getTarget().getHealth() + " health left.");

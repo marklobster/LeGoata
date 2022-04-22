@@ -1,5 +1,6 @@
 package Engine.GameCharacter;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import Engine.Equipment.Equipment;
@@ -156,6 +157,9 @@ public class GameCharacter {
 	}
 	
 	public int loseHealth(int points) {
+		if (points < 0) {
+			points = 0;
+		}
 		health -= points;
 		if (health < 0) {
 			health = 0;
@@ -263,5 +267,20 @@ public class GameCharacter {
 			}
 		}
 		return Utils.pickRandom(livingOpponents);
+	}
+	
+	public void printStats(PrintStream sysOut) {
+		sysOut.println(String.format("%s%s%s", "~", getFullName(), "~"));
+		sysOut.println(String.format("Health: %d / %d", health, maxHealth));
+		sysOut.println(String.format("Weapon: %s", getWeapon().getName()));
+		sysOut.println(String.format("Shield: %s", shield == null ? "none" : getShield().getName()));
+		sysOut.println(String.format("Strength: %d", strength));
+		sysOut.println(String.format("Dexterity: %d", dexterity));
+		sysOut.println(String.format("Quickness: %d", quickness));
+		sysOut.println(String.format("Agility: %d", agility));
+		sysOut.println(String.format("Awareness: %d", awareness));
+		sysOut.println(String.format("Resolve: %d", resolve));
+		sysOut.println(String.format("Rating: %d", strength + dexterity + quickness + agility + awareness + resolve));
+		sysOut.println("");
 	}
 }
