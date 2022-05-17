@@ -1,4 +1,4 @@
-package Engine.Game;
+package legoata.engine.game;
 
 /**
  * An option which can be selected by the user.

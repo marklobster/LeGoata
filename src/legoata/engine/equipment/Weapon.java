@@ -1,4 +1,4 @@
-package Engine.Equipment;
+package legoata.engine.equipment;
 
 public class Weapon extends Equipment {
 

@@ -1,9 +1,9 @@
-package Engine.Incident;
+package legoata.engine.incident;
 
 import java.util.ArrayList;
 
-import Engine.Actions.MeleeAttack;
-import Engine.GameCharacter.GameCharacter;
+import legoata.engine.actions.MeleeAttack;
+import legoata.engine.gamecharacter.GameCharacter;
 
 public class Battle {
 	private ArrayList<GameCharacter> goodies;

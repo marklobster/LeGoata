@@ -1,7 +1,7 @@
-package Engine.GameCharacter;
+package legoata.engine.gamecharacter;
 
-import Engine.Equipment.Shield;
-import Engine.Equipment.Weapon;
+import legoata.engine.equipment.Shield;
+import legoata.engine.equipment.Weapon;
 
 public class EquipmentManager {
 	private Weapon weapon;

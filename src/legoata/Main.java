@@ -1,12 +1,13 @@
+package legoata;
 import java.util.ArrayList;
 import java.util.Random;
 
-import Engine.Equipment.Shield;
-import Engine.Equipment.Weapon;
-import Engine.GameCharacter.CharacterInitializer;
-import Engine.GameCharacter.GameCharacter;
-import Engine.Incident.Battle;
-import Engine.Utility.Utils;
+import legoata.engine.equipment.Shield;
+import legoata.engine.equipment.Weapon;
+import legoata.engine.gamecharacter.CharacterInitializer;
+import legoata.engine.gamecharacter.GameCharacter;
+import legoata.engine.incident.Battle;
+import legoata.engine.utils.Utils;
 
 public class Main {
 	

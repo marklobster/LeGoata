@@ -1,4 +1,4 @@
-package Engine.Utility;
+package legoata.engine.utils;
 
 import java.util.ArrayList;
 import java.util.Random;

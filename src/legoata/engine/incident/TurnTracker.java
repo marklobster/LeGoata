@@ -1,9 +1,9 @@
-package Engine.Incident;
+package legoata.engine.incident;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Engine.GameCharacter.GameCharacter;
+import legoata.engine.gamecharacter.GameCharacter;
 
 public class TurnTracker {
 	

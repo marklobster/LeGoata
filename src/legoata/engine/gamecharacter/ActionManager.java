@@ -1,4 +1,4 @@
-package Engine.GameCharacter;
+package legoata.engine.gamecharacter;
 
 public class ActionManager {
 	private GameCharacter gameChar;

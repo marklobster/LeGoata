@@ -1,4 +1,4 @@
-package Engine.Equipment;
+package legoata.engine.equipment;
 
 public abstract class Equipment {
 	private int weight;

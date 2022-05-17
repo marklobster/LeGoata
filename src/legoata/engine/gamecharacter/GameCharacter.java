@@ -1,12 +1,12 @@
-package Engine.GameCharacter;
+package legoata.engine.gamecharacter;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import Engine.Equipment.Equipment;
-import Engine.Equipment.Shield;
-import Engine.Equipment.Weapon;
-import Engine.Utility.Utils;
+import legoata.engine.equipment.Equipment;
+import legoata.engine.equipment.Shield;
+import legoata.engine.equipment.Weapon;
+import legoata.engine.utils.Utils;
 
 public class GameCharacter {
 	

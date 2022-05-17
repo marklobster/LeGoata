@@ -1,6 +1,6 @@
-package Engine.Actions;
+package legoata.engine.actions;
 
-import Engine.GameCharacter.GameCharacter;
+import legoata.engine.gamecharacter.GameCharacter;
 
 public abstract class TargetingAction extends CharacterAction {
 	private GameCharacter target;
