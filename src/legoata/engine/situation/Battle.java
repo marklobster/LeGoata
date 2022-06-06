@@ -24,27 +24,6 @@ public class Battle extends TimedActionSituation {
 		}
 	}
 	
-//	public void run() throws IllegalStateException {
-//		
-//		ArrayList<GameCharacter> winners = null;
-//		while (winners == null) {
-//			GameCharacter nextUp = turnTracker.getNextUp();
-//			ArrayList<GameCharacter> opponents = goodies.contains(nextUp) ? baddies : goodies;
-//			GameCharacter target = nextUp.selectTarget(opponents);
-//			MeleeAttack action = new MeleeAttack();
-//			action.setActionPerformer(nextUp);
-//			action.setTarget(target);
-//			action.performAction(System.out);
-//			if (target.isFallen()) {
-//				turnTracker.removeGameCharacter(target);
-//			}
-//			turnTracker.payActionCost(nextUp, action.getCost());
-//			winners = getVictor();
-//		}
-//		
-//		System.out.println("The winner is... " + (winners == goodies ? "you!!" : "the bad guys!!"));
-//	}
-	
 	@Override
 	public ArrayList<CharacterAction> getPossibleActions() {
 		ArrayList<CharacterAction> actionList = new ArrayList<CharacterAction>();

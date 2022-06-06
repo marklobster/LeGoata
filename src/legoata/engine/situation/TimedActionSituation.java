@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import legoata.engine.actions.CharacterAction;
 import legoata.engine.gamecharacter.GameCharacter;
 
+/**
+ * Default implementation for TurnBasedSituation which utilizes action cost.  
+ * Use addGameCharacter method to add characters to the situation. 
+ * @author Mark
+ *
+ */
 public abstract class TimedActionSituation implements TurnBasedSituation {
 	
 	private TurnTracker turnTracker = new TurnTracker();
