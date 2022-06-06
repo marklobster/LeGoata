@@ -17,17 +17,38 @@ public abstract class TimedActionSituation implements TurnBasedSituation {
 	private TurnTracker turnTracker = new TurnTracker();
 	private GameCharacter currentCharacter = null;
 	private SituationState State = SituationState.Initialized;
+	private boolean debug = false;
 
+	/**
+	 * Initializes TimedActionSituation with debug = false.
+	 */
 	public TimedActionSituation() {
 		
 	}
 	
+	/**
+	 * Initialize TimedActionSituation with debug setting.  When debug 
+	 * is true, TurnTracker prints state information whenenver it is 
+	 * updated.
+	 * @param debug
+	 */
+	public TimedActionSituation(boolean debug) {
+		this.debug = debug;
+	}
+	
 	public final GameCharacter getNextUp() {
+		if (debug && State == SituationState.Initialized) {
+			turnTracker.displayTrackerInfo(System.out);
+		}
 		if (State == SituationState.CharacterLoaded) {
 			throw new IllegalStateException("getNextUp called in CharacterLoaded state.");
 		}
 		currentCharacter = turnTracker.getNextUp();
 		State = SituationState.CharacterLoaded;
+		if (debug) {
+			turnTracker.displayTrackerInfo(System.out);
+		}
+		
 		return currentCharacter;
 	}
 	
