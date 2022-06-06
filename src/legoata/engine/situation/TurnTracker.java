@@ -1,4 +1,4 @@
-package legoata.engine.incident;
+package legoata.engine.situation;
 
 import java.util.ArrayList;
 import java.util.Collections;

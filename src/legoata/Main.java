@@ -2,52 +2,46 @@ package legoata;
 import java.util.ArrayList;
 import java.util.Random;
 
+import legoata.engine.actions.MeleeAttack;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
+import legoata.engine.game.GameRunner;
 import legoata.engine.gamecharacter.CharacterInitializer;
 import legoata.engine.gamecharacter.GameCharacter;
-import legoata.engine.incident.Battle;
+import legoata.engine.situation.Battle;
+import legoata.engine.situation.TimedActionSituation;
 import legoata.engine.utils.Utils;
 
 public class Main {
 	
-	private static int counter = 0;
-
 	public static void main(String[] args) {
-		
-		System.out.println("Hello Goats!  Let's get battlin'!");
-		
-		// build teams
-		ArrayList<GameCharacter> goodies = new ArrayList<GameCharacter>();
-		goodies.add(getTestCharacter("Mark", "Aardvark"));
-		goodies.add(getTestCharacter("Matt", "Oats"));
-		goodies.add(getTestCharacter("Alfred", "Sauce"));
-		goodies.add(getTestCharacter("Princess", "Xena"));
-		ArrayList<GameCharacter> baddies = new ArrayList<GameCharacter>();
-		baddies.add(getTestCharacter("Slimebag", "Fartbreath"));
-		baddies.add(getTestCharacter("Rusty", "Fork"));
-		baddies.add(getTestCharacter("Snappy", "Fingers"));
-		baddies.add(getTestCharacter("Grunt", "Ugly"));
-		
-		Battle battle = new Battle(goodies, baddies);
 		try {
-			battle.run();
-			System.out.println("");
-			System.out.println("The stats:");
-			System.out.println("");
-			for (GameCharacter gc : goodies) {
-				gc.printStats(System.out);
-			}
-			for (GameCharacter gc : baddies) {
-				gc.printStats(System.out);
-			}
+			System.out.println("Hello Goats!  Let's get battlin'!");
+			
+			// configure game
+			GameRunner game = new GameRunner();
+
+			// build teams
+			int counter = 0;
+			game.addTestHero(getTestCharacter("Mark", "Aardvark", counter++));
+			game.addTestHero(getTestCharacter("Matt", "Oats", counter++));
+			game.addTestHero(getTestCharacter("Alfred", "Sauce", counter++));
+			game.addTestHero(getTestCharacter("Princess", "Xena", counter++));
+			game.addTestEnemy(getTestCharacter("Slimebag", "Fartbreath", counter++));
+			game.addTestEnemy(getTestCharacter("Rusty", "Fork", counter++));
+			game.addTestEnemy(getTestCharacter("Snappy", "Fingers", counter++));
+			game.addTestEnemy(getTestCharacter("Grunt", "Ugly", counter++));
+			
+			// start game
+			game.run();
+			
 		} catch (Exception e) {
 			System.out.println("Here comes Tony Hawk gettin' some big error!");
 			e.printStackTrace();
 		}
 	}
-
-	private static GameCharacter getTestCharacter(String firstName, String lastName) {
+	
+	private static GameCharacter getTestCharacter(String firstName, String lastName, int counter) {
 		CharacterInitializer init = new CharacterInitializer();
 		init.setFirstName(firstName);
 		init.setLastName(lastName);
