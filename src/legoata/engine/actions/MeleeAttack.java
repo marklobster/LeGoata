@@ -3,7 +3,7 @@ package legoata.engine.actions;
 import java.io.PrintStream;
 
 public class MeleeAttack extends TargetingAction {
-
+	
 	@Override
 	public void performAction(PrintStream sysOut) {
 		// describe attack
@@ -49,5 +49,10 @@ public class MeleeAttack extends TargetingAction {
 	@Override
 	public int getCost() {
 		return 5;
+	}
+	
+	@Override
+	public TargetType getTargetType() {
+		return TargetType.Foe;
 	}
 }

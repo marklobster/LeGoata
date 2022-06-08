@@ -1,5 +1,6 @@
-package legoata.engine.incident;
+package legoata.engine.situation;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -43,13 +44,33 @@ public class TurnTracker {
 	}
 	
 	public void payActionCost(GameCharacter gChar, int cost) {
+		// find character's tracker
+		CharacterTracker target = null;
 		for (CharacterTracker tracker : trackerList) {
 			if (tracker.getGameCharacter() == gChar) {
-				tracker.payActionCost(cost);
+				target = tracker;
 				break;
 			}
 		}
+		
+		// pay cost
+		target.payActionCost(cost);
+		
+		// move to end of list so that they do not line-jump when there is a tie
+		trackerList.remove(target);
+		trackerList.add(target);
 		Collections.sort(trackerList);
+	}
+	
+	public void displayTrackerInfo(PrintStream stream) {
+		int i = 0;
+		for (CharacterTracker tracker : trackerList) {
+			stream.println(String.format("%d %d %s",
+				i++,
+				tracker.getDelayState(),
+				tracker.getGameCharacter().getFullName()
+			));
+		}
 	}
 
 	private class CharacterTracker implements Comparable<CharacterTracker>{

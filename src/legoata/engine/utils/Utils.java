@@ -10,7 +10,7 @@ public class Utils {
 		return rand.nextInt(to - from + 1) + from;
 	}
 	
-	public static <T> T pickRandom(ArrayList<T> list){
+	public static <T> T pickRandom(ArrayList<T> list) {
 		int i = rand.nextInt(list.size());
 		return list.get(i);
 	}

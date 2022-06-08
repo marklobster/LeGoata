@@ -10,6 +10,8 @@ import legoata.engine.utils.Utils;
 
 public class GameCharacter {
 	
+	private boolean isUser;
+	
 	private String firstName;
 	
 	private String lastName;
@@ -39,6 +41,7 @@ public class GameCharacter {
 	private int resolve;
 	
 	public GameCharacter(CharacterInitializer initializer) {
+		this.isUser = initializer.isUserControlled();
 		this.firstName = initializer.getFirstName();
 		this.lastName = initializer.getLastName();
 		this.equipment = new ArrayList<Equipment>();
@@ -59,6 +62,11 @@ public class GameCharacter {
 		this.agility = initializer.getAgility();
 		this.awareness = initializer.getAwareness();
 		this.resolve = initializer.getResolve();
+	}
+	
+	// user or not
+	public boolean isUserControlled() {
+		return isUser;
 	}
 	
 	// Name
@@ -269,18 +277,18 @@ public class GameCharacter {
 		return Utils.pickRandom(livingOpponents);
 	}
 	
-	public void printStats(PrintStream sysOut) {
-		sysOut.println(String.format("%s%s%s", "~", getFullName(), "~"));
-		sysOut.println(String.format("Health: %d / %d", health, maxHealth));
-		sysOut.println(String.format("Weapon: %s", getWeapon().getName()));
-		sysOut.println(String.format("Shield: %s", shield == null ? "none" : getShield().getName()));
-		sysOut.println(String.format("Strength: %d", strength));
-		sysOut.println(String.format("Dexterity: %d", dexterity));
-		sysOut.println(String.format("Quickness: %d", quickness));
-		sysOut.println(String.format("Agility: %d", agility));
-		sysOut.println(String.format("Awareness: %d", awareness));
-		sysOut.println(String.format("Resolve: %d", resolve));
-		sysOut.println(String.format("Rating: %d", strength + dexterity + quickness + agility + awareness + resolve));
-		sysOut.println("");
+	public void printStats(PrintStream stream) {
+		stream.println(String.format("%s%s%s", "~", getFullName(), "~"));
+		stream.println(String.format("Health: %d / %d", health, maxHealth));
+		stream.println(String.format("Weapon: %s", getWeapon().getName()));
+		stream.println(String.format("Shield: %s", shield == null ? "none" : getShield().getName()));
+		stream.println(String.format("Strength: %d", strength));
+		stream.println(String.format("Dexterity: %d", dexterity));
+		stream.println(String.format("Quickness: %d", quickness));
+		stream.println(String.format("Agility: %d", agility));
+		stream.println(String.format("Awareness: %d", awareness));
+		stream.println(String.format("Resolve: %d", resolve));
+		stream.println(String.format("Rating: %d", strength + dexterity + quickness + agility + awareness + resolve));
+		stream.println("");
 	}
 }

@@ -4,6 +4,8 @@ import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
 
 public class CharacterInitializer {
+	
+	private boolean isUser;
 
 	private String firstName;
 	
@@ -28,6 +30,14 @@ public class CharacterInitializer {
 	private int awareness;
 	
 	private int resolve;
+	
+	public boolean isUserControlled() {
+		return this.isUser;
+	}
+	
+	public void setUserControlled(boolean isUserControllered) {
+		this.isUser = isUserControllered;
+	}
 	
 	public String getFirstName() {
 		return firstName;
