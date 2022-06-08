@@ -1,15 +1,10 @@
 package legoata;
-import java.util.ArrayList;
-import java.util.Random;
 
-import legoata.engine.actions.MeleeAttack;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
 import legoata.engine.game.GameRunner;
 import legoata.engine.gamecharacter.CharacterInitializer;
 import legoata.engine.gamecharacter.GameCharacter;
-import legoata.engine.situation.Battle;
-import legoata.engine.situation.TimedActionSituation;
 import legoata.engine.utils.Utils;
 
 public class Main {
@@ -17,6 +12,7 @@ public class Main {
 	public static void main(String[] args) {
 		try {
 			System.out.println("Hello Goats!  Let's get battlin'!");
+			System.out.println();
 			
 			// configure game
 			GameRunner game = new GameRunner();
@@ -43,6 +39,9 @@ public class Main {
 	
 	private static GameCharacter getTestCharacter(String firstName, String lastName, int counter) {
 		CharacterInitializer init = new CharacterInitializer();
+		if (firstName.equals("Mark")) {
+			init.setUserControlled(true);
+		}
 		init.setFirstName(firstName);
 		init.setLastName(lastName);
 		init.setAgility(getStatValue());

@@ -12,8 +12,8 @@ import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.decision.Option;
 import legoata.engine.decision.OptionSet;
+import legoata.engine.game.battle.Battle;
 import legoata.engine.gamecharacter.GameCharacter;
-import legoata.engine.situation.Battle;
 import legoata.engine.situation.TimedActionSituation;
 import legoata.engine.utils.Utils;
 
@@ -61,6 +61,8 @@ public class GameRunner {
 			}
 			
 			situation.submitDecision(decision, System.out);
+			pause();
+			System.out.println();
 		}
 		
 		postGameDebrief();
@@ -71,6 +73,11 @@ public class GameRunner {
 		Stack<OptionSet> menuStack = new Stack<OptionSet>();
 		menuStack.push(builder.getOptionSet());
 		boolean decisionComplete = false;
+		String firstMessage = builder.getInitialText();
+		
+		if (firstMessage != null && firstMessage != "") {
+			System.out.println(builder.getInitialText());
+		}
 		
 		do {
 			OptionSet currentMenu = menuStack.peek();
@@ -96,7 +103,7 @@ public class GameRunner {
 				
 			} else if (selection != null) {
 				
-				// make selection NOT DONE YET
+				// make selection
 				OptionSet nextMenu = currentMenu.select(builder.getDecision(), selection);
 				
 				if (nextMenu == null) {
@@ -137,7 +144,7 @@ public class GameRunner {
 			
 			// show 'back' option, when applicable
 			if (allowEscape) {
-				System.out.println("[b] back");
+				System.out.println("[b] Back");
 			}
 			
 			// get input, check if valid
@@ -152,6 +159,10 @@ public class GameRunner {
 		} while (selection == null && !escape);
 		
 		return selection;
+	}
+	
+	private void pause() {
+		scanner.nextLine();
 	}
 	
 	private void postGameDebrief() {
