@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import legoata.engine.actions.CharacterAction;
+import legoata.engine.decision.Decision;
 import legoata.engine.gamecharacter.GameCharacter;
 
 /**
@@ -16,7 +17,7 @@ public abstract class TimedActionSituation implements TurnBasedSituation {
 	
 	private TurnTracker turnTracker = new TurnTracker();
 	private GameCharacter currentCharacter = null;
-	private SituationState State = SituationState.Initialized;
+	private SituationState State = SituationState.NotLoaded;
 	private boolean debug = false;
 
 	/**
@@ -37,7 +38,7 @@ public abstract class TimedActionSituation implements TurnBasedSituation {
 	}
 	
 	public final GameCharacter getNextUp() {
-		if (debug && State == SituationState.Initialized) {
+		if (debug && State == SituationState.NotLoaded) {
 			turnTracker.displayTrackerInfo(System.out);
 		}
 		if (State == SituationState.CharacterLoaded) {
@@ -52,13 +53,14 @@ public abstract class TimedActionSituation implements TurnBasedSituation {
 		return currentCharacter;
 	}
 	
-	public final void performAction(CharacterAction action, PrintStream stream) {
-		if (State == SituationState.ActionDone) {
+	public final void submitDecision(Decision decision, PrintStream stream) {
+		if (State == SituationState.ActionComplete) {
 			throw new IllegalStateException("performAction called in ActionDone state.");
 		}
+		CharacterAction action = decision.getAction();
 		action.performAction(stream);
 		turnTracker.payActionCost(currentCharacter, action.getCost());
-		State = SituationState.ActionDone;
+		State = SituationState.ActionComplete;
 		afterActionComplete();
 	}
 	
@@ -79,8 +81,8 @@ public abstract class TimedActionSituation implements TurnBasedSituation {
 	}
 	
 	public enum SituationState {
-		Initialized,
+		NotLoaded,
 		CharacterLoaded,
-		ActionDone
+		ActionComplete
 	}
 }

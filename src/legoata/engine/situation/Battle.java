@@ -1,13 +1,17 @@
 package legoata.engine.situation;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import legoata.engine.actions.CharacterAction;
 import legoata.engine.actions.MeleeAttack;
 import legoata.engine.actions.TargetType;
+import legoata.engine.decision.Decision;
+import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.gamecharacter.GameCharacter;
 
 public class Battle extends TimedActionSituation {
+	
 	private ArrayList<GameCharacter> goodies = new ArrayList<GameCharacter>();
 	private ArrayList<GameCharacter> baddies = new ArrayList<GameCharacter>();
 	
@@ -25,6 +29,11 @@ public class Battle extends TimedActionSituation {
 	}
 	
 	@Override
+	public DecisionBuilder getDecisionBuilder() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public ArrayList<CharacterAction> getPossibleActions() {
 		ArrayList<CharacterAction> actionList = new ArrayList<CharacterAction>();
 		actionList.add(new MeleeAttack());

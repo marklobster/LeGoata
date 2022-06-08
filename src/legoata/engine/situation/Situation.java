@@ -1,9 +1,9 @@
 package legoata.engine.situation;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 
-import legoata.engine.actions.CharacterAction;
+import legoata.engine.decision.Decision;
+import legoata.engine.decision.DecisionBuilder;
 
 /**
  * Provides infrastructure for characters to perform actions.
@@ -12,7 +12,7 @@ import legoata.engine.actions.CharacterAction;
  */
 public interface Situation {
 	
-	public abstract ArrayList<CharacterAction> getPossibleActions();
+	public abstract DecisionBuilder getDecisionBuilder();
 
-	public abstract void performAction(CharacterAction action, PrintStream stream);
+	public abstract void submitDecision(Decision decision, PrintStream stream);
 }
