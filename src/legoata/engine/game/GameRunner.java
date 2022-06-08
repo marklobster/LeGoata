@@ -104,7 +104,7 @@ public class GameRunner {
 			} else if (selection != null) {
 				
 				// make selection
-				OptionSet nextMenu = currentMenu.select(builder.getDecision(), selection);
+				OptionSet nextMenu = currentMenu.select(builder.getDecision(), selection, actor);
 				
 				if (nextMenu == null) {
 					// end of tree reached, decision complete

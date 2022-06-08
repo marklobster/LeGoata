@@ -6,7 +6,7 @@ import legoata.engine.gamecharacter.GameCharacter;
 
 public interface OptionSet {
 
-	public OptionSet select(Decision decision, Option selection);
+	public OptionSet select(Decision decision, Option selection, GameCharacter actor);
 	
 	public void undoSelection(Decision decision);
 	

@@ -37,8 +37,8 @@ public class FunctionBasedOptionSet implements OptionSet {
 	}
 
 	@Override
-	public OptionSet select(Decision decision, Option selection) {
-		return onSelect.select(decision, selection);
+	public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
+		return onSelect.select(decision, selection, actor);
 	}
 
 	@Override
@@ -49,8 +49,8 @@ public class FunctionBasedOptionSet implements OptionSet {
 	}
 
 	@Override
-	public ArrayList<Option> getOptions(GameCharacter character) {
-		return this.onGetOptions.getOptions(character);
+	public ArrayList<Option> getOptions(GameCharacter actor) {
+		return this.onGetOptions.getOptions(actor);
 	}
 
 	@Override

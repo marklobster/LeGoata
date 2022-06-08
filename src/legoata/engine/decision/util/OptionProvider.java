@@ -7,6 +7,6 @@ import legoata.engine.gamecharacter.GameCharacter;
 
 public interface OptionProvider {
 
-	ArrayList<Option> getOptions(GameCharacter character);
+	ArrayList<Option> getOptions(GameCharacter actor);
 	
 }

@@ -10,11 +10,15 @@ import legoata.engine.decision.Option;
 import legoata.engine.decision.OptionSet;
 import legoata.engine.gamecharacter.GameCharacter;
 
+/**
+ * Decision Builder for Battles.
+ * @author Mark
+ *
+ */
 public class BattleDecisionBuilder extends DecisionBuilder {
 	
 	private ArrayList<GameCharacter> heroes;
 	private ArrayList<GameCharacter> enemies;
-	private GameCharacter actor;
 
 	public BattleDecisionBuilder(
 			ArrayList<GameCharacter> heroes,
@@ -24,7 +28,6 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 
 		this.heroes = heroes;
 		this.enemies = enemies;
-		this.actor = actor;
 		
 		this.setOptionSet(new ActionMenu());
 		this.setInitialText(actor.getFullName() + "'s turn!");
@@ -33,7 +36,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class TargetMenu implements OptionSet {
 
 		@Override
-		public OptionSet select(Decision decision, Option selection) {
+		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
 			TargetingAction action = (TargetingAction)decision.getAction();
 			GameCharacter target = (GameCharacter)selection.getAttachedData();
 			action.setTarget(target);
@@ -47,7 +50,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(GameCharacter character) {
+		public ArrayList<Option> getOptions(GameCharacter actor) {
 			
 			ArrayList<Option> options = new ArrayList<Option>();
 			ArrayList<GameCharacter> possibleTargets = heroes.contains(actor) ?
@@ -78,7 +81,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class ActionMenu implements OptionSet {
 
 		@Override
-		public OptionSet select(Decision decision, Option selection) {
+		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
 			switch (selection.getTitle()) {
 			default:
 				MeleeAttack action = new MeleeAttack();
