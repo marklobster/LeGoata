@@ -19,14 +19,14 @@ public class Main {
 
 			// build teams
 			int counter = 0;
-			game.addTestHero(getTestCharacter("Mark", "Aardvark", counter++));
-			game.addTestHero(getTestCharacter("Matt", "Oats", counter++));
-			game.addTestHero(getTestCharacter("Alfred", "Sauce", counter++));
-			game.addTestHero(getTestCharacter("Princess", "Xena", counter++));
-			game.addTestEnemy(getTestCharacter("Slimebag", "Fartbreath", counter++));
-			game.addTestEnemy(getTestCharacter("Rusty", "Fork", counter++));
-			game.addTestEnemy(getTestCharacter("Snappy", "Fingers", counter++));
-			game.addTestEnemy(getTestCharacter("Grunt", "Ugly", counter++));
+			game.addTestHero(getTestCharacter("Mark", "Aardvark", true, counter++));
+			game.addTestHero(getTestCharacter("Matt", "Oats", false, counter++));
+			game.addTestHero(getAlfred(false,  counter++));
+			game.addTestHero(getTestCharacter("Princess", "Xena", false,  counter++));
+			game.addTestEnemy(getTestCharacter("Slimebag", "Fartbreath", false,  counter++));
+			game.addTestEnemy(getTestCharacter("Rusty", "Fork", false,  counter++));
+			game.addTestEnemy(getTestCharacter("Snappy", "Fingers", false,  counter++));
+			game.addTestEnemy(getTestCharacter("Grunt", "Ugly", false,  counter++));
 			
 			// start game
 			game.run();
@@ -37,11 +37,9 @@ public class Main {
 		}
 	}
 	
-	private static GameCharacter getTestCharacter(String firstName, String lastName, int counter) {
+	private static GameCharacter getTestCharacter(String firstName, String lastName, boolean isUser, int counter) {
 		CharacterInitializer init = new CharacterInitializer();
-		if (firstName.equals("Mark")) {
-			init.setUserControlled(true);
-		}
+		init.setUserControlled(isUser);
 		init.setFirstName(firstName);
 		init.setLastName(lastName);
 		init.setAgility(getStatValue());
@@ -58,6 +56,28 @@ public class Main {
 			init.setWeapon(new Weapon(6, true, 5, "Heavy Sword", "Maybe for real combat."));
 		}
 		init.setDefaultWeapon(new Weapon(1, false, 0, "Fists", "Punch"));
+		return new GameCharacter(init);
+	}
+	
+	private static GameCharacter getAlfred(boolean isUser, int counter) {
+		CharacterInitializer init = new CharacterInitializer();
+		init.setUserControlled(isUser);
+		init.setFirstName("Alfred");
+		init.setLastName("Sauce");
+		init.setAgility(10);
+		init.setAwareness(10);
+		init.setDexterity(10);
+		init.setMaxHealth(50);
+		init.setQuickness(10);
+		init.setResolve(10);
+		init.setStrength(10);
+		if (counter++ % 2 == 0) {
+			init.setShield(new Shield(4, 4, "Wood Shield", "Not for real combat."));
+			init.setWeapon(new Weapon(7, false, 4, "Kewl Sword", "Kewl."));
+		} else {
+			init.setWeapon(new Weapon(8, true, 6, "Big Bad Sword", "Heavy and Kewl."));
+		}
+		init.setDefaultWeapon(new Weapon(1, false, 0, "Paws", "Puppy paw action!"));
 		return new GameCharacter(init);
 	}
 	
