@@ -3,6 +3,7 @@ package legoata.engine.game.battle;
 import java.util.ArrayList;
 
 import legoata.engine.actions.MeleeAttack;
+import legoata.engine.actions.TargetType;
 import legoata.engine.actions.TargetingAction;
 import legoata.engine.actions.UseItem;
 import legoata.engine.decision.Decision;
@@ -61,12 +62,12 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision) {
+		public void undoSelection(Decision decision, GameCharacter actor) {
 			decision.setAction(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(GameCharacter character) {
+		public ArrayList<Option> getOptions(Decision decision, GameCharacter character) {
 			 ArrayList<Option> options = new ArrayList<Option>();
 			 options.add(new Option("Melee Attack"));
 			 options.add(new Option("Use Item"));
@@ -94,13 +95,13 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision) {
+		public void undoSelection(Decision decision, GameCharacter actor) {
 			UseItem action = (UseItem)decision.getAction();
 			action.setItem(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(GameCharacter character) {
+		public ArrayList<Option> getOptions(Decision decision, GameCharacter character) {
 			ArrayList<Option> options = new ArrayList<Option>();
 			for (Equipment item : character.getEquipment()) {
 				options.add(new Option(item.getName(), item));
@@ -131,23 +132,44 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision) {
+		public void undoSelection(Decision decision, GameCharacter actor) {
 			TargetingAction action = (TargetingAction)decision.getAction();
 			action.setTarget(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(GameCharacter actor) {
+		public ArrayList<Option> getOptions(Decision decision, GameCharacter actor) {
 			
 			ArrayList<Option> options = new ArrayList<Option>();
-			ArrayList<GameCharacter> possibleTargets = heroes.contains(actor) ?
-					enemies :
-					heroes;
+			ArrayList<GameCharacter> possibleTargets;
 			
-			for (GameCharacter target : possibleTargets) {
-				if (!target.isFallen()) {
-					options.add(new Option(target.getFullName(), target));
+			TargetingAction action = (TargetingAction)decision.getAction();
+			
+			switch (action.getTargetType()) {
+			case Self:
+				options.add(new Option("Self", actor));
+				break;
+			case Ally:
+				possibleTargets = heroes.contains(actor) ?
+						heroes :
+						enemies;
+				for (GameCharacter target : possibleTargets) {
+					if (!target.isFallen()) {
+						options.add(new Option(target.getFullName(), target));
+					}
 				}
+				break;
+				
+			case Foe:
+				possibleTargets = heroes.contains(actor) ?
+						enemies :
+						heroes;
+				for (GameCharacter target : possibleTargets) {
+					if (!target.isFallen()) {
+						options.add(new Option(target.getFullName(), target));
+					}
+				}
+				break;
 			}
 			
 			return options;

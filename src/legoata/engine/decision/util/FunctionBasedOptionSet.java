@@ -42,15 +42,15 @@ public class FunctionBasedOptionSet implements OptionSet {
 	}
 
 	@Override
-	public void undoSelection(Decision decision) {
+	public void undoSelection(Decision decision, GameCharacter actor) {
 		if (this.onUndo != null) {
-			this.onUndo.undoSelection(decision);
+			this.onUndo.undoSelection(decision, actor);
 		}
 	}
 
 	@Override
-	public ArrayList<Option> getOptions(GameCharacter actor) {
-		return this.onGetOptions.getOptions(actor);
+	public ArrayList<Option> getOptions(Decision decision, GameCharacter actor) {
+		return this.onGetOptions.getOptions(decision, actor);
 	}
 
 	@Override

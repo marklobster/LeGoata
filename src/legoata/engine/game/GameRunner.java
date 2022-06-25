@@ -81,7 +81,7 @@ public class GameRunner {
 		
 		do {
 			OptionSet currentMenu = menuStack.peek();
-			ArrayList<Option> options = currentMenu.getOptions(actor);
+			ArrayList<Option> options = currentMenu.getOptions(builder.getDecision(), actor);
 			boolean isSubMenu = menuStack.size() > 1;
 			
 			if (!isSubMenu && (options == null || options.size() == 0)) {
@@ -99,7 +99,7 @@ public class GameRunner {
 				// revert previous selection
 				menuStack.pop();
 				OptionSet previousMenu = menuStack.peek();
-				previousMenu.undoSelection(builder.getDecision());
+				previousMenu.undoSelection(builder.getDecision(), actor);
 				
 			} else if (selection != null) {
 				
