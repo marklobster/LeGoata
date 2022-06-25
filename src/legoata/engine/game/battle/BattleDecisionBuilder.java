@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import legoata.engine.actions.MeleeAttack;
 import legoata.engine.actions.TargetingAction;
+import legoata.engine.actions.UseItem;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.decision.Option;
 import legoata.engine.decision.OptionSet;
+import legoata.engine.equipment.Equipment;
 import legoata.engine.gamecharacter.GameCharacter;
 
 /**
@@ -31,6 +33,91 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		
 		this.setOptionSet(new ActionMenu());
 		this.setInitialText(actor.getFullName() + "'s turn!");
+	}
+	
+	private class ActionMenu implements OptionSet {
+
+		@Override
+		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
+			
+			OptionSet options = null;
+			
+			switch (selection.getTitle()) {
+			
+			case "Use Item":
+				UseItem useItemAction = new UseItem();
+				useItemAction.setActionPerformer(actor);
+				decision.setAction(useItemAction);
+				options = new ItemMenu();
+				break;
+			case "Melee Attack":
+				MeleeAttack meleeAction = new MeleeAttack();
+				meleeAction.setActionPerformer(actor);
+				decision.setAction(meleeAction);
+				options = new TargetMenu();
+			}
+			
+			return options;
+		}
+
+		@Override
+		public void undoSelection(Decision decision) {
+			decision.setAction(null);
+		}
+
+		@Override
+		public ArrayList<Option> getOptions(GameCharacter character) {
+			 ArrayList<Option> options = new ArrayList<Option>();
+			 options.add(new Option("Melee Attack"));
+			 options.add(new Option("Use Item"));
+			 return options;
+		}
+
+		@Override
+		public String getPrompt() {
+			return "Select action:";
+		}
+
+		@Override
+		public String getEmptySetText() {
+			return null;
+		}
+	}
+	
+	private class ItemMenu implements OptionSet {
+
+		@Override
+		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
+			UseItem action = (UseItem)decision.getAction();
+			action.setItem((Equipment)selection.getAttachedData());
+			return new TargetMenu();
+		}
+
+		@Override
+		public void undoSelection(Decision decision) {
+			UseItem action = (UseItem)decision.getAction();
+			action.setItem(null);
+		}
+
+		@Override
+		public ArrayList<Option> getOptions(GameCharacter character) {
+			ArrayList<Option> options = new ArrayList<Option>();
+			for (Equipment item : character.getEquipment()) {
+				options.add(new Option(item.getName(), item));
+			}
+			return options;
+		}
+
+		@Override
+		public String getPrompt() {
+			return "Select item:";
+		}
+
+		@Override
+		public String getEmptySetText() {
+			return "Inventory is emtpy.";
+		}
+		
 	}
 	
 	private class TargetMenu implements OptionSet {
@@ -69,43 +156,6 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		@Override
 		public String getPrompt() {
 			return "Select target:";
-		}
-
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
-	}
-
-	private class ActionMenu implements OptionSet {
-
-		@Override
-		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
-			switch (selection.getTitle()) {
-			default:
-				MeleeAttack action = new MeleeAttack();
-				action.setActionPerformer(actor);
-				decision.setAction(action);
-			}
-			return new TargetMenu();
-		}
-
-		@Override
-		public void undoSelection(Decision decision) {
-			decision.setAction(null);
-		}
-
-		@Override
-		public ArrayList<Option> getOptions(GameCharacter character) {
-			 ArrayList<Option> options = new ArrayList<Option>();
-			 options.add(new Option("Melee Attack"));
-			 return options;
-		}
-
-		@Override
-		public String getPrompt() {
-			return "Select action:";
 		}
 
 		@Override

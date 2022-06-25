@@ -8,7 +8,7 @@ public abstract class CharacterAction {
 	
 	private GameCharacter actionPerformer;
 	
-	public abstract void performAction(PrintStream sysOut);
+	public abstract void performAction(PrintStream out);
 	
 	public abstract int getCost();
 	

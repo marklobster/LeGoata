@@ -82,7 +82,11 @@ public class GameCharacter {
 		return String.join(" ", firstName, lastName);
 	}
 	
-	// Equipment	
+	// Equipment
+	public ArrayList<Equipment> getEquipment(){
+		return (ArrayList<Equipment>) this.equipment.clone();
+	}
+	
 	public boolean equipWeapon(Weapon weapon) {
 		if (weapon.isTwoHanded() && shield != null) {
 			return false;
