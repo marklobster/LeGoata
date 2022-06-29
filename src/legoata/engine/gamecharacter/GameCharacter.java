@@ -44,16 +44,7 @@ public class GameCharacter {
 		this.isUser = initializer.isUserControlled();
 		this.firstName = initializer.getFirstName();
 		this.lastName = initializer.getLastName();
-		this.equipment = new ArrayList<Equipment>();
-		Weapon weapon = initializer.getWeapon();
-		if (weapon != null) {
-			this.addItem(weapon);
-			this.equipWeapon(weapon);
-		}
-		if (initializer.getShield() != null) {
-			this.equipShield(initializer.getShield());
-		}
-		this.defaultWeapon = initializer.getDefaultWeapon();
+		
 		this.maxHealth = initializer.getMaxHealth();
 		this.health = this.maxHealth;
 		this.strength = initializer.getStrength();
@@ -62,6 +53,26 @@ public class GameCharacter {
 		this.agility = initializer.getAgility();
 		this.awareness = initializer.getAwareness();
 		this.resolve = initializer.getResolve();
+		
+		this.equipment = new ArrayList<Equipment>();
+		for (Equipment item : initializer.getEquipment()) {
+			this.addItem(item);
+		}
+		Weapon weapon = initializer.getWeapon();
+		if (weapon != null) {
+			if (!equipment.contains(weapon)) {
+				this.addItem(weapon);
+			}
+			this.equipWeapon(weapon);
+		}
+		Shield shield = initializer.getShield();
+		if (shield != null) {
+			if (!equipment.contains(shield)) {
+				this.addItem(shield);
+			}
+			this.equipShield(shield);
+		}
+		this.defaultWeapon = initializer.getDefaultWeapon();
 	}
 	
 	// user or not
@@ -84,7 +95,7 @@ public class GameCharacter {
 	
 	// Equipment
 	public ArrayList<Equipment> getEquipment(){
-		return (ArrayList<Equipment>) this.equipment.clone();
+		return this.equipment;
 	}
 	
 	public boolean equipWeapon(Weapon weapon) {
