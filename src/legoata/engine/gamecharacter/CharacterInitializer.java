@@ -2,7 +2,7 @@ package legoata.engine.gamecharacter;
 
 import java.util.ArrayList;
 
-import legoata.engine.equipment.Equipment;
+import legoata.engine.equipment.Item;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
 
@@ -14,7 +14,7 @@ public class CharacterInitializer {
 	
 	private String lastName;
 	
-	private ArrayList<Equipment> equipment = new ArrayList<Equipment>();
+	private ArrayList<Item> item = new ArrayList<Item>();
 	
 	private Weapon weapon;
 	
@@ -60,8 +60,8 @@ public class CharacterInitializer {
 		this.lastName = lastName;
 	}
 	
-	public ArrayList<Equipment> getEquipment(){
-		return equipment;
+	public ArrayList<Item> getEquipment(){
+		return item;
 	}
 
 	public Weapon getWeapon() {

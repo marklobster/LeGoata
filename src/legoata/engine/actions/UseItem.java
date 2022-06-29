@@ -2,25 +2,28 @@ package legoata.engine.actions;
 
 import java.io.PrintStream;
 
-import legoata.engine.equipment.Equipment;
+import legoata.engine.equipment.Item;
 
 public class UseItem extends TargetingAction {
 	
-	private Equipment item;
-	
-	public UseItem() {
-	}
+	private Item item;
 
 	@Override
 	public void performAction(PrintStream out) {
 		// flavor text
-		String frag1 = String.format("%s uses %s", this.getActionPerformer().getFullName(), this.getItem().getName());
+		Item item = this.getItem();
+		String frag1 = String.format("%s uses %s", this.getActionPerformer().getFullName(), item.getName());
 		String frag2 = this.getActionPerformer() == this.getTarget() ?
 				"." : String.format(" on %s.", this.getTarget().getFullName());
 		out.println(frag1 + frag2);
 		
 		// use item
-		this.getItem().useItem(this.getActionPerformer(), this.getTarget(), out);
+		item.useItem(this.getActionPerformer(), this.getTarget(), out);
+		
+		// dispose item if it is disposable
+		if (item.disposeOnUse()) {
+			this.getActionPerformer().removeItem(item);
+		}
 	}
 
 	@Override
@@ -28,11 +31,11 @@ public class UseItem extends TargetingAction {
 		return 7; // for now
 	}
 	
-	public Equipment getItem() {
+	public Item getItem() {
 		return item;
 	}
 	
-	public void setItem(Equipment item) {
+	public void setItem(Item item) {
 		this.item = item;
 	}
 

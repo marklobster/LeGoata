@@ -5,10 +5,10 @@ import java.io.PrintStream;
 import legoata.engine.actions.TargetType;
 import legoata.engine.gamecharacter.GameCharacter;
 
-public class Weapon extends Equipment {
+public class Weapon extends Item {
 
 	public Weapon(int power, boolean twoHanded, int weight, String name, String description) {
-		super(weight, name, description, TargetType.Self);
+		super(weight, name, description, TargetType.Self, false);
 		this.power = power;
 	}
 	

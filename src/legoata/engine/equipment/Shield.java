@@ -5,10 +5,10 @@ import java.io.PrintStream;
 import legoata.engine.actions.TargetType;
 import legoata.engine.gamecharacter.GameCharacter;
 
-public class Shield extends Equipment {
+public class Shield extends Item {
 
 	public Shield(int block, int weight, String name, String description) {
-		super(weight, name, description, TargetType.Self);
+		super(weight, name, description, TargetType.Self, false);
 		this.block = block;
 	}
 	

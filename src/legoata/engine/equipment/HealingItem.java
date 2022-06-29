@@ -5,12 +5,12 @@ import java.io.PrintStream;
 import legoata.engine.actions.TargetType;
 import legoata.engine.gamecharacter.GameCharacter;
 
-public class HealingItem extends Equipment {
+public class HealingItem extends Item {
 	
 	private int healthPoints;
 
 	public HealingItem(int weight, String name, String description, int healthPoints) {
-		super(weight, name, description, TargetType.Ally);
+		super(weight, name, description, TargetType.Ally, true);
 		this.healthPoints = healthPoints;
 	}
 

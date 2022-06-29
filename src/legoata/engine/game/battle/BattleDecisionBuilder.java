@@ -10,7 +10,7 @@ import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.decision.Option;
 import legoata.engine.decision.OptionSet;
-import legoata.engine.equipment.Equipment;
+import legoata.engine.equipment.Item;
 import legoata.engine.gamecharacter.GameCharacter;
 
 /**
@@ -90,7 +90,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		@Override
 		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
 			UseItem action = (UseItem)decision.getAction();
-			action.setItem((Equipment)selection.getAttachedData());
+			action.setItem((Item)selection.getAttachedData());
 			return new TargetMenu();
 		}
 
@@ -103,7 +103,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		@Override
 		public ArrayList<Option> getOptions(Decision decision, GameCharacter character) {
 			ArrayList<Option> options = new ArrayList<Option>();
-			for (Equipment item : character.getEquipment()) {
+			for (Item item : character.getEquipment()) {
 				options.add(new Option(item.getName(), item));
 			}
 			return options;

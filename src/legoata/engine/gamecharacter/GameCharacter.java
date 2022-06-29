@@ -2,8 +2,10 @@ package legoata.engine.gamecharacter;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import legoata.engine.equipment.Equipment;
+import legoata.engine.equipment.Item;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
 import legoata.engine.utils.Utils;
@@ -16,7 +18,7 @@ public class GameCharacter {
 	
 	private String lastName;
 	
-	private ArrayList<Equipment> equipment;
+	private ArrayList<Item> items;
 	
 	private Weapon weapon;
 	
@@ -54,20 +56,20 @@ public class GameCharacter {
 		this.awareness = initializer.getAwareness();
 		this.resolve = initializer.getResolve();
 		
-		this.equipment = new ArrayList<Equipment>();
-		for (Equipment item : initializer.getEquipment()) {
+		this.items = new ArrayList<Item>();
+		for (Item item : initializer.getEquipment()) {
 			this.addItem(item);
 		}
 		Weapon weapon = initializer.getWeapon();
 		if (weapon != null) {
-			if (!equipment.contains(weapon)) {
+			if (!items.contains(weapon)) {
 				this.addItem(weapon);
 			}
 			this.equipWeapon(weapon);
 		}
 		Shield shield = initializer.getShield();
 		if (shield != null) {
-			if (!equipment.contains(shield)) {
+			if (!items.contains(shield)) {
 				this.addItem(shield);
 			}
 			this.equipShield(shield);
@@ -93,9 +95,9 @@ public class GameCharacter {
 		return String.join(" ", firstName, lastName);
 	}
 	
-	// Equipment
-	public ArrayList<Equipment> getEquipment(){
-		return this.equipment;
+	// Item
+	public List<Item> getEquipment(){
+		return Collections.unmodifiableList(items);
 	}
 	
 	public boolean equipWeapon(Weapon weapon) {
@@ -138,20 +140,20 @@ public class GameCharacter {
 		return this.shield;
 	}
 	
-	public boolean canCarry(Equipment item) {
+	public boolean canCarry(Item item) {
 		return getCarriedWeight() + item.getWeight() <= getCarryingCapacity();
 	}
 	
-	public boolean addItem(Equipment item) {
+	public boolean addItem(Item item) {
 		if (canCarry(item)) {
-			equipment.add(item);
+			items.add(item);
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean removeItem(Equipment item) {
-		boolean removed = equipment.remove(item);
+	public boolean removeItem(Item item) {
+		boolean removed = items.remove(item);
 		if (removed) {
 			if (item == shield) {
 				shield = null;
@@ -225,7 +227,7 @@ public class GameCharacter {
 	
 	public int getCarriedWeight() {
 		int weight = 0;
-		for (Equipment item : equipment) {
+		for (Item item : items) {
 			weight += item.getWeight();
 		}
 		return weight;
