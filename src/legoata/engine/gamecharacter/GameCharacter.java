@@ -2,8 +2,10 @@ package legoata.engine.gamecharacter;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import legoata.engine.equipment.Equipment;
+import legoata.engine.equipment.Item;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
 import legoata.engine.utils.Utils;
@@ -16,7 +18,7 @@ public class GameCharacter {
 	
 	private String lastName;
 	
-	private ArrayList<Equipment> equipment;
+	private ArrayList<Item> items;
 	
 	private Weapon weapon;
 	
@@ -44,16 +46,7 @@ public class GameCharacter {
 		this.isUser = initializer.isUserControlled();
 		this.firstName = initializer.getFirstName();
 		this.lastName = initializer.getLastName();
-		this.equipment = new ArrayList<Equipment>();
-		Weapon weapon = initializer.getWeapon();
-		if (weapon != null) {
-			this.addItem(weapon);
-			this.equipWeapon(weapon);
-		}
-		if (initializer.getShield() != null) {
-			this.equipShield(initializer.getShield());
-		}
-		this.defaultWeapon = initializer.getDefaultWeapon();
+		
 		this.maxHealth = initializer.getMaxHealth();
 		this.health = this.maxHealth;
 		this.strength = initializer.getStrength();
@@ -62,6 +55,26 @@ public class GameCharacter {
 		this.agility = initializer.getAgility();
 		this.awareness = initializer.getAwareness();
 		this.resolve = initializer.getResolve();
+		
+		this.items = new ArrayList<Item>();
+		for (Item item : initializer.getEquipment()) {
+			this.addItem(item);
+		}
+		Weapon weapon = initializer.getWeapon();
+		if (weapon != null) {
+			if (!items.contains(weapon)) {
+				this.addItem(weapon);
+			}
+			this.equipWeapon(weapon);
+		}
+		Shield shield = initializer.getShield();
+		if (shield != null) {
+			if (!items.contains(shield)) {
+				this.addItem(shield);
+			}
+			this.equipShield(shield);
+		}
+		this.defaultWeapon = initializer.getDefaultWeapon();
 	}
 	
 	// user or not
@@ -82,7 +95,11 @@ public class GameCharacter {
 		return String.join(" ", firstName, lastName);
 	}
 	
-	// Equipment	
+	// Item
+	public List<Item> getEquipment(){
+		return Collections.unmodifiableList(items);
+	}
+	
 	public boolean equipWeapon(Weapon weapon) {
 		if (weapon.isTwoHanded() && shield != null) {
 			return false;
@@ -123,20 +140,20 @@ public class GameCharacter {
 		return this.shield;
 	}
 	
-	public boolean canCarry(Equipment item) {
+	public boolean canCarry(Item item) {
 		return getCarriedWeight() + item.getWeight() <= getCarryingCapacity();
 	}
 	
-	public boolean addItem(Equipment item) {
+	public boolean addItem(Item item) {
 		if (canCarry(item)) {
-			equipment.add(item);
+			items.add(item);
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean removeItem(Equipment item) {
-		boolean removed = equipment.remove(item);
+	public boolean removeItem(Item item) {
+		boolean removed = items.remove(item);
 		if (removed) {
 			if (item == shield) {
 				shield = null;
@@ -210,7 +227,7 @@ public class GameCharacter {
 	
 	public int getCarriedWeight() {
 		int weight = 0;
-		for (Equipment item : equipment) {
+		for (Item item : items) {
 			weight += item.getWeight();
 		}
 		return weight;
@@ -243,13 +260,14 @@ public class GameCharacter {
 	// Attempts
 	public boolean attemptMeleeStrike() {
 		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
-		return strikeAttempt > 8;
+		return strikeAttempt > 4;
 	}
 	public boolean attemptCriticalMeleeStrike() {
 		return false;
 	}
 	public boolean attemptRangedStrike() {
-		return false;
+		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
+		return strikeAttempt > 6;
 	}
 	public boolean attemptCriticalRangedStrike() {
 		return false;

@@ -8,9 +8,9 @@ public interface OptionSet {
 
 	public OptionSet select(Decision decision, Option selection, GameCharacter actor);
 	
-	public void undoSelection(Decision decision);
+	public void undoSelection(Decision decision, GameCharacter character);
 	
-	public ArrayList<Option> getOptions(GameCharacter character);
+	public ArrayList<Option> getOptions(Decision decision, GameCharacter character);
 	
 	public String getPrompt();
 	

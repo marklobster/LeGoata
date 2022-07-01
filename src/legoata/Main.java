@@ -1,6 +1,9 @@
 package legoata;
 
+import legoata.engine.equipment.HealingItem;
+import legoata.engine.equipment.Item;
 import legoata.engine.equipment.Shield;
+import legoata.engine.equipment.SmackySlap;
 import legoata.engine.equipment.Weapon;
 import legoata.engine.game.GameRunner;
 import legoata.engine.gamecharacter.CharacterInitializer;
@@ -42,6 +45,9 @@ public class Main {
 		init.setUserControlled(isUser);
 		init.setFirstName(firstName);
 		init.setLastName(lastName);
+		init.getEquipment().add(getHealingItem());
+		init.getEquipment().add(getAttackItem());
+		init.getEquipment().add(getAttackItem());
 		init.setAgility(getStatValue());
 		init.setAwareness(getStatValue());
 		init.setDexterity(getStatValue());
@@ -64,6 +70,7 @@ public class Main {
 		init.setUserControlled(isUser);
 		init.setFirstName("Alfred");
 		init.setLastName("Sauce");
+		init.getEquipment().add(getHealingItem());
 		init.setAgility(10);
 		init.setAwareness(10);
 		init.setDexterity(10);
@@ -83,5 +90,13 @@ public class Main {
 	
 	private static int getStatValue() {
 		return 7 + Utils.getRandom(-4, 4);
+	}
+	
+	private static HealingItem getHealingItem() {
+		return new HealingItem(1, "Cod Liver Oil", "Gives you some health points!", 12);
+	}
+	
+	private static Item getAttackItem() {
+		return new SmackySlap();
 	}
 }

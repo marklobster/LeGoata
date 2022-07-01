@@ -1,5 +1,8 @@
 package legoata.engine.gamecharacter;
 
+import java.util.ArrayList;
+
+import legoata.engine.equipment.Item;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.Weapon;
 
@@ -10,6 +13,8 @@ public class CharacterInitializer {
 	private String firstName;
 	
 	private String lastName;
+	
+	private ArrayList<Item> item = new ArrayList<Item>();
 	
 	private Weapon weapon;
 	
@@ -53,6 +58,10 @@ public class CharacterInitializer {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+	
+	public ArrayList<Item> getEquipment(){
+		return item;
 	}
 
 	public Weapon getWeapon() {
