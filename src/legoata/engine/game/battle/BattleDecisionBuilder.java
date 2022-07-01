@@ -90,7 +90,12 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		@Override
 		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
 			UseItem action = (UseItem)decision.getAction();
-			action.setItem((Item)selection.getAttachedData());
+			Item item = (Item)selection.getAttachedData();
+			action.setItem(item);
+			if (item.getTargetType() == TargetType.Self) {
+				action.setTarget(action.getActionPerformer());
+				return null;
+			}
 			return new TargetMenu();
 		}
 
@@ -146,9 +151,11 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 			TargetingAction action = (TargetingAction)decision.getAction();
 			
 			switch (action.getTargetType()) {
+			
 			case Self:
 				options.add(new Option("Self", actor));
 				break;
+				
 			case Ally:
 				possibleTargets = heroes.contains(actor) ?
 						heroes :

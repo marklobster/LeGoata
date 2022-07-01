@@ -260,13 +260,14 @@ public class GameCharacter {
 	// Attempts
 	public boolean attemptMeleeStrike() {
 		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
-		return strikeAttempt > 8;
+		return strikeAttempt > 4;
 	}
 	public boolean attemptCriticalMeleeStrike() {
 		return false;
 	}
 	public boolean attemptRangedStrike() {
-		return false;
+		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
+		return strikeAttempt > 6;
 	}
 	public boolean attemptCriticalRangedStrike() {
 		return false;
