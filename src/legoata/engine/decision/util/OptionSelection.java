@@ -1,8 +1,8 @@
 package legoata.engine.decision.util;
 
 import legoata.engine.decision.Decision;
-import legoata.engine.decision.Option;
-import legoata.engine.decision.OptionSet;
+import legoata.engine.decision.node.branching.Option;
+import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.gamecharacter.GameCharacter;
 
 public interface OptionSelection {

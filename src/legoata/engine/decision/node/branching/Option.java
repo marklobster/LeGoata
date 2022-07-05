@@ -1,4 +1,4 @@
-package legoata.engine.decision;
+package legoata.engine.decision.node.branching;
 
 public class Option {
 	

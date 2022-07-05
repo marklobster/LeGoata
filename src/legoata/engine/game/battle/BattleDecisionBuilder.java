@@ -8,8 +8,8 @@ import legoata.engine.actions.TargetingAction;
 import legoata.engine.actions.UseItem;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
-import legoata.engine.decision.Option;
-import legoata.engine.decision.OptionSet;
+import legoata.engine.decision.node.branching.Option;
+import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.equipment.Item;
 import legoata.engine.gamecharacter.GameCharacter;
 

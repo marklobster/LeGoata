@@ -1,5 +1,13 @@
 package legoata.engine.decision;
 
+import legoata.engine.decision.node.branching.OptionSet;
+
+/**
+ * Provides a means of navigating a menu with or without sub-menus which will ultimately 
+ * result in the user building an action.
+ * @author Mark
+ *
+ */
 public class DecisionBuilder {
 
 	private Decision decision;
@@ -29,7 +37,7 @@ public class DecisionBuilder {
 		return this.decision;
 	}
 	
-	public OptionSet getOptionSet() {
+	public OptionSet getRootMenu() {
 		return this.optionSet;
 	}
 	
