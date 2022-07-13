@@ -125,6 +125,7 @@ public class GameRunner {
 				
 				else if (nextNode instanceof GoBack) {
 					GoBack goBackSignal = (GoBack)nextNode;
+					menuStack.peek().undoSelection(builder.getDecision(), actor);
 					int counter = 0;
 					while (counter++ < goBackSignal.getNumberOfStepsBack()
 							&& menuStack.size() > 1) {
@@ -135,8 +136,11 @@ public class GameRunner {
 				
 				// return to menu root
 				else if (nextNode instanceof ReturnToRoot) {
-					menuStack.clear();
-					menuStack.push(builder.getRootMenu());
+					menuStack.peek().undoSelection(builder.getDecision(), actor);
+					while (menuStack.size() > 1) {
+						menuStack.pop();
+						menuStack.peek().undoSelection(builder.getDecision(), actor);
+					}
 				}
 				
 				// push sub-menu onto stack

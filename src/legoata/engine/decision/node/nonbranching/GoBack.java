@@ -5,13 +5,13 @@ import legoata.engine.decision.node.DecisionBuilderNode;
 /**
  * Indicates that the user needs to go back 1 or more menus.  Use this when it is necessary
  * to force the user back n-number of menus after making a selection.  The default value of 
- * n is 1.
+ * n is 0.
  * @author Mark
  *
  */
 public final class GoBack implements DecisionBuilderNode {
 
-	private int frames = 1;
+	private int steps = 0;
 	
 	public GoBack() {
 		
@@ -22,11 +22,11 @@ public final class GoBack implements DecisionBuilderNode {
 	}
 
 	public int getNumberOfStepsBack() {
-		return frames;
+		return steps;
 	}
 
 	public void setNumberOfStepsBack(int steps) {
-		this.frames = steps;
+		this.steps = steps;
 	}
 
 }
