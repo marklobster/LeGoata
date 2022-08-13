@@ -118,11 +118,17 @@ public class GameRunner {
 				// run method for selected option
 				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor);
 				
+				// repeat same decision
+				if (nextNode == null) {
+					currentMenu.undoSelection(builder.getDecision(), actor);
+				}
+				
 				// decision completed
-				if (nextNode == null || nextNode instanceof DecisionComplete) {
+				else if (nextNode instanceof DecisionComplete) {
 					decisionComplete = true;
 				}
 				
+				// go back n number of nodes
 				else if (nextNode instanceof GoBack) {
 					GoBack goBackSignal = (GoBack)nextNode;
 					menuStack.peek().undoSelection(builder.getDecision(), actor);
@@ -143,7 +149,7 @@ public class GameRunner {
 					}
 				}
 				
-				// push sub-menu onto stack
+				// sub-menu
 				else if (nextNode instanceof OptionSet) {
 					menuStack.push((OptionSet)nextNode);
 				}

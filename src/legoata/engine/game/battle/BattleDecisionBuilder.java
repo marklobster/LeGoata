@@ -8,8 +8,10 @@ import legoata.engine.actions.TargetingAction;
 import legoata.engine.actions.UseItem;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
+import legoata.engine.decision.node.DecisionBuilderNode;
 import legoata.engine.decision.node.branching.Option;
 import legoata.engine.decision.node.branching.OptionSet;
+import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.equipment.Item;
 import legoata.engine.gamecharacter.GameCharacter;
 
@@ -39,7 +41,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class ActionMenu implements OptionSet {
 
 		@Override
-		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor) {
 			
 			OptionSet options = null;
 			
@@ -88,7 +90,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class ItemMenu implements OptionSet {
 
 		@Override
-		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor) {
 			UseItem action = (UseItem)decision.getAction();
 			Item item = (Item)selection.getAttachedData();
 			action.setItem(item);
@@ -129,11 +131,11 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class TargetMenu implements OptionSet {
 
 		@Override
-		public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor) {
 			TargetingAction action = (TargetingAction)decision.getAction();
 			GameCharacter target = (GameCharacter)selection.getAttachedData();
 			action.setTarget(target);
-			return null;
+			return new DecisionComplete();
 		}
 
 		@Override
