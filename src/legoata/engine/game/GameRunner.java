@@ -1,7 +1,6 @@
 package legoata.engine.game;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.Stack;
@@ -10,8 +9,12 @@ import legoata.engine.actions.MeleeAttack;
 import legoata.engine.actions.TargetType;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
-import legoata.engine.decision.Option;
-import legoata.engine.decision.OptionSet;
+import legoata.engine.decision.node.DecisionBuilderNode;
+import legoata.engine.decision.node.branching.Option;
+import legoata.engine.decision.node.branching.OptionSet;
+import legoata.engine.decision.node.nonbranching.DecisionComplete;
+import legoata.engine.decision.node.nonbranching.GoBack;
+import legoata.engine.decision.node.nonbranching.ReturnToRoot;
 import legoata.engine.game.battle.Battle;
 import legoata.engine.gamecharacter.GameCharacter;
 import legoata.engine.situation.TimedActionSituation;
@@ -68,50 +71,95 @@ public class GameRunner {
 		postGameDebrief();
 	}
 	
-	private Decision buildUserDecision(DecisionBuilder builder, GameCharacter actor) {
+	private Decision buildUserDecision(DecisionBuilder builder, GameCharacter actor) throws UnsupportedOperationException {
 		
+		// put root level menu onto stack
 		Stack<OptionSet> menuStack = new Stack<OptionSet>();
-		menuStack.push(builder.getOptionSet());
+		menuStack.push(builder.getRootMenu());
 		boolean decisionComplete = false;
-		String firstMessage = builder.getInitialText();
 		
-		if (firstMessage != null && firstMessage != "") {
-			System.out.println(builder.getInitialText());
+		// print initial text of menu tree
+		String initialText = builder.getInitialText();
+		if (initialText != null && initialText != "") {
+			System.out.println(initialText);
 		}
 		
 		do {
+			// get current menu
 			OptionSet currentMenu = menuStack.peek();
 			ArrayList<Option> options = currentMenu.getOptions(builder.getDecision(), actor);
 			boolean isSubMenu = menuStack.size() > 1;
 			
+			// check for invalid state
 			if (!isSubMenu && (options == null || options.size() == 0)) {
 				throw new IllegalStateException("Root menu cannot have zero options.");
 			}
 			
+			// get option from user input
 			Option selection = getUserSelection(
 					currentMenu.getPrompt(),
 					options,
 					isSubMenu,
 					isSubMenu ? currentMenu.getEmptySetText() : null);
 			
+			// none selected - go back to previous menu
+			// but if there is no previous menu, just get input again
 			if (selection == null && isSubMenu) {
 				
 				// revert previous selection
 				menuStack.pop();
 				OptionSet previousMenu = menuStack.peek();
 				previousMenu.undoSelection(builder.getDecision(), actor);
+			}
+			
+			// handle selected option
+			else if (selection != null) {
 				
-			} else if (selection != null) {
+				// run method for selected option
+				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor, System.out);
 				
-				// make selection
-				OptionSet nextMenu = currentMenu.select(builder.getDecision(), selection, actor);
+				// repeat same decision
+				if (nextNode == null) {
+					currentMenu.undoSelection(builder.getDecision(), actor);
+				}
 				
-				if (nextMenu == null) {
-					// end of tree reached, decision complete
+				// decision completed
+				else if (nextNode instanceof DecisionComplete) {
 					decisionComplete = true;
-				} else {
-					// push next sub menu
-					menuStack.push(nextMenu);
+				}
+				
+				// go back n number of nodes
+				else if (nextNode instanceof GoBack) {
+					GoBack goBackSignal = (GoBack)nextNode;
+					menuStack.peek().undoSelection(builder.getDecision(), actor);
+					int counter = 0;
+					while (counter++ < goBackSignal.getNumberOfStepsBack()
+							&& menuStack.size() > 1) {
+						menuStack.pop();
+						menuStack.peek().undoSelection(builder.getDecision(), actor);
+					}
+				}
+				
+				// return to menu root
+				else if (nextNode instanceof ReturnToRoot) {
+					menuStack.peek().undoSelection(builder.getDecision(), actor);
+					while (menuStack.size() > 1) {
+						menuStack.pop();
+						menuStack.peek().undoSelection(builder.getDecision(), actor);
+					}
+				}
+				
+				// sub-menu
+				else if (nextNode instanceof OptionSet) {
+					menuStack.push((OptionSet)nextNode);
+				}
+				
+				// unsupported DecisionBuilderNode type
+				else {
+					String err = String.format(
+							"The legoata.engine.decision.DecisionBuilderNode sub-class %s is not supported.",
+							nextNode.getClass());
+					throw new UnsupportedOperationException(err);
 				}
 			}
 			
