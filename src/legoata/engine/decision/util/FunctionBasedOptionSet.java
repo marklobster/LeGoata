@@ -1,5 +1,6 @@
 package legoata.engine.decision.util;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import legoata.engine.decision.Decision;
@@ -37,8 +38,8 @@ public class FunctionBasedOptionSet implements OptionSet {
 	}
 
 	@Override
-	public OptionSet select(Decision decision, Option selection, GameCharacter actor) {
-		return onSelect.select(decision, selection, actor);
+	public OptionSet select(Decision decision, Option selection, GameCharacter actor, PrintStream out) {
+		return onSelect.select(decision, selection, actor, out);
 	}
 
 	@Override

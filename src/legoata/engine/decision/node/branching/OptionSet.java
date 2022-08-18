@@ -1,5 +1,6 @@
 package legoata.engine.decision.node.branching;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import legoata.engine.decision.Decision;
@@ -13,7 +14,7 @@ import legoata.engine.gamecharacter.GameCharacter;
  */
 public interface OptionSet extends DecisionBuilderNode {
 
-	public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor);
+	public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor, PrintStream out);
 	
 	public void undoSelection(Decision decision, GameCharacter character);
 	

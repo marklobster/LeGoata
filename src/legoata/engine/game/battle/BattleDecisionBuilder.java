@@ -1,5 +1,6 @@
 package legoata.engine.game.battle;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import legoata.engine.actions.MeleeAttack;
@@ -39,25 +40,33 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	}
 	
 	private class ActionMenu implements OptionSet {
+		
+		private final String MELEE_MENU_TITLE = "Melee Attack";
+		private final String ITEM_MENU_TITLE = "Use Item";
+		private final String LOOK_MENU_TITLE = "Look Around";
 
 		@Override
-		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor) {
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor, PrintStream out) {
 			
 			OptionSet options = null;
 			
 			switch (selection.getTitle()) {
 			
-			case "Use Item":
+			case ITEM_MENU_TITLE:
 				UseItem useItemAction = new UseItem();
 				useItemAction.setActionPerformer(actor);
 				decision.setAction(useItemAction);
 				options = new ItemMenu();
 				break;
-			case "Melee Attack":
+			case MELEE_MENU_TITLE:
 				MeleeAttack meleeAction = new MeleeAttack();
 				meleeAction.setActionPerformer(actor);
 				decision.setAction(meleeAction);
 				options = new TargetMenu();
+				break;
+			case LOOK_MENU_TITLE:
+				options = new LookMenu();
+				break;
 			}
 			
 			return options;
@@ -71,8 +80,9 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 		@Override
 		public ArrayList<Option> getOptions(Decision decision, GameCharacter character) {
 			 ArrayList<Option> options = new ArrayList<Option>();
-			 options.add(new Option("Melee Attack"));
-			 options.add(new Option("Use Item"));
+			 options.add(new Option(MELEE_MENU_TITLE));
+			 options.add(new Option(ITEM_MENU_TITLE));
+			 options.add(new Option(LOOK_MENU_TITLE));
 			 return options;
 		}
 
@@ -90,7 +100,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class ItemMenu implements OptionSet {
 
 		@Override
-		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor) {
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor, PrintStream out) {
 			UseItem action = (UseItem)decision.getAction();
 			Item item = (Item)selection.getAttachedData();
 			action.setItem(item);
@@ -131,7 +141,7 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 	private class TargetMenu implements OptionSet {
 
 		@Override
-		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor) {
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor, PrintStream out) {
 			TargetingAction action = (TargetingAction)decision.getAction();
 			GameCharacter target = (GameCharacter)selection.getAttachedData();
 			action.setTarget(target);
@@ -194,5 +204,73 @@ public class BattleDecisionBuilder extends DecisionBuilder {
 			return null;
 		}
 		
+	}
+	
+	private class LookMenu implements OptionSet {
+		
+		private final String ALLIES = "Allies";
+		private final String FOES = "Foes";
+		private final String SELF = "Self";
+		
+		@Override
+		public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor, PrintStream out) {
+			switch (selection.getTitle()) {
+			case ALLIES:
+				for (GameCharacter gameCharacter : heroes) {
+					printHealth(gameCharacter, out);
+				}
+				break;
+			case FOES:
+				for (GameCharacter gameCharacter : enemies) {
+					printHealth(gameCharacter, out);
+				}
+				break;
+				
+			case SELF:
+				printHealth(actor, out);
+				break;
+			}
+			return null;
+		}
+
+		@Override
+		public void undoSelection(Decision decision, GameCharacter actor) {
+			decision.setAction(null);
+		}
+
+		@Override
+		public ArrayList<Option> getOptions(Decision decision, GameCharacter actor) {
+			
+			ArrayList<Option> options = new ArrayList<Option>();
+			options.add(new Option(ALLIES));
+			options.add(new Option(FOES));
+			options.add(new Option(SELF));
+			
+			return options;
+		}
+
+		@Override
+		public String getPrompt() {
+			return "Look at who?";
+		}
+
+		@Override
+		public String getEmptySetText() {
+			return null;
+		}
+		
+		private void printHealth(GameCharacter gameCharacter, PrintStream out) {
+			if (gameCharacter.isFallen()) {
+				out.println(
+					String.format("%s is down for the count", gameCharacter.getFullName()));
+			} else {
+				out.println(
+					String.format(
+						"%s has %d / %d health",
+						gameCharacter.getFullName(),
+						gameCharacter.getHealth(),
+						gameCharacter.getMaxHealth()));
+			}
+		}
 	}
 }

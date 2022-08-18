@@ -116,7 +116,7 @@ public class GameRunner {
 			else if (selection != null) {
 				
 				// run method for selected option
-				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor);
+				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor, System.out);
 				
 				// repeat same decision
 				if (nextNode == null) {
