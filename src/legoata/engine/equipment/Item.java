@@ -2,7 +2,6 @@ package legoata.engine.equipment;
 
 import java.io.PrintStream;
 
-import legoata.engine.actions.TargetType;
 import legoata.engine.gamecharacter.GameCharacter;
 
 public abstract class Item {

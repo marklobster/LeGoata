@@ -1,4 +1,4 @@
-package legoata.engine.actions;
+package legoata.engine.equipment;
 
 public enum TargetType {
 	Self,
