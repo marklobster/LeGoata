@@ -1,4 +1,4 @@
-package legoata.engine.game.clock;
+package legoata.engine.execute.clock;
 
 public class ReadOnlyClock {
 	

@@ -1,16 +1,27 @@
-package legoata.engine.game;
+package legoata.engine.execute;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import legoata.engine.execute.provider.controller.ControllerProvider;
 import legoata.engine.gamecharacter.GameCharacter;
 import legoata.engine.utils.Utils;
 
 public class GameRunner {
 	
 	private Scanner scanner = new Scanner(System.in);
+	private ControllerProvider controllerProvider;
 	
 	private ArrayList<GameCharacter> heroes = new ArrayList<GameCharacter>();
 	private ArrayList<GameCharacter> enemies = new ArrayList<GameCharacter>();
+	
+	public ControllerProvider getControllerProvider() {
+		return controllerProvider;
+	}
+
+	public void setControllerProvider(ControllerProvider controllerProvider) {
+		this.controllerProvider = controllerProvider;
+	}
 	
 	public void addTestHero(GameCharacter hero) {
 		heroes.add(hero);
@@ -54,4 +65,5 @@ public class GameRunner {
 	private GameCharacter selectTarget(ArrayList<GameCharacter> targets) {
 		return Utils.pickRandom(targets);
 	}
+
 }

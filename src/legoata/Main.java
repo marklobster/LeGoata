@@ -5,7 +5,7 @@ import legoata.engine.equipment.Item;
 import legoata.engine.equipment.Shield;
 import legoata.engine.equipment.SmackySlap;
 import legoata.engine.equipment.Weapon;
-import legoata.engine.game.GameRunner;
+import legoata.engine.execute.GameRunner;
 import legoata.engine.gamecharacter.CharacterInitializer;
 import legoata.engine.gamecharacter.GameCharacter;
 import legoata.engine.utils.Utils;

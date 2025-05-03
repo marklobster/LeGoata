@@ -1,5 +1,5 @@
 package legoata.engine.controller.command;
 
-public interface FrameworkCommand {
+public interface TurnCommand {
 
 }

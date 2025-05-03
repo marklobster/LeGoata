@@ -1,6 +1,6 @@
 package legoata.engine.controller.command;
 
-public class ExitGame implements FrameworkCommand {
+public class ExitGame implements TurnCommand {
 
 	private boolean advance;
 	

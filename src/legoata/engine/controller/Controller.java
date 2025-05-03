@@ -5,7 +5,14 @@ import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.Stack;
 
-import legoata.engine.controller.command.FrameworkCommand;
+import legoata.engine.action.Action;
+import legoata.engine.action.ActionResultCode;
+import legoata.engine.action.ActionResult;
+import legoata.engine.controller.command.RepeatController;
+import legoata.engine.controller.command.CompleteTurn;
+import legoata.engine.controller.command.ExitGame;
+import legoata.engine.controller.command.TurnCommand;
+import legoata.engine.controller.command.ChangeController;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.decision.node.DecisionBuilderNode;
@@ -18,12 +25,41 @@ import legoata.engine.model.LGObject;
 
 public abstract class Controller {
 	
-	private Scanner scanner;
+	private Scanner scanner = null;
 
-	public abstract FrameworkCommand executeTurn(LGObject turnTaker);
-	
 	public Controller(Scanner scanner) {
 		this.scanner = scanner;
+	}
+	
+	public TurnCommand init(LGObject turnTaker) {
+		return null;
+	}
+	
+	public Decision getDecision() {
+		return null;
+	}
+	
+	public ActionResult executeAction(Action action) {
+		return null;
+	}
+	
+	public void onExecute(ActionResult result) {
+		
+	}
+	
+	public TurnCommand close(ActionResult result) {
+		// default to 
+		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
+		switch (code) {
+			case Consequential:
+				return new CompleteTurn();
+			case Inconsequential:
+			case Incomplete:
+				return new RepeatController();
+			// if exit requested, or if in error state, exit the game
+			default:
+				return new ExitGame();
+		}
 	}
 	
 	protected Decision getUserDecision(DecisionBuilder builder, LGObject actor) {
