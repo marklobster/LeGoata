@@ -1,19 +1,28 @@
 package legoata.engine.execute;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
+import legoata.engine.Constants;
+import legoata.engine.controller.Controller;
+import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.execute.provider.controller.ControllerProvider;
-import legoata.engine.gamecharacter.GameCharacter;
-import legoata.engine.utils.Utils;
+import legoata.engine.execute.provider.gameop.GameOpProvider;
+import legoata.engine.gameop.GameOp;
 
 public class GameRunner {
 	
 	private Scanner scanner = new Scanner(System.in);
-	private ControllerProvider controllerProvider;
+	private GameOpProvider gameOpProvider = null;
+	private ControllerProvider controllerProvider = null;
+	private ActionProvider actionProvider = null;
 	
-	private ArrayList<GameCharacter> heroes = new ArrayList<GameCharacter>();
-	private ArrayList<GameCharacter> enemies = new ArrayList<GameCharacter>();
+	public GameOpProvider getGameOpProvider() {
+		return gameOpProvider;
+	}
+
+	public void setGameOpProvider(GameOpProvider gameOpProvider) {
+		this.gameOpProvider = gameOpProvider;
+	}
 	
 	public ControllerProvider getControllerProvider() {
 		return controllerProvider;
@@ -23,47 +32,17 @@ public class GameRunner {
 		this.controllerProvider = controllerProvider;
 	}
 	
-	public void addTestHero(GameCharacter hero) {
-		heroes.add(hero);
+	public ActionProvider getActionProvider() {
+		return actionProvider;
 	}
-	
-	public void addTestEnemy(GameCharacter enemy) {
-		enemies.add(enemy);
+
+	public void setActionProvider(ActionProvider actionProvider) {
+		this.actionProvider = actionProvider;
 	}
 	
 	public void run() {
-		
-	}
-	
-	private void pause() {
-		scanner.nextLine();
-	}
-	
-	private void postGameDebrief() {
-		boolean goodTeamRemains = false;
-		for (GameCharacter member : heroes) {
-			if (!member.isFallen()) {
-				goodTeamRemains = true;
-				break;
-			}
-		}
-		
-		System.out.println("");
-		System.out.println("The winner is... " + (goodTeamRemains ? "you!!" : "the bad guys!!"));
-		
-		System.out.println("");
-		System.out.println("The stats:");
-		System.out.println("");
-		for (GameCharacter gc : heroes) {
-			gc.printStats(System.out);
-		}
-		for (GameCharacter gc : enemies) {
-			gc.printStats(System.out);
-		}
-	}
-	
-	private GameCharacter selectTarget(ArrayList<GameCharacter> targets) {
-		return Utils.pickRandom(targets);
+		GameOp init = this.gameOpProvider.getGameOp(Constants.INIT_GAME_OP);
+		init.execute();
 	}
 
 }
