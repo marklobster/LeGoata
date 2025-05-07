@@ -21,6 +21,7 @@ import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.decision.node.nonbranching.GoBack;
 import legoata.engine.decision.node.nonbranching.ReturnToRoot;
+import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.model.LGObject;
 
 public abstract class Controller {
@@ -37,6 +38,10 @@ public abstract class Controller {
 	
 	public Decision getDecision() {
 		return null;
+	}
+	
+	public Action resolveActionName(ActionProvider provider, String actionName, Object data) {
+		return provider.getAction(actionName);
 	}
 	
 	public ActionResult executeAction(Action action) {
