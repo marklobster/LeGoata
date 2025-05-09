@@ -1,9 +1,9 @@
 package legoata.engine.execute;
 
 enum TurnResultCode {
-	TurnIncomplete,
+	TurnInProgress,
+	TurnCancelled,
 	TurnFinished,
 	RoundFinished,
-	GameOpRequested,
 	ExitGame
 }

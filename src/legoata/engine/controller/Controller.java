@@ -21,6 +21,7 @@ import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.decision.node.nonbranching.GoBack;
 import legoata.engine.decision.node.nonbranching.ReturnToRoot;
+import legoata.engine.execute.controls.TurnControls;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.model.LGObject;
 
@@ -32,28 +33,28 @@ public abstract class Controller {
 		this.scanner = scanner;
 	}
 	
-	public TurnCommand init(LGObject turnTaker) {
+	public TurnCommand init(LGObject turnTaker, TurnControls controls) {
 		return null;
 	}
 	
-	public Decision getDecision() {
+	public Decision getDecision(LGObject turnTaker, TurnControls controls) {
 		return null;
 	}
 	
-	public Action resolveActionName(ActionProvider provider, String actionName, Object data) {
-		return provider.getAction(actionName);
+	public Action resolveActionName(LGObject turnTaker, ActionProvider provider, Decision decision, TurnControls controls) {
+		return provider.getAction(decision.getAction());
 	}
 	
-	public ActionResult executeAction(Action action) {
+	public ActionResult executeAction(LGObject turnTaker, Action action, TurnControls controls) {
 		return null;
 	}
 	
-	public void onExecute(ActionResult result) {
+	public void onExecute(LGObject turnTaker, ActionResult result, TurnControls controls) {
 		
 	}
 	
-	public TurnCommand close(ActionResult result) {
-		// default to 
+	public TurnCommand close(LGObject turnTaker, ActionResult result, TurnControls controls) {
+		// default to error
 		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
 		switch (code) {
 			case Consequential:

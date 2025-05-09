@@ -2,6 +2,7 @@ package legoata.engine.execute;
 
 enum RoundResultCode {
 	RoundFinished,
-	GameOpRequested,
+	TurnInterrupted,
+	RoundInterrupted,
 	ExitGame
 }
