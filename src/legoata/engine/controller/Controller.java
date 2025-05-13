@@ -7,6 +7,8 @@ import java.util.Stack;
 
 import legoata.engine.action.Action;
 import legoata.engine.action.ActionResultCode;
+import legoata.engine.action.ModelAction;
+import legoata.engine.action.ModelActionNullData;
 import legoata.engine.action.ActionResult;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.CompleteTurn;
@@ -45,8 +47,16 @@ public abstract class Controller {
 		return provider.getAction(decision.getAction());
 	}
 	
-	public ActionResult executeAction(LGObject turnTaker, Action action, TurnControls controls) {
-		return null;
+	public ActionResult executeAction(LGObject turnTaker, Action action, Object input, TurnControls controls) {
+		ActionResult result = null;
+		if (action instanceof ModelAction) {
+			ModelAction ma = (ModelAction)action;
+			result = ma.execute(turnTaker, input, controls);
+		} else {
+			ModelActionNullData ma = (ModelActionNullData)action;
+			result = ma.execute(turnTaker, controls);
+		}
+		return result;
 	}
 	
 	public void onExecute(LGObject turnTaker, ActionResult result, TurnControls controls) {

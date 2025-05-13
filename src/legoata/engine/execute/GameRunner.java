@@ -15,6 +15,8 @@ import legoata.engine.controller.command.Interrupt;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.TurnCommand;
 import legoata.engine.decision.Decision;
+import legoata.engine.execute.controls.GameControls;
+import legoata.engine.execute.controls.RoundControls;
 import legoata.engine.execute.controls.TurnControls;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.execute.provider.controller.ControllerProvider;
@@ -25,10 +27,14 @@ import legoata.engine.model.LGObject;
 public class GameRunner {
 	
 	private Scanner scanner = new Scanner(System.in);
+	private GameOp initializer = null;
 	private GameOpProvider gameOpProvider = null;
 	private ControllerProvider controllerProvider = null;
 	private ActionProvider actionProvider = null;
-	private ArrayList<LGObject> players = new ArrayList<LGObject>();
+	
+	public void setInitializer(GameOp initializer) {
+		this.initializer = initializer;
+	}
 	
 	public GameOpProvider getGameOpProvider() {
 		return gameOpProvider;
@@ -55,51 +61,54 @@ public class GameRunner {
 	}
 	
 	public void run() {
-		boolean exit = false;
-		String gameOpName = Constants.INIT_GAME_OP;
-		do {
-			if (gameOpName != null && gameOpName != "") {
-				GameOp op = this.gameOpProvider.getGameOp(gameOpName);
-				exit = op.execute();
-			} else {
-				RoundResult roundResult = executeRound();
-				switch (roundResult.getCode()) {
-				case ExitGame:
-					exit = true;
-					break;
-				case RoundInterrupted:
-					
-				case RoundFinished:
+		ArrayList<LGObject> players = new ArrayList<LGObject>();
+		RoundControls[] rounds = new RoundControls[2];
+		rounds[1] = new RoundControls();
+		GameControls controls = new GameControls(players, rounds);
+		this.initializer.execute(controls);
+		while (!controls.getExitFlag()) {
+			rounds[0] = rounds[1];
+			rounds[1] = null;
+			executeRound(controls);
+		}
+	}
+	
+	private void executeRound(GameControls controls) {
+		
+		while (!controls.getExitFlag() && !controls.getCurrentRound().isRoundComplete()) {
+			if (controls.getCurrentRound().getIndex() >= controls.getPlayers().size()) {
+				controls.getCurrentRound().finishRound();
+				break;
+			}
+			LGObject player = controls.getPlayers().get(controls.getCurrentRound().getIndex());
+			TurnControls turn = new TurnControls();
+			TurnResultCode code = executeTurn(player, turn);
+			
+			if (code == TurnResultCode.TurnCancelled) {
+				if (turn.wasExitRequested()) {
+					controls.setExitFlag(true);
 					break;
 				}
-			}
-		} while (!exit);
-	}
-	
-	private RoundResult executeRound() {
-		RoundResult roundResult = new RoundResult();
-		roundResult.setCode(RoundResultCode.RoundFinished);
-		for (LGObject player : players) {
-			TurnControls controls = new TurnControls();
-			TurnResult turnResult = executeTurn(player, controls);
-			TurnResultCode code = turnResult.getCode();
-			if (code == TurnResultCode.RoundFinished) {
-				roundResult.setCode(RoundResultCode.RoundFinished);
-				break;
-			} else if (code == TurnResultCode.TurnCancelled) {
-				roundResult.setCode(RoundResultCode.RoundInterrupted);
-				break;
+				executeGameOp(turn.getImmediateGameOp(), controls);
+			} else {
+				controls.getCurrentRound().incrementIndex();
+				if (turn.wasExitRequested()) {
+					controls.setExitFlag(true);
+					break;
+				}
+				String gameOp = turn.getImmediateGameOp();
+				if (gameOp != null && gameOp != "") {
+					executeGameOp(gameOp, controls);
+				}
 			}
 		}
-		return roundResult;
 	}
 	
-	private TurnResult executeTurn(LGObject player, TurnControls controls) {
+	private TurnResultCode executeTurn(LGObject player, TurnControls controls) {
 		
-		TurnResult result = new TurnResult();
-		result.setCode(TurnResultCode.TurnInProgress);
 		String ctrlName = Constants.DEFAULT_CTRL;
 		ArrayList<String> trackedControllerNames = new ArrayList<String>();
+		TurnResultCode code = TurnResultCode.TurnInProgress;
 		
 		do {
 			// check for infinite loop changing controllers
@@ -121,10 +130,10 @@ public class GameRunner {
 			TurnCommand tcmd = ctrl.init(player, controls);
 			
 			if (tcmd instanceof CompleteTurn) {
-				result.setCode(TurnResultCode.TurnFinished);
+				code = TurnResultCode.TurnFinished;
 				break;
 			} else if (tcmd instanceof Interrupt || checkForInterrupt(controls)) {
-				result.setCode(TurnResultCode.TurnCancelled);
+				code = TurnResultCode.TurnCancelled;
 				break;
 			} else if (tcmd instanceof RepeatController) {
 				throw new IllegalStateException("Cannot use RepeatController command during init phase.");
@@ -144,7 +153,7 @@ public class GameRunner {
 			Action action = ctrl.resolveActionName(player, actionProvider, decision, controls);
 			
 			// execute action
-			ActionResult actionResult = ctrl.executeAction(player, action, controls);
+			ActionResult actionResult = ctrl.executeAction(player, action, decision.getData(), controls);
 			
 			// post execute
 			ctrl.onExecute(player, actionResult, controls);
@@ -157,15 +166,19 @@ public class GameRunner {
 			// check if turn is ending
 			tcmd = ctrl.close(player, actionResult, controls);
 			if (tcmd instanceof CompleteTurn){
-				result.setCode(TurnResultCode.TurnFinished);
+				code = TurnResultCode.TurnFinished;
 			} else if (tcmd instanceof Interrupt || checkForInterrupt(controls)) {
-				result.setCode(TurnResultCode.TurnCancelled);
+				code = TurnResultCode.TurnCancelled;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
 			}
 			
-		} while (result.getCode() != TurnResultCode.TurnInProgress);
-		return result;
+		} while (code != TurnResultCode.TurnInProgress);
+		return code;
+	}
+	
+	private void executeGameOp(String name, GameControls controls) {
+		this.gameOpProvider.getGameOp(name).execute(controls);
 	}
 	
 	private boolean checkForInterrupt(TurnControls controls) {
