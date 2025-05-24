@@ -15,9 +15,6 @@ import legoata.engine.controller.command.Interrupt;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.TurnCommand;
 import legoata.engine.decision.Decision;
-import legoata.engine.execute.controls.GameControls;
-import legoata.engine.execute.controls.RoundControls;
-import legoata.engine.execute.controls.TurnControls;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.execute.provider.controller.ControllerProvider;
 import legoata.engine.execute.provider.gameop.GameOpProvider;
@@ -26,7 +23,6 @@ import legoata.engine.model.LGObject;
 
 public class GameRunner {
 	
-	private Scanner scanner = new Scanner(System.in);
 	private GameOp initializer = null;
 	private GameOpProvider gameOpProvider = null;
 	private ControllerProvider controllerProvider = null;
@@ -61,50 +57,55 @@ public class GameRunner {
 	}
 	
 	public void run() {
-		ArrayList<LGObject> players = new ArrayList<LGObject>();
-		RoundControls[] rounds = new RoundControls[2];
-		rounds[1] = new RoundControls();
-		GameControls controls = new GameControls(players, rounds);
-		this.initializer.execute(controls);
-		while (!controls.getExitFlag()) {
-			rounds[0] = rounds[1];
-			rounds[1] = null;
-			executeRound(controls);
+		Game game = new Game();
+		game.setScanner(new Scanner(System.in));
+		game.setOutStream(System.out);
+		
+		this.initializer.execute(new GameControls(game));
+		
+		while (!game.getExitFlag()) {
+			// execute round
+			executeRound(game);
 		}
 	}
 	
-	private void executeRound(GameControls controls) {
+	private void executeRound(Game grc) {
 		
-		while (!controls.getExitFlag() && !controls.getCurrentRound().isRoundComplete()) {
-			if (controls.getCurrentRound().getIndex() >= controls.getPlayers().size()) {
-				controls.getCurrentRound().finishRound();
+		// create round
+		Round round = new Round();
+		grc.setRound(round);
+		GameControls gameControls = new GameControls(grc);
+		
+		while (!gameControls.getExitFlag() && !gameControls.getRoundControls().isRoundFinished()) {
+			if (gameControls.getRoundControls().getIndex() >= gameControls.getPlayers().size()) {
+				gameControls.getRoundControls().finishRound();
 				break;
 			}
-			LGObject player = controls.getPlayers().get(controls.getCurrentRound().getIndex());
-			TurnControls turn = new TurnControls();
-			TurnResultCode code = executeTurn(player, turn);
+			
+			LGObject player = gameControls.getPlayers().get(gameControls.getRoundControls().getIndex());
+			TurnResultCode code = executeTurn(player, grc);
 			
 			if (code == TurnResultCode.TurnCancelled) {
-				if (turn.wasExitRequested()) {
-					controls.setExitFlag(true);
+				if (gameControls.getExitFlag()) {
 					break;
 				}
-				executeGameOp(turn.getImmediateGameOp(), controls);
 			} else {
-				controls.getCurrentRound().incrementIndex();
-				if (turn.wasExitRequested()) {
-					controls.setExitFlag(true);
+				gameControls.getRoundControls().incrementIndex();
+				if (gameControls.getExitFlag()) {
 					break;
-				}
-				String gameOp = turn.getImmediateGameOp();
-				if (gameOp != null && gameOp != "") {
-					executeGameOp(gameOp, controls);
 				}
 			}
 		}
+		
+		// delete round
+		grc.setRound(null);
 	}
 	
-	private TurnResultCode executeTurn(LGObject player, TurnControls controls) {
+	private TurnResultCode executeTurn(LGObject player, Game grc) {
+		
+		// create turn
+		grc.setTurn(new Turn());
+		GameControls gameControls = new GameControls(grc);
 		
 		String ctrlName = Constants.DEFAULT_CTRL;
 		ArrayList<String> trackedControllerNames = new ArrayList<String>();
@@ -124,15 +125,15 @@ public class GameRunner {
 			}
 			
 			// look up controller
-			Controller ctrl = this.controllerProvider.getController(ctrlName, scanner);
+			Controller ctrl = this.controllerProvider.getController(ctrlName, player, gameControls);
 			
 			// init phase
-			TurnCommand tcmd = ctrl.init(player, controls);
+			TurnCommand tcmd = ctrl.init();
 			
 			if (tcmd instanceof CompleteTurn) {
 				code = TurnResultCode.TurnFinished;
 				break;
-			} else if (tcmd instanceof Interrupt || checkForInterrupt(controls)) {
+			} else if (tcmd instanceof Interrupt) {
 				code = TurnResultCode.TurnCancelled;
 				break;
 			} else if (tcmd instanceof RepeatController) {
@@ -147,16 +148,16 @@ public class GameRunner {
 			trackedControllerNames.clear();
 			
 			// get decision
-			Decision decision = ctrl.getDecision(player, controls);
+			Decision decision = ctrl.getDecision();
 			
 			// get action
-			Action action = ctrl.resolveActionName(player, actionProvider, decision, controls);
+			Action action = ctrl.resolveActionName(actionProvider, decision);
 			
 			// execute action
-			ActionResult actionResult = ctrl.executeAction(player, action, decision.getData(), controls);
+			ActionResult actionResult = ctrl.executeAction(action, decision.getData());
 			
 			// post execute
-			ctrl.onExecute(player, actionResult, controls);
+			ctrl.onExecute(actionResult);
 //			if (checkIfTurnOver(controls)) {
 //				result.setCode(
 //					actionResult.getCode() == ActionResultCode.Consequential ? TurnResultCode.TurnFinished : TurnResultCode.TurnCancelled);
@@ -164,26 +165,20 @@ public class GameRunner {
 //			}
 			
 			// check if turn is ending
-			tcmd = ctrl.close(player, actionResult, controls);
+			tcmd = ctrl.close(actionResult);
 			if (tcmd instanceof CompleteTurn){
 				code = TurnResultCode.TurnFinished;
-			} else if (tcmd instanceof Interrupt || checkForInterrupt(controls)) {
+			} else if (tcmd instanceof Interrupt) {
 				code = TurnResultCode.TurnCancelled;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
 			}
 			
 		} while (code != TurnResultCode.TurnInProgress);
+		
+		// delete turn
+		grc.setTurn(null);
 		return code;
-	}
-	
-	private void executeGameOp(String name, GameControls controls) {
-		this.gameOpProvider.getGameOp(name).execute(controls);
-	}
-	
-	private boolean checkForInterrupt(TurnControls controls) {
-		String immediateGameOp = controls.getImmediateGameOp();
-		return controls.wasExitRequested() || (immediateGameOp != null && immediateGameOp != "");
 	}
 	
 }

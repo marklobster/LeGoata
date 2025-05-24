@@ -23,47 +23,51 @@ import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.decision.node.nonbranching.GoBack;
 import legoata.engine.decision.node.nonbranching.ReturnToRoot;
-import legoata.engine.execute.controls.TurnControls;
+import legoata.engine.execute.GameControls;
+import legoata.engine.execute.RoundControls;
+import legoata.engine.execute.TurnControls;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.model.LGObject;
 
 public abstract class Controller {
 	
-	private Scanner scanner = null;
+	private LGObject turnTaker = null;
+	private GameControls gameControls = null;
 
-	public Controller(Scanner scanner) {
-		this.scanner = scanner;
+	public Controller(LGObject turnTaker, GameControls gameControls) {
+		this.turnTaker = turnTaker;
+		this.gameControls = gameControls;
 	}
 	
-	public TurnCommand init(LGObject turnTaker, TurnControls controls) {
+	public TurnCommand init() {
 		return null;
 	}
 	
-	public Decision getDecision(LGObject turnTaker, TurnControls controls) {
+	public Decision getDecision() {
 		return null;
 	}
 	
-	public Action resolveActionName(LGObject turnTaker, ActionProvider provider, Decision decision, TurnControls controls) {
+	public Action resolveActionName(ActionProvider provider, Decision decision) {
 		return provider.getAction(decision.getAction());
 	}
 	
-	public ActionResult executeAction(LGObject turnTaker, Action action, Object input, TurnControls controls) {
+	public ActionResult executeAction(Action action, Object input) {
 		ActionResult result = null;
 		if (action instanceof ModelAction) {
 			ModelAction ma = (ModelAction)action;
-			result = ma.execute(turnTaker, input, controls);
+			result = ma.execute(turnTaker, input, this.gameControls);
 		} else {
 			ModelActionNullData ma = (ModelActionNullData)action;
-			result = ma.execute(turnTaker, controls);
+			result = ma.execute(turnTaker, this.gameControls);
 		}
 		return result;
 	}
 	
-	public void onExecute(LGObject turnTaker, ActionResult result, TurnControls controls) {
+	public void onExecute(ActionResult result) {
 		
 	}
 	
-	public TurnCommand close(LGObject turnTaker, ActionResult result, TurnControls controls) {
+	public TurnCommand close(ActionResult result) {
 		// default to error
 		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
 		switch (code) {
@@ -203,7 +207,7 @@ public abstract class Controller {
 			
 			// get input, check if valid
 			selection = null;
-			String input = this.scanner.nextLine();
+			String input = this.gameControls.getScanner().nextLine();
 			if (input.equalsIgnoreCase(BACK)) {
 				escape = allowEscape;
 			} else {

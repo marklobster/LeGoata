@@ -1,6 +1,6 @@
 package legoata.engine.gameop;
 
-import legoata.engine.execute.controls.GameControls;
+import legoata.engine.execute.GameControls;
 
 public interface GameOp {
 
