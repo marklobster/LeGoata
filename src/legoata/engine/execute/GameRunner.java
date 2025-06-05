@@ -6,11 +6,9 @@ import java.util.Scanner;
 import legoata.engine.Constants;
 import legoata.engine.action.Action;
 import legoata.engine.action.ActionResult;
-import legoata.engine.action.ActionResultCode;
 import legoata.engine.controller.Controller;
 import legoata.engine.controller.command.ChangeController;
 import legoata.engine.controller.command.CompleteTurn;
-import legoata.engine.controller.command.ExitGame;
 import legoata.engine.controller.command.Interrupt;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.TurnCommand;
@@ -61,51 +59,43 @@ public class GameRunner {
 		game.setScanner(new Scanner(System.in));
 		game.setOutStream(System.out);
 		
-		this.initializer.execute(new GameControls(game));
+		MutableControlSet controls = new MutableControlSet();
+		controls.setGameControls(new GameControls(game));
+		
+		this.initializer.execute(controls);
 		
 		while (!game.getExitFlag()) {
 			// execute round
-			executeRound(game);
+			executeRound(game, controls);
 		}
 	}
 	
-	private void executeRound(Game grc) {
+	private void executeRound(Game game, MutableControlSet controls) {
 		
 		// create round
 		Round round = new Round();
-		grc.setRound(round);
-		GameControls gameControls = new GameControls(grc);
+		game.setRound(round);
+		controls.setRoundControls(new RoundControls(round));
 		
-		while (!gameControls.getExitFlag() && !gameControls.getRoundControls().isRoundFinished()) {
-			if (gameControls.getRoundControls().getIndex() >= gameControls.getPlayers().size()) {
-				gameControls.getRoundControls().finishRound();
-				break;
-			}
+		while (!game.getExitFlag() && game.getRound().getIndex() < game.getPlayers().size()) {
 			
-			LGObject player = gameControls.getPlayers().get(gameControls.getRoundControls().getIndex());
-			TurnResultCode code = executeTurn(player, grc);
-			
-			if (code == TurnResultCode.TurnCancelled) {
-				if (gameControls.getExitFlag()) {
-					break;
-				}
-			} else {
-				gameControls.getRoundControls().incrementIndex();
-				if (gameControls.getExitFlag()) {
-					break;
-				}
-			}
+			LGObject player = game.getPlayers().get(game.getRound().getIndex());
+			TurnResultCode code = executeTurn(player, game, controls);
+			game.getRound().incrementIndex();
+
 		}
 		
 		// delete round
-		grc.setRound(null);
+		game.setRound(null);
+		controls.setRoundControls(null);
 	}
 	
-	private TurnResultCode executeTurn(LGObject player, Game grc) {
+	private TurnResultCode executeTurn(LGObject player, Game game, MutableControlSet controls) {
 		
 		// create turn
-		grc.setTurn(new Turn());
-		GameControls gameControls = new GameControls(grc);
+		Turn turn = new Turn();
+		game.setTurn(turn);
+		controls.setTurnControls(new TurnControls(turn));
 		
 		String ctrlName = Constants.DEFAULT_CTRL;
 		ArrayList<String> trackedControllerNames = new ArrayList<String>();
@@ -125,7 +115,7 @@ public class GameRunner {
 			}
 			
 			// look up controller
-			Controller ctrl = this.controllerProvider.getController(ctrlName, player, gameControls);
+			Controller ctrl = this.controllerProvider.getController(ctrlName, player, controls);
 			
 			// init phase
 			TurnCommand tcmd = ctrl.init();
@@ -177,7 +167,8 @@ public class GameRunner {
 		} while (code != TurnResultCode.TurnInProgress);
 		
 		// delete turn
-		grc.setTurn(null);
+		game.setTurn(null);
+		controls.setTurnControls(null);
 		return code;
 	}
 	

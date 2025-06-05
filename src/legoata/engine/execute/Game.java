@@ -10,9 +10,7 @@ class Game {
 
 	private ArrayList<LGObject> players = new ArrayList<LGObject>();
 	private Round round = null;
-	private RoundControls roundControls = null;
 	private Turn turn = null;
-	private TurnControls turnControls = null;
 	private Scanner scanner = null;
 	private PrintStream outStream = null;
 	private boolean exitFlag;	
@@ -59,22 +57,6 @@ class Game {
 
 	public void setTurn(Turn turn) {
 		this.turn = turn;
-	}
-
-	public RoundControls getRoundControls() {
-		return roundControls;
-	}
-
-	public void setRoundControls(RoundControls roundControls) {
-		this.roundControls = roundControls;
-	}
-
-	public TurnControls getTurnControls() {
-		return turnControls;
-	}
-
-	public void setTurnControls(TurnControls turnControls) {
-		this.turnControls = turnControls;
 	}
 
 }

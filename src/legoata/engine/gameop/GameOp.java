@@ -1,9 +1,9 @@
 package legoata.engine.gameop;
 
-import legoata.engine.execute.GameControls;
+import legoata.engine.execute.ControlSet;
 
 public interface GameOp {
 
-	public void execute(GameControls currentRound);
+	public void execute(ControlSet controls);
 	
 }

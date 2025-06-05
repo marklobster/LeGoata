@@ -1,5 +1,6 @@
 package legoata.engine.controller;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner;
@@ -23,20 +24,19 @@ import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.decision.node.nonbranching.GoBack;
 import legoata.engine.decision.node.nonbranching.ReturnToRoot;
+import legoata.engine.execute.ControlSet;
 import legoata.engine.execute.GameControls;
-import legoata.engine.execute.RoundControls;
-import legoata.engine.execute.TurnControls;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.model.LGObject;
 
 public abstract class Controller {
 	
 	private LGObject turnTaker = null;
-	private GameControls gameControls = null;
+	private ControlSet controls = null;
 
-	public Controller(LGObject turnTaker, GameControls gameControls) {
+	public Controller(LGObject turnTaker, ControlSet controls) {
 		this.turnTaker = turnTaker;
-		this.gameControls = gameControls;
+		this.controls = controls;
 	}
 	
 	public TurnCommand init() {
@@ -55,10 +55,10 @@ public abstract class Controller {
 		ActionResult result = null;
 		if (action instanceof ModelAction) {
 			ModelAction ma = (ModelAction)action;
-			result = ma.execute(turnTaker, input, this.gameControls);
+			result = ma.execute(turnTaker, input, this.controls);
 		} else {
 			ModelActionNullData ma = (ModelActionNullData)action;
-			result = ma.execute(turnTaker, this.gameControls);
+			result = ma.execute(turnTaker, this.controls);
 		}
 		return result;
 	}
@@ -83,6 +83,9 @@ public abstract class Controller {
 	}
 	
 	protected Decision getUserDecision(DecisionBuilder builder, LGObject actor) {
+		
+		PrintStream out = this.controls.getGameControls().getOutStream();
+		
 		// put root level menu onto stack
 		Stack<OptionSet> menuStack = new Stack<OptionSet>();
 		menuStack.push(builder.getRootMenu());
@@ -91,7 +94,7 @@ public abstract class Controller {
 		// print initial text of menu tree
 		String initialText = builder.getInitialText();
 		if (initialText != null && initialText != "") {
-			System.out.println(initialText);
+			out.println(initialText);
 		}
 		
 		do {
@@ -126,7 +129,7 @@ public abstract class Controller {
 			else if (selection != null) {
 				
 				// run method for selected option
-				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor, System.out);
+				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor, out);
 				
 				// repeat same decision
 				if (nextNode == null) {
@@ -181,33 +184,34 @@ public abstract class Controller {
 	private Option getUserSelection(String prompt, ArrayList<Option> options, boolean allowEscape, String emptyListText) {
 		
 		final String BACK = "b";
+		PrintStream out = this.controls.getGameControls().getOutStream();
 		Option selection = null;
 		boolean escape = false;
 				
 		do {
 			// show prompt
-			System.out.println(prompt);
+			out.println(prompt);
 			
 			// show options
 			Hashtable<String, Option> map = new Hashtable<String, Option>();
 			if (options.isEmpty() && emptyListText != null && emptyListText != "") {
-				System.out.println(emptyListText);
+				out.println(emptyListText);
 			} else {
 				int counter = 0;
 				for (Option option : options) {
 					map.put(String.valueOf(counter), option);
-					System.out.println(String.format("[%d] %s", counter++, option.getTitle()));
+					out.println(String.format("[%d] %s", counter++, option.getTitle()));
 				}
 			}
 			
 			// show 'back' option, when applicable
 			if (allowEscape) {
-				System.out.println("[b] Back");
+				out.println("[b] Back");
 			}
 			
 			// get input, check if valid
 			selection = null;
-			String input = this.gameControls.getScanner().nextLine();
+			String input = this.controls.getGameControls().getScanner().nextLine();
 			if (input.equalsIgnoreCase(BACK)) {
 				escape = allowEscape;
 			} else {
