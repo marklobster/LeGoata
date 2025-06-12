@@ -3,7 +3,6 @@ package legoata.engine.controller;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Scanner;
 import java.util.Stack;
 
 import legoata.engine.action.Action;
@@ -13,9 +12,7 @@ import legoata.engine.action.ModelActionNullData;
 import legoata.engine.action.ActionResult;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.CompleteTurn;
-import legoata.engine.controller.command.ExitGame;
 import legoata.engine.controller.command.TurnCommand;
-import legoata.engine.controller.command.ChangeController;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.decision.node.DecisionBuilderNode;
@@ -25,7 +22,6 @@ import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.decision.node.nonbranching.GoBack;
 import legoata.engine.decision.node.nonbranching.ReturnToRoot;
 import legoata.engine.execute.ControlSet;
-import legoata.engine.execute.GameControls;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.model.LGObject;
 
@@ -78,7 +74,8 @@ public abstract class Controller {
 				return new RepeatController();
 			// if exit requested, or if in error state, exit the game
 			default:
-				return new ExitGame();
+				this.controls.getGameControls().setExitFlag(true);
+				return new CompleteTurn();
 		}
 	}
 	

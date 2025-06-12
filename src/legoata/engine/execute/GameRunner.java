@@ -14,7 +14,6 @@ import legoata.engine.action.ActionResult;
 import legoata.engine.controller.Controller;
 import legoata.engine.controller.command.ChangeController;
 import legoata.engine.controller.command.CompleteTurn;
-import legoata.engine.controller.command.Interrupt;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.TurnCommand;
 import legoata.engine.decision.Decision;
@@ -100,6 +99,7 @@ public class GameRunner {
 	
 	public void run() {
 		
+		// set up
 		MutableControlSet controls = new MutableControlSet();
 		EventHandlerSet eventHandlers = this.initializeEventHandlerSet();
 		Clock gameClock = new Clock();
@@ -117,8 +117,10 @@ public class GameRunner {
 		controls.setGameControls(new GameControls(game));
 		controls.setClockControls(new ClockControls(gameClock));
 		
+		// run the INIT_GAME event handler
 		this.initializer.consume(new GameCycleEvent(Phase.INIT_GAME), controls);
 		
+		// execute game loop
 		while (!game.getExitFlag()) {
 			// execute round
 			executeRound(game, controls, eventHandlers);
@@ -132,12 +134,20 @@ public class GameRunner {
 		game.getClock().increment(); // fires TimeChangeEvent
 		fireGameCycleEvent(Phase.PRE_ROUND, controls, eventHandlers);
 		
+		if (game.getExitFlag()) {
+			return;
+		}
+		
 		// INIT_ROUND
 		game.setPhase(Phase.INIT_ROUND);
 		Round round = new Round();
 		game.setRound(round);
 		controls.setRoundControls(new RoundControls(round));
 		fireGameCycleEvent(Phase.INIT_ROUND, controls, eventHandlers);
+		
+		if (game.getExitFlag()) {
+			return;
+		}
 		
 		// execute turns
 		while (!game.getExitFlag() && game.getRound().getIndex() < game.getPlayers().size()) {
@@ -146,6 +156,10 @@ public class GameRunner {
 			executeTurn(player, game, controls, eventHandlers);
 			game.getRound().incrementIndex();
 
+		}
+		
+		if (game.getExitFlag()) {
+			return;
 		}
 		
 		// POST_ROUND
@@ -163,12 +177,20 @@ public class GameRunner {
 		game.setPhase(Phase.PRE_TURN);
 		fireGameCycleEvent(Phase.PRE_TURN, controls, eventHandlers);
 		
+		if (game.getExitFlag()) {
+			return TurnResultCode.TurnCancelled;
+		}
+		
 		// INIT_TURN
 		game.setPhase(Phase.INIT_TURN);
 		Turn turn = new Turn(player);
 		game.setTurn(turn);
 		controls.setTurnControls(new TurnControls(turn));
 		fireGameCycleEvent(Phase.INIT_TURN, controls, eventHandlers);
+		
+		if (game.getExitFlag()) {
+			return TurnResultCode.TurnCancelled;
+		}
 
 		// ACTION
 		game.setPhase(Phase.ACTION);
@@ -196,11 +218,11 @@ public class GameRunner {
 			// init phase
 			TurnCommand tcmd = ctrl.init();
 			
-			if (tcmd instanceof CompleteTurn) {
-				code = TurnResultCode.TurnFinished;
-				break;
-			} else if (tcmd instanceof Interrupt) {
+			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
+				return code;
+			} else if (tcmd instanceof CompleteTurn) {
+				code = TurnResultCode.TurnFinished;
 				break;
 			} else if (tcmd instanceof RepeatController) {
 				throw new IllegalStateException("Cannot use RepeatController command during init phase.");
@@ -233,10 +255,11 @@ public class GameRunner {
 			
 			// check if turn is ending
 			tcmd = ctrl.close(actionResult);
-			if (tcmd instanceof CompleteTurn){
-				code = TurnResultCode.TurnFinished;
-			} else if (tcmd instanceof Interrupt) {
+			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
+				return code;
+			} else if (tcmd instanceof CompleteTurn){
+				code = TurnResultCode.TurnFinished;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
 			}
