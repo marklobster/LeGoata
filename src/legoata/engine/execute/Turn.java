@@ -3,12 +3,23 @@ package legoata.engine.execute;
 import java.util.HashMap;
 import java.util.Map;
 
+import legoata.engine.model.LGObject;
+
 class Turn {
 
+	private LGObject turnTaker;
 	private TurnState state = TurnState.PRE_INIT;
 	private Map<String, Object> data = new HashMap<String, Object>();
 	private int actionCount;
 	private int actionLimit;
+	
+	Turn(LGObject turnTaker) {
+		this.turnTaker = turnTaker;
+	}
+
+	public LGObject getTurnTaker() {
+		return turnTaker;
+	}
 
 	public TurnState getState() {
 		return state;

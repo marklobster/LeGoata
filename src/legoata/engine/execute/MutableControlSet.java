@@ -3,6 +3,7 @@ package legoata.engine.execute;
 class MutableControlSet implements ControlSet {
 	
 	private GameControls gameControls;
+	private ClockControls clockControls;
 	private RoundControls roundControls;
 	private TurnControls turnControls;
 	
@@ -11,6 +12,12 @@ class MutableControlSet implements ControlSet {
 	}
 	void setGameControls(GameControls gameControls) {
 		this.gameControls = gameControls;
+	}
+	public ClockControls getClockControls() {
+		return this.clockControls;
+	}
+	void setClockControls(ClockControls clockControls) {
+		this.clockControls = clockControls;
 	}
 	public RoundControls getRoundControls() {
 		return roundControls;

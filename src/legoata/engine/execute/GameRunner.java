@@ -1,7 +1,12 @@
 package legoata.engine.execute;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.function.LongConsumer;
 import java.util.Scanner;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import legoata.engine.Constants;
 import legoata.engine.action.Action;
@@ -13,25 +18,35 @@ import legoata.engine.controller.command.Interrupt;
 import legoata.engine.controller.command.RepeatController;
 import legoata.engine.controller.command.TurnCommand;
 import legoata.engine.decision.Decision;
+import legoata.engine.event.ActionEvent;
+import legoata.engine.event.ActionEventHandler;
+import legoata.engine.event.GameCycleEvent;
+import legoata.engine.event.GameCycleEventHandler;
+import legoata.engine.event.TimeChangeEvent;
+import legoata.engine.event.TimeChangeEventHandler;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.execute.provider.controller.ControllerProvider;
-import legoata.engine.gameop.GameOp;
 import legoata.engine.model.LGObject;
 
 public class GameRunner {
 	
-	private GameOp initializer = null;
+	private InputStream input = System.in;
+	private PrintStream out = System.out;
+	
+	private GameCycleEventHandler initializer = null;
 	private ControllerProvider controllerProvider = null;
 	private ActionProvider actionProvider = null;
-	private ArrayList<GameOp> preRound = new ArrayList<GameOp>();
-	private ArrayList<GameOp> initRound = new ArrayList<GameOp>();
-	private ArrayList<GameOp> preTurn = new ArrayList<GameOp>();
-	private ArrayList<GameOp> initTurn = new ArrayList<GameOp>();
-	private ArrayList<GameOp> onAction = new ArrayList<GameOp>();
-	private ArrayList<GameOp> postTurn = new ArrayList<GameOp>();
-	private ArrayList<GameOp> postRound = new ArrayList<GameOp>();
 	
-	public void setInitializer(GameOp initializer) {
+	private ArrayList<GameCycleEventHandler> preRound = new ArrayList<GameCycleEventHandler>();
+	private ArrayList<GameCycleEventHandler> initRound = new ArrayList<GameCycleEventHandler>();
+	private ArrayList<GameCycleEventHandler> preTurn = new ArrayList<GameCycleEventHandler>();
+	private ArrayList<GameCycleEventHandler> initTurn = new ArrayList<GameCycleEventHandler>();
+	private ArrayList<ActionEventHandler> onAction = new ArrayList<ActionEventHandler>();
+	private ArrayList<GameCycleEventHandler> postTurn = new ArrayList<GameCycleEventHandler>();
+	private ArrayList<GameCycleEventHandler> postRound = new ArrayList<GameCycleEventHandler>();
+	private ArrayList<TimeChangeEventHandler> moment = new ArrayList<TimeChangeEventHandler>();
+	
+	public void setInitializer(GameCycleEventHandler initializer) {
 		this.initializer = initializer;
 	}
 	
@@ -51,96 +66,112 @@ public class GameRunner {
 		this.actionProvider = actionProvider;
 	}
 	
-	public void addPreRoundEventHandler(GameOp op) {
+	public void addPreRoundEventHandler(GameCycleEventHandler op) {
 		this.preRound.add(op);
 	}
 	
-	public void addInitRoundEventHandler(GameOp op) {
+	public void addInitRoundEventHandler(GameCycleEventHandler op) {
 		this.initRound.add(op);
 	}
 	
-	public void addPreTurnEventHandler(GameOp op) {
+	public void addPreTurnEventHandler(GameCycleEventHandler op) {
 		this.preTurn.add(op);
 	}
 	
-	public void addInitTurnEventHandler(GameOp op) {
+	public void addInitTurnEventHandler(GameCycleEventHandler op) {
 		this.initTurn.add(op);
 	}
 	
-	public void addActionEventHandler(GameOp op) {
+	public void addActionEventHandler(ActionEventHandler op) {
 		this.onAction.add(op);
 	}
 	
-	public void addPostTurnEventHandler(GameOp op) {
+	public void addPostTurnEventHandler(GameCycleEventHandler op) {
 		this.postTurn.add(op);
 	}
 	
-	public void addPostRoundEventHandler(GameOp op) {
+	public void addPostRoundEventHandler(GameCycleEventHandler op) {
 		this.postRound.add(op);
 	}
 	
+	public void addMomentEventHandler(TimeChangeEventHandler op) {
+		this.moment.add(op);
+	}
+	
 	public void run() {
-		Game game = new Game();
-		game.setScanner(new Scanner(System.in));
-		game.setOutStream(System.out);
 		
 		MutableControlSet controls = new MutableControlSet();
+		EventHandlerSet eventHandlers = this.initializeEventHandlerSet();
+		Clock gameClock = new Clock();
+		gameClock.setOnMomentStrike(new LongConsumer() {
+			@Override
+			public void accept(long moment) {
+				fireTimeChangeEvent(moment, controls, eventHandlers);
+			}
+		});
+		Game game = new Game();
+		game.setClock(gameClock);
+		game.setScanner(new Scanner(this.input));
+		game.setOutStream(this.out);
+
 		controls.setGameControls(new GameControls(game));
+		controls.setClockControls(new ClockControls(gameClock));
 		
-		this.initializer.execute(controls);
+		this.initializer.consume(new GameCycleEvent(Phase.INIT_GAME), controls);
 		
 		while (!game.getExitFlag()) {
 			// execute round
-			executeRound(game, controls);
+			executeRound(game, controls, eventHandlers);
 		}
 	}
 	
-	private void executeRound(Game game, MutableControlSet controls) {
+	private void executeRound(Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
 		
-		for (GameOp op : this.preRound) {
-			op.execute(controls);
-		}
+		// PRE_ROUND
+		game.setPhase(Phase.PRE_ROUND);
+		game.getClock().increment(); // fires TimeChangeEvent
+		fireGameCycleEvent(Phase.PRE_ROUND, controls, eventHandlers);
 		
-		// create round
+		// INIT_ROUND
+		game.setPhase(Phase.INIT_ROUND);
 		Round round = new Round();
 		game.setRound(round);
 		controls.setRoundControls(new RoundControls(round));
+		fireGameCycleEvent(Phase.INIT_ROUND, controls, eventHandlers);
 		
-		for (GameOp op : this.initRound) {
-			op.execute(controls);
-		}
-		
+		// execute turns
 		while (!game.getExitFlag() && game.getRound().getIndex() < game.getPlayers().size()) {
 			
 			LGObject player = game.getPlayers().get(game.getRound().getIndex());
-			executeTurn(player, game, controls);
+			executeTurn(player, game, controls, eventHandlers);
 			game.getRound().incrementIndex();
 
 		}
 		
-		for (GameOp op : this.postRound) {
-			op.execute(controls);
-		}
+		// POST_ROUND
+		game.setPhase(Phase.POST_ROUND);
+		fireGameCycleEvent(Phase.POST_ROUND, controls, eventHandlers);
 		
 		// delete round
 		game.setRound(null);
 		controls.setRoundControls(null);
 	}
 	
-	private TurnResultCode executeTurn(LGObject player, Game game, MutableControlSet controls) {
+	private TurnResultCode executeTurn(LGObject player, Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
+
+		// PRE_TURN
+		game.setPhase(Phase.PRE_TURN);
+		fireGameCycleEvent(Phase.PRE_TURN, controls, eventHandlers);
 		
-		for (GameOp op : this.preTurn) {
-			op.execute(controls);
-		}
-		
-		// create turn
-		Turn turn = new Turn();
+		// INIT_TURN
+		game.setPhase(Phase.INIT_TURN);
+		Turn turn = new Turn(player);
 		game.setTurn(turn);
 		controls.setTurnControls(new TurnControls(turn));
-		
-		for (GameOp op : this.initTurn) {
-			op.execute(controls);
-		}
+		fireGameCycleEvent(Phase.INIT_TURN, controls, eventHandlers);
+
+		// ACTION
+		game.setPhase(Phase.ACTION);
 		
 		String ctrlName = Constants.DEFAULT_CTRL;
 		ArrayList<String> trackedControllerNames = new ArrayList<String>();
@@ -190,10 +221,12 @@ public class GameRunner {
 			
 			// execute action
 			ActionResult actionResult = ctrl.executeAction(action, decision.getData());
-			
-			for (GameOp op : this.onAction) {
-				op.execute(controls);
-			}
+			fireActionEvent(
+					decision.getAction(),
+					action,
+					actionResult,
+					controls,
+					eventHandlers);
 			
 			// post execute
 			ctrl.onExecute(actionResult);
@@ -210,14 +243,165 @@ public class GameRunner {
 			
 		} while (code != TurnResultCode.TurnInProgress);
 		
-		for (GameOp op : this.postTurn) {
-			op.execute(controls);
-		}
-		
+		// POST_TURN
+		game.setPhase(Phase.POST_TURN);
+		fireGameCycleEvent(Phase.POST_TURN, controls, eventHandlers);
+
 		// delete turn
 		game.setTurn(null);
 		controls.setTurnControls(null);
 		return code;
 	}
 	
+	private EventHandlerSet initializeEventHandlerSet() {
+		
+		EventHandlerSet eventHandlers = new EventHandlerSet();
+		
+		eventHandlers.getPermanentPreRoundHandlers().addAll(this.preRound);
+		eventHandlers.getPermanentInitRoundHandlers().addAll(this.initRound);
+		eventHandlers.getPermanentPreTurnHandlers().addAll(this.preTurn);
+		eventHandlers.getPermanentInitTurnHandlers().addAll(this.initTurn);
+		eventHandlers.getPermanentActionHandlers().addAll(this.onAction);
+		eventHandlers.getPermanentPostTurnHandlers().addAll(this.postTurn);
+		eventHandlers.getPermanentPostRoundHandlers().addAll(this.postRound);
+		eventHandlers.getPermanentMomentHandlers().addAll(this.moment);
+		
+		return eventHandlers;
+	}
+	
+	private void fireGameCycleEvent(
+			Phase phase,
+			ControlSet controls,
+			EventHandlerSet eventHandlers) {
+		
+		ArrayList<GameCycleEventHandler> permanentEventHandlers = null;
+		TreeSet<ScheduledEvent<GameCycleEventHandler>> scheduledEventHandlers = null;
+		UUID turnTaker = null;
+		
+		// determine event handlers to use and identity of turnTaker (for some phases)
+		switch (phase) {
+		case PRE_ROUND:
+			permanentEventHandlers = eventHandlers.getPermanentPreRoundHandlers();
+			scheduledEventHandlers = eventHandlers.getScheduledPreRoundHandlers();
+			break;
+		case INIT_ROUND:
+			permanentEventHandlers = eventHandlers.getPermanentInitRoundHandlers();
+			scheduledEventHandlers = eventHandlers.getScheduledInitRoundHandlers();
+			break;
+		case PRE_TURN:
+			permanentEventHandlers = eventHandlers.getPermanentPreTurnHandlers();
+			scheduledEventHandlers = eventHandlers.getScheduledPreTurnHandlers();
+			break;
+		case INIT_TURN:
+			turnTaker = controls.getTurnControls().getTurnTaker().getId();
+			permanentEventHandlers = eventHandlers.getPermanentInitTurnHandlers();
+			scheduledEventHandlers = eventHandlers.getScheduledInitTurnHandlers();
+			break;
+		case POST_TURN:
+			turnTaker = controls.getTurnControls().getTurnTaker().getId();
+			permanentEventHandlers = eventHandlers.getPermanentPostTurnHandlers();
+			scheduledEventHandlers = eventHandlers.getScheduledPostTurnHandlers();
+			break;
+		case POST_ROUND:
+			permanentEventHandlers = eventHandlers.getPermanentPostRoundHandlers();
+			scheduledEventHandlers = eventHandlers.getScheduledPostRoundHandlers();
+			break;
+		default:
+			return;
+		}
+		
+		GameCycleEvent event = new GameCycleEvent(phase);
+		
+		// run permanent event handlers
+		for (GameCycleEventHandler handler : permanentEventHandlers) {
+			handler.consume(event, controls);
+		}
+		
+		// run scheduled event handlers
+		long currentMoment = controls.getClockControls().getMoment();
+		ArrayList<ScheduledEvent<GameCycleEventHandler>> discards = new ArrayList<ScheduledEvent<GameCycleEventHandler>>();
+		for (ScheduledEvent<GameCycleEventHandler> scheduledEvent : scheduledEventHandlers) {
+			long scheduledTime = scheduledEvent.getTime();
+			if (scheduledTime < currentMoment) {
+				// discard past event handlers
+				discards.add(scheduledEvent);
+			} else if (scheduledTime == currentMoment && scheduledEvent.getObjectId() == turnTaker) {
+				// run then discard scheduled events which correspond to turnTaker, even if it is null
+				scheduledEvent.getEventHandler().consume(event, controls);
+				discards.add(scheduledEvent);
+			} else if (scheduledTime > currentMoment) {
+				// stop once we get to future event handlers
+				break;
+			}
+		}
+		scheduledEventHandlers.removeAll(discards);
+	}
+	
+	private void fireActionEvent(
+			String actionName,
+			Action action,
+			ActionResult result,
+			ControlSet controls,
+			EventHandlerSet eventHandlers) {
+		
+		ActionEvent event = new ActionEvent(actionName, action, result);
+		
+		// run permanent event handlers
+		for (ActionEventHandler handler : eventHandlers.getPermanentActionHandlers()) {
+			handler.consume(event, controls);
+		}
+		
+		// run the scheduled event handlers
+		long currentMoment = controls.getClockControls().getMoment();
+		UUID turnTaker = controls.getTurnControls().getTurnTaker().getId();
+		ArrayList<ScheduledEvent<ActionEventHandler>> discards = new ArrayList<ScheduledEvent<ActionEventHandler>>();
+		for (ScheduledEvent<ActionEventHandler> scheduledEvent : eventHandlers.getScheduledActionHandlers()) {
+			long scheduledTime = scheduledEvent.getTime();
+			if (scheduledTime < currentMoment) {
+				// remove any past events which are still in the queue
+				discards.add(scheduledEvent);
+			} else if (scheduledTime == currentMoment && scheduledEvent.getObjectId() == turnTaker) {
+				// run then discard events for the active player at this moment
+				scheduledEvent.getEventHandler().consume(event, controls);
+				discards.add(scheduledEvent);
+			} else if (scheduledTime > currentMoment) {
+				// stop when future events are reached
+				break;
+			}
+		}
+		eventHandlers.getScheduledActionHandlers().removeAll(discards);
+	}
+	
+	private void fireTimeChangeEvent(
+			long currentMoment,
+			ControlSet controls,
+			EventHandlerSet eventHandlers) {
+		
+		TimeChangeEvent event = new TimeChangeEvent(currentMoment);
+		
+		// run permanent event handlers
+		ArrayList<TimeChangeEventHandler> permanentEventHandlers = eventHandlers.getPermanentMomentHandlers();
+		for (TimeChangeEventHandler handler : permanentEventHandlers) {
+			handler.consume(event, controls);
+		}
+		
+		// run the scheduled event handlers
+		TreeSet<ScheduledEvent<TimeChangeEventHandler>> scheduledEventHandlers = eventHandlers.getScheduledMomentHandlers();
+		ArrayList<ScheduledEvent<TimeChangeEventHandler>> discards = new ArrayList<ScheduledEvent<TimeChangeEventHandler>>();
+		for (ScheduledEvent<TimeChangeEventHandler> scheduledEvent : scheduledEventHandlers) {
+			long scheduledTime = scheduledEvent.getTime();
+			if (scheduledTime < currentMoment) {
+				// remove any past events which are still in the queue
+				discards.add(scheduledEvent);
+			} else if (scheduledTime == currentMoment) {
+				// run then discard events for this moment
+				scheduledEvent.getEventHandler().consume(event, controls);
+				discards.add(scheduledEvent);
+			} else {
+				// stop when future events are reached
+				break;
+			}
+		}
+		scheduledEventHandlers.removeAll(discards);
+	}
 }

@@ -2,6 +2,8 @@ package legoata.engine.execute;
 
 import java.util.Map;
 
+import legoata.engine.model.LGObject;
+
 public class TurnControls {
 	
 	private Turn turn;
@@ -30,4 +32,7 @@ public class TurnControls {
 		this.turn.setActionLimit(actionLimit);
 	}
 	
+	public LGObject getTurnTaker() {
+		return this.turn.getTurnTaker();
+	}
 }

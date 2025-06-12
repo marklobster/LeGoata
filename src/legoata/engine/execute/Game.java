@@ -8,15 +8,33 @@ import legoata.engine.model.LGObject;
 
 class Game {
 
+	private Phase phase = Phase.INIT_GAME;
 	private ArrayList<LGObject> players = new ArrayList<LGObject>();
+	private Clock clock;
 	private Round round = null;
 	private Turn turn = null;
 	private Scanner scanner = null;
 	private PrintStream outStream = null;
-	private boolean exitFlag;	
+	private boolean exitFlag;
 	
+	public Phase getPhase() {
+		return phase;
+	}
+
+	public void setPhase(Phase phase) {
+		this.phase = phase;
+	}
+
 	ArrayList<LGObject> getPlayers() {
 		return this.players;
+	}
+
+	public Clock getClock() {
+		return clock;
+	}
+
+	public void setClock(Clock clock) {
+		this.clock = clock;
 	}
 
 	public boolean getExitFlag() {
