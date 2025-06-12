@@ -19,9 +19,5 @@ public class RoundControls {
 	public void incrementIndex() {
 		this.round.incrementIndex();
 	}
-	
-	public RoundState getRoundState() {
-		return this.round.getState();
-	}
 
 }

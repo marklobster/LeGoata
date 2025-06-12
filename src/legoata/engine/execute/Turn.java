@@ -8,7 +8,6 @@ import legoata.engine.model.LGObject;
 class Turn {
 
 	private LGObject turnTaker;
-	private TurnState state = TurnState.PRE_INIT;
 	private Map<String, Object> data = new HashMap<String, Object>();
 	private int actionCount;
 	private int actionLimit;
@@ -19,14 +18,6 @@ class Turn {
 
 	public LGObject getTurnTaker() {
 		return turnTaker;
-	}
-
-	public TurnState getState() {
-		return state;
-	}
-
-	public void setState(TurnState state) {
-		this.state = state;
 	}
 
 	public int getActionCount() {
