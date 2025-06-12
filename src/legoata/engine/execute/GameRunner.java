@@ -116,13 +116,14 @@ public class GameRunner {
 
 		controls.setGameControls(new GameControls(game));
 		controls.setClockControls(new ClockControls(gameClock));
+		controls.setSchedulingControls(new SchedulingControls(eventHandlers));
 		
 		// run the INIT_GAME event handler
 		this.initializer.consume(new GameCycleEvent(Phase.INIT_GAME), controls);
 		
 		// execute game loop
 		while (!game.getExitFlag()) {
-			// execute round
+			
 			executeRound(game, controls, eventHandlers);
 		}
 	}

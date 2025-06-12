@@ -4,6 +4,7 @@ class MutableControlSet implements ControlSet {
 	
 	private GameControls gameControls;
 	private ClockControls clockControls;
+	private SchedulingControls schedulingControls;
 	private RoundControls roundControls;
 	private TurnControls turnControls;
 	
@@ -18,6 +19,12 @@ class MutableControlSet implements ControlSet {
 	}
 	void setClockControls(ClockControls clockControls) {
 		this.clockControls = clockControls;
+	}
+	public SchedulingControls getSchedulingControls() {
+		return this.schedulingControls;
+	}
+	void setSchedulingControls(SchedulingControls schedulingControls) {
+		this.schedulingControls = schedulingControls;
 	}
 	public RoundControls getRoundControls() {
 		return roundControls;
