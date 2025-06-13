@@ -25,6 +25,9 @@ import legoata.engine.execute.ControlSet;
 import legoata.engine.execute.provider.action.ActionProvider;
 import legoata.engine.model.LGObject;
 
+/**
+ * Class for handling a given situation for a player, or designating a different controller for the job.
+ */
 public abstract class Controller {
 	
 	private LGObject turnTaker = null;
@@ -35,18 +38,40 @@ public abstract class Controller {
 		this.controls = controls;
 	}
 	
+	/**
+	 * Return a ChangeController command to route to a different controller, a CompleteTurn command to take no actions, 
+	 * or null to just continue with this controller.  Returning a RepeatController command at this point will throw an 
+	 * exception.
+	 * @return TurnCommand
+	 */
 	public TurnCommand init() {
 		return null;
 	}
 	
+	/**
+	 * Instantiate a Decision for the player.
+	 * @return
+	 */
 	public Decision getDecision() {
 		return null;
 	}
 	
+	/**
+	 * Instantiate the Action.  It is very unlikely that this function will need to be overridden.
+	 * @param provider
+	 * @param decision
+	 * @return
+	 */
 	public Action resolveActionName(ActionProvider provider, Decision decision) {
 		return provider.getAction(decision.getAction());
 	}
 	
+	/**
+	 * Execute the action, using the appropriate executor.  It is not likely this function will need overridden.
+	 * @param action
+	 * @param input
+	 * @return
+	 */
 	public ActionResult executeAction(Action action, Object input) {
 		ActionResult result = null;
 		if (action instanceof ModelAction) {
@@ -59,10 +84,19 @@ public abstract class Controller {
 		return result;
 	}
 	
+	/**
+	 * Perform any upkeep for this controller, post-action.
+	 * @param result
+	 */
 	public void onExecute(ActionResult result) {
 		
 	}
 	
+	/**
+	 * Translate the ActionResult to a TurnCommand, thereby either finalizing the turn, or continuing it.
+	 * @param result
+	 * @return
+	 */
 	public TurnCommand close(ActionResult result) {
 		// default to error
 		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
@@ -79,6 +113,12 @@ public abstract class Controller {
 		}
 	}
 	
+	/**
+	 * Obtain input from a player who is a user. Use a DecisionBuilder to present options and obtain the selection.
+	 * @param builder
+	 * @param actor
+	 * @return
+	 */
 	protected Decision getUserDecision(DecisionBuilder builder, LGObject actor) {
 		
 		PrintStream out = this.controls.getGameControls().getOutStream();

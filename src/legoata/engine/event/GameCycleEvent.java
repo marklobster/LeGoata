@@ -2,6 +2,9 @@ package legoata.engine.event;
 
 import legoata.engine.execute.Phase;
 
+/**
+ * An event that fires when the game cycles to certain phases.
+ */
 public class GameCycleEvent extends GameEvent {
 	
 	private Phase phase;
@@ -10,6 +13,10 @@ public class GameCycleEvent extends GameEvent {
 		this.phase = phase;
 	}
 
+	/**
+	 * The phase change which caused the event to fire.
+	 * @return
+	 */
 	public Phase getPhase() {
 		return phase;
 	}

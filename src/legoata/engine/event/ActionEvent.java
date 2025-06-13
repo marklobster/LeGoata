@@ -3,6 +3,9 @@ package legoata.engine.event;
 import legoata.engine.action.Action;
 import legoata.engine.action.ActionResult;
 
+/**
+ * An event that fires when an action is performed.
+ */
 public class ActionEvent extends GameEvent {
 	private String actionName;
 	private Action action;

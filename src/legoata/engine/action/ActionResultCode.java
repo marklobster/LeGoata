@@ -1,17 +1,17 @@
 package legoata.engine.action;
 
 /**
- * 
+ * The result of an action's execution.
  * @author Mark
  *
  */
 public enum ActionResultCode {
 	/**
-	 * The action completed and potentially completed the turn.
+	 * The action completed and the player progresses toward the end of their turn.
 	 */
 	Consequential,
 	/**
-	 * The action completed, but it is not an action that normally ends a turn.
+	 * The action completed, but it is not an action that normally progresses a turn.
 	 */
 	Inconsequential,
 	/**
@@ -23,7 +23,7 @@ public enum ActionResultCode {
 	 */
 	Error,
 	/**
-	 * The user requested to exit the game.
+	 * The player requested to exit the game.
 	 */
 	ExitRequested
 }

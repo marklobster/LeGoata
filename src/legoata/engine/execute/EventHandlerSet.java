@@ -7,6 +7,9 @@ import legoata.engine.event.ActionEventHandler;
 import legoata.engine.event.GameCycleEventHandler;
 import legoata.engine.event.TimeChangeEventHandler;
 
+/**
+ * Contains every active Game Event Handler.
+ */
 class EventHandlerSet {
 	
 	private ArrayList<GameCycleEventHandler> preRound = new ArrayList<GameCycleEventHandler>();

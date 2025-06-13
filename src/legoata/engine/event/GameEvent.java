@@ -2,12 +2,19 @@ package legoata.engine.event;
 
 import java.time.LocalDateTime;
 
+/**
+ * An event fired by the Le Goata framework.
+ */
 public abstract class GameEvent {
-	private LocalDateTime timeStamp;
+	private LocalDateTime timestamp;
 	public GameEvent() {
-		this.timeStamp = LocalDateTime.now();
+		this.timestamp = LocalDateTime.now();
 	}
-	public LocalDateTime getTimeStamp() {
-		return timeStamp;
+	/**
+	 * The event's time of instantiation.
+	 * @return
+	 */
+	public LocalDateTime getTimestamp() {
+		return timestamp;
 	}
 }

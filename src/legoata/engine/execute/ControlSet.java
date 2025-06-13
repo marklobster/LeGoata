@@ -1,5 +1,8 @@
 package legoata.engine.execute;
 
+/**
+ * Contains controls for manipulating game state and data.
+ */
 public interface ControlSet {
 
 	public GameControls getGameControls();

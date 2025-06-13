@@ -1,5 +1,8 @@
 package legoata.engine.action;
 
+/**
+ * An action to be performed by a player during a turn.
+ */
 public abstract class Action {
 
 	protected ActionResult actionCompleteWithConsequence() {
