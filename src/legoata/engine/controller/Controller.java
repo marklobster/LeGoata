@@ -1,12 +1,18 @@
-package legoata.engine.game;
+package legoata.engine.controller;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Scanner;
 import java.util.Stack;
 
-import legoata.engine.actions.MeleeAttack;
-import legoata.engine.actions.TargetType;
+import legoata.engine.action.Action;
+import legoata.engine.action.ActionResultCode;
+import legoata.engine.action.ModelAction;
+import legoata.engine.action.ModelActionNullData;
+import legoata.engine.action.ActionResult;
+import legoata.engine.controller.command.RepeatController;
+import legoata.engine.controller.command.CompleteTurn;
+import legoata.engine.controller.command.TurnCommand;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.DecisionBuilder;
 import legoata.engine.decision.node.DecisionBuilderNode;
@@ -15,63 +21,107 @@ import legoata.engine.decision.node.branching.OptionSet;
 import legoata.engine.decision.node.nonbranching.DecisionComplete;
 import legoata.engine.decision.node.nonbranching.GoBack;
 import legoata.engine.decision.node.nonbranching.ReturnToRoot;
-import legoata.engine.game.battle.Battle;
-import legoata.engine.gamecharacter.GameCharacter;
-import legoata.engine.situation.TimedActionSituation;
-import legoata.engine.utils.Utils;
+import legoata.engine.execute.ControlSet;
+import legoata.engine.execute.provider.action.ActionProvider;
+import legoata.engine.model.LGObject;
 
-public class GameRunner {
+/**
+ * Class for handling a given situation for a player, or designating a different controller for the job.
+ */
+public abstract class Controller {
 	
-	private Scanner scanner = new Scanner(System.in);
-	
-	private ArrayList<GameCharacter> heroes = new ArrayList<GameCharacter>();
-	private ArrayList<GameCharacter> enemies = new ArrayList<GameCharacter>();
-	
-	public void addTestHero(GameCharacter hero) {
-		heroes.add(hero);
+	private LGObject turnTaker = null;
+	private ControlSet controls = null;
+
+	public Controller(LGObject turnTaker, ControlSet controls) {
+		this.turnTaker = turnTaker;
+		this.controls = controls;
 	}
 	
-	public void addTestEnemy(GameCharacter enemy) {
-		enemies.add(enemy);
+	/**
+	 * Return a ChangeController command to route to a different controller, a CompleteTurn command to take no actions, 
+	 * or null to just continue with this controller.  Returning a RepeatController command at this point will throw an 
+	 * exception.
+	 * @return TurnCommand
+	 */
+	public TurnCommand init() {
+		return null;
 	}
 	
-	public void run() {
-		
-		TimedActionSituation situation = new Battle(heroes, enemies);
-		
-		while (!situation.isSituationOver()) {
-			
-			GameCharacter actor = situation.getNextUp();
-			Decision decision = null;
-			
-			// check if user or not
-			if (actor.isUserControlled()) {
-				
-				// build decision from user input
-				DecisionBuilder builder = situation.getDecisionBuilder();
-				decision = buildUserDecision(builder, actor);
-				
-			} else {
-				
-				// NPC attacks random foe
-				MeleeAttack attack = new MeleeAttack();
-				attack.setActionPerformer(actor);
-				ArrayList<GameCharacter> possibleTargets = situation.getPossibleTargets(TargetType.Foe);
-				GameCharacter target = selectTarget(possibleTargets);
-				attack.setTarget(target);
-				decision = new Decision();
-				decision.setAction(attack);
-			}
-			
-			situation.submitDecision(decision, System.out);
-			pause();
-			System.out.println();
+	/**
+	 * Instantiate a Decision for the player.
+	 * @return
+	 */
+	public Decision getDecision() {
+		return null;
+	}
+	
+	/**
+	 * Instantiate the Action.  It is very unlikely that this function will need to be overridden.
+	 * @param provider
+	 * @param decision
+	 * @return
+	 */
+	public Action resolveActionName(ActionProvider provider, Decision decision) {
+		return provider.getAction(decision.getAction());
+	}
+	
+	/**
+	 * Execute the action, using the appropriate executor.  It is not likely this function will need overridden.
+	 * @param action
+	 * @param input
+	 * @return
+	 */
+	public ActionResult executeAction(Action action, Object input) {
+		ActionResult result = null;
+		if (action instanceof ModelAction) {
+			ModelAction ma = (ModelAction)action;
+			result = ma.execute(turnTaker, input, this.controls);
+		} else {
+			ModelActionNullData ma = (ModelActionNullData)action;
+			result = ma.execute(turnTaker, this.controls);
 		}
-		
-		postGameDebrief();
+		return result;
 	}
 	
-	private Decision buildUserDecision(DecisionBuilder builder, GameCharacter actor) throws UnsupportedOperationException {
+	/**
+	 * Perform any upkeep for this controller, post-action.
+	 * @param result
+	 */
+	public void onExecute(ActionResult result) {
+		
+	}
+	
+	/**
+	 * Translate the ActionResult to a TurnCommand, thereby either finalizing the turn, or continuing it.
+	 * @param result
+	 * @return
+	 */
+	public TurnCommand close(ActionResult result) {
+		// default to error
+		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
+		switch (code) {
+			case Consequential:
+				return new CompleteTurn();
+			case Inconsequential:
+			case Incomplete:
+				return new RepeatController();
+			// if exit requested, or if in error state, exit the game
+			default:
+				this.controls.getGameControls().setExitFlag(true);
+				return new CompleteTurn();
+		}
+	}
+	
+	/**
+	 * Obtain input from a player who is a user. Use a DecisionBuilder to present options and obtain the selection.
+	 * @param builder
+	 * @param actor
+	 * @return
+	 */
+	protected Decision getUserDecision(DecisionBuilder builder, LGObject actor) {
+		
+		PrintStream out = this.controls.getGameControls().getOutStream();
 		
 		// put root level menu onto stack
 		Stack<OptionSet> menuStack = new Stack<OptionSet>();
@@ -81,7 +131,7 @@ public class GameRunner {
 		// print initial text of menu tree
 		String initialText = builder.getInitialText();
 		if (initialText != null && initialText != "") {
-			System.out.println(initialText);
+			out.println(initialText);
 		}
 		
 		do {
@@ -116,7 +166,7 @@ public class GameRunner {
 			else if (selection != null) {
 				
 				// run method for selected option
-				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor, System.out);
+				DecisionBuilderNode nextNode = currentMenu.select(builder.getDecision(), selection, actor, out);
 				
 				// repeat same decision
 				if (nextNode == null) {
@@ -171,33 +221,34 @@ public class GameRunner {
 	private Option getUserSelection(String prompt, ArrayList<Option> options, boolean allowEscape, String emptyListText) {
 		
 		final String BACK = "b";
+		PrintStream out = this.controls.getGameControls().getOutStream();
 		Option selection = null;
 		boolean escape = false;
 				
 		do {
 			// show prompt
-			System.out.println(prompt);
+			out.println(prompt);
 			
 			// show options
 			Hashtable<String, Option> map = new Hashtable<String, Option>();
 			if (options.isEmpty() && emptyListText != null && emptyListText != "") {
-				System.out.println(emptyListText);
+				out.println(emptyListText);
 			} else {
 				int counter = 0;
 				for (Option option : options) {
 					map.put(String.valueOf(counter), option);
-					System.out.println(String.format("[%d] %s", counter++, option.getTitle()));
+					out.println(String.format("[%d] %s", counter++, option.getTitle()));
 				}
 			}
 			
 			// show 'back' option, when applicable
 			if (allowEscape) {
-				System.out.println("[b] Back");
+				out.println("[b] Back");
 			}
 			
 			// get input, check if valid
 			selection = null;
-			String input = scanner.nextLine();
+			String input = this.controls.getGameControls().getScanner().nextLine();
 			if (input.equalsIgnoreCase(BACK)) {
 				escape = allowEscape;
 			} else {
@@ -209,34 +260,4 @@ public class GameRunner {
 		return selection;
 	}
 	
-	private void pause() {
-		scanner.nextLine();
-	}
-	
-	private void postGameDebrief() {
-		boolean goodTeamRemains = false;
-		for (GameCharacter member : heroes) {
-			if (!member.isFallen()) {
-				goodTeamRemains = true;
-				break;
-			}
-		}
-		
-		System.out.println("");
-		System.out.println("The winner is... " + (goodTeamRemains ? "you!!" : "the bad guys!!"));
-		
-		System.out.println("");
-		System.out.println("The stats:");
-		System.out.println("");
-		for (GameCharacter gc : heroes) {
-			gc.printStats(System.out);
-		}
-		for (GameCharacter gc : enemies) {
-			gc.printStats(System.out);
-		}
-	}
-	
-	private GameCharacter selectTarget(ArrayList<GameCharacter> targets) {
-		return Utils.pickRandom(targets);
-	}
 }

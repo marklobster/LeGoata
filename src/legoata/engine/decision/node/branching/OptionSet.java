@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import legoata.engine.decision.Decision;
 import legoata.engine.decision.node.DecisionBuilderNode;
 import legoata.engine.gamecharacter.GameCharacter;
+import legoata.engine.model.LGObject;
 
 /**
  * A menu of selectable options.
@@ -14,11 +15,11 @@ import legoata.engine.gamecharacter.GameCharacter;
  */
 public interface OptionSet extends DecisionBuilderNode {
 
-	public DecisionBuilderNode select(Decision decision, Option selection, GameCharacter actor, PrintStream out);
+	public DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out);
 	
-	public void undoSelection(Decision decision, GameCharacter character);
+	public void undoSelection(Decision decision, LGObject actor);
 	
-	public ArrayList<Option> getOptions(Decision decision, GameCharacter character);
+	public ArrayList<Option> getOptions(Decision decision, LGObject actor);
 	
 	public String getPrompt();
 	

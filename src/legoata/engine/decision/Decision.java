@@ -1,17 +1,25 @@
 package legoata.engine.decision;
 
-import legoata.engine.actions.CharacterAction;
-
 public class Decision {
 
-	private CharacterAction action;
+	private String actionName;
+	
+	private Object data;
 
-	public CharacterAction getAction() {
-		return action;
+	public Object getData() {
+		return data;
 	}
 
-	public void setAction(CharacterAction action) {
-		this.action = action;
+	public void setData(Object data) {
+		this.data = data;
+	}
+
+	public String getAction() {
+		return actionName;
+	}
+
+	public void setActionName(String actionName) {
+		this.actionName = actionName;
 	}
 	
 }
