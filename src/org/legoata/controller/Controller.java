@@ -10,6 +10,7 @@ import org.legoata.action.ActionResult;
 import org.legoata.action.ActionResultCode;
 import org.legoata.action.ModelAction;
 import org.legoata.action.ModelActionNullData;
+import org.legoata.config.LGConfig;
 import org.legoata.controller.command.CompleteTurn;
 import org.legoata.controller.command.RepeatController;
 import org.legoata.controller.command.TurnCommand;
@@ -22,6 +23,7 @@ import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.decision.node.nonbranching.GoBack;
 import org.legoata.decision.node.nonbranching.ReturnToRoot;
 import org.legoata.execute.ControlSet;
+import org.legoata.execute.TurnControls;
 import org.legoata.execute.provider.action.ActionProvider;
 import org.legoata.model.LGObject;
 
@@ -102,15 +104,27 @@ public abstract class Controller {
 		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
 		switch (code) {
 			case Consequential:
+				LGConfig settings = this.getControls().getGameControls().getSettings();
+				if (settings.isActionCountingEnabled()) {
+					TurnControls turnControls = this.getControls().getTurnControls();
+					turnControls.setActionCount(turnControls.getActionCount() + 1);
+					if (turnControls.getActionCount() < turnControls.getActionLimit()) {
+						return new RepeatController();
+					}
+				}
 				return new CompleteTurn();
 			case Inconsequential:
 			case Incomplete:
 				return new RepeatController();
 			// if exit requested, or if in error state, exit the game
 			default:
-				this.controls.getGameControls().setExitFlag(true);
+				this.getControls().getGameControls().setExitFlag(true);
 				return new CompleteTurn();
 		}
+	}
+	
+	protected ControlSet getControls() {
+		return this.controls;
 	}
 	
 	/**

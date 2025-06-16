@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.legoata.config.LGConfig;
 import org.legoata.model.LGObject;
 
 public class GameControls {
@@ -24,6 +25,10 @@ public class GameControls {
 	
 	public PrintStream getOutStream() {
 		return game.getOutStream();
+	}
+	
+	public LGConfig getSettings() {
+		return this.game.getSettings();
 	}
 	
 	public boolean getExitFlag() {

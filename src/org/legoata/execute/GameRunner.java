@@ -8,6 +8,8 @@ import java.util.function.LongConsumer;
 import org.legoata.Constants;
 import org.legoata.action.Action;
 import org.legoata.action.ActionResult;
+import org.legoata.config.GameConfig;
+import org.legoata.config.ReadOnlyGameConfig;
 import org.legoata.controller.Controller;
 import org.legoata.controller.command.ChangeController;
 import org.legoata.controller.command.CompleteTurn;
@@ -28,6 +30,9 @@ import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.UUID;
 
+/**
+ * Configure your game, then call the run method to run the game.
+ */
 public class GameRunner {
 	
 	private InputStream input = System.in;
@@ -36,6 +41,8 @@ public class GameRunner {
 	private GameCycleEventHandler initializer = null;
 	private ControllerProvider controllerProvider = null;
 	private ActionProvider actionProvider = null;
+	
+	private GameConfig settings = new GameConfig();
 	
 	private ArrayList<GameCycleEventHandler> preRound = new ArrayList<GameCycleEventHandler>();
 	private ArrayList<GameCycleEventHandler> initRound = new ArrayList<GameCycleEventHandler>();
@@ -98,6 +105,13 @@ public class GameRunner {
 		this.moment.add(op);
 	}
 	
+	public GameConfig getConfig() {
+		return this.settings;
+	}
+	
+	/**
+	 * Run the game.
+	 */
 	public void run() {
 		
 		// set up
@@ -114,6 +128,7 @@ public class GameRunner {
 		game.setClock(gameClock);
 		game.setScanner(new Scanner(this.input));
 		game.setOutStream(this.out);
+		game.setSettings(new ReadOnlyGameConfig(this.settings));
 
 		controls.setGameControls(new GameControls(game));
 		controls.setClockControls(new ClockControls(gameClock));
@@ -133,7 +148,12 @@ public class GameRunner {
 		
 		// PRE_ROUND
 		game.setPhase(Phase.PRE_ROUND);
-		game.getClock().increment(); // fires TimeChangeEvent
+		
+		// update clock for PER_ROUND configuration
+		if (game.getSettings().isAutoClockTickEnabled()) {
+			game.getClock().increment();
+		}
+		
 		fireGameCycleEvent(Phase.PRE_ROUND, controls, eventHandlers);
 		
 		if (game.getExitFlag()) {
@@ -188,6 +208,9 @@ public class GameRunner {
 		Turn turn = new Turn(player);
 		game.setTurn(turn);
 		controls.setTurnControls(new TurnControls(turn));
+		if (game.getSettings().isActionCountingEnabled()) {
+			turn.setActionLimit(game.getSettings().getDefaultActionLimit());
+		}
 		fireGameCycleEvent(Phase.INIT_TURN, controls, eventHandlers);
 		
 		if (game.getExitFlag()) {
@@ -254,7 +277,7 @@ public class GameRunner {
 			
 			// post execute
 			ctrl.onExecute(actionResult);
-			
+
 			// check if turn is ending
 			tcmd = ctrl.close(actionResult);
 			if (game.getExitFlag()) {

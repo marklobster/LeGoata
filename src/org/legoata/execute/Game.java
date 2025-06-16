@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.legoata.config.LGConfig;
 import org.legoata.model.LGObject;
 
 class Game {
@@ -15,6 +16,7 @@ class Game {
 	private Turn turn = null;
 	private Scanner scanner = null;
 	private PrintStream outStream = null;
+	private LGConfig settings;
 	private boolean exitFlag;
 	
 	public Phase getPhase() {
@@ -75,6 +77,14 @@ class Game {
 
 	public void setTurn(Turn turn) {
 		this.turn = turn;
+	}
+
+	public LGConfig getSettings() {
+		return settings;
+	}
+
+	public void setSettings(LGConfig settings) {
+		this.settings = settings;
 	}
 
 }
