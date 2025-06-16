@@ -19,8 +19,10 @@ Players and other game objects derive from LGObject.  This object does not have 
 
 Once you've made your controllers, actions, event handlers, and LGObjects, you run the game by instantiating a Game Runner and configuring it to use your controllers/actions/handlers/objects.  Then, call the run method to start the game!
 
+The following packages will be deleted after I check them for salvage-able code (so you can ignore them):
+- org.legoata.equipment
+- org.legoata.gamecharacter
+
 Coming soon:
-- game runner configurations
 - map controls
-- restructuring packages to fit Java conventions
 - sample projects
