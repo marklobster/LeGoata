@@ -241,7 +241,7 @@ public class GameRunner {
 			Controller ctrl = this.controllerProvider.getController(ctrlName, player, controls);
 			
 			// init phase
-			TurnCommand tcmd = ctrl.init();
+			TurnCommand tcmd = ctrl.preActionCommand();
 			
 			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
@@ -279,7 +279,7 @@ public class GameRunner {
 			ctrl.onExecute(actionResult);
 
 			// check if turn is ending
-			tcmd = ctrl.close(actionResult);
+			tcmd = ctrl.postActionCommand(actionResult);
 			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
 				return code;
@@ -287,6 +287,8 @@ public class GameRunner {
 				code = TurnResultCode.TurnFinished;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
+			} else if (tcmd == null) {
+				ctrlName = Constants.DEFAULT_CTRL;
 			}
 			
 		} while (code != TurnResultCode.TurnInProgress);

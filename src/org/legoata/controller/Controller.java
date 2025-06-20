@@ -41,12 +41,11 @@ public abstract class Controller {
 	}
 	
 	/**
-	 * Return a ChangeController command to route to a different controller, a CompleteTurn command to take no actions, 
-	 * or null to just continue with this controller.  Returning a RepeatController command at this point will throw an 
-	 * exception.
+	 * Return a command to forego this controller, or null to continue with it.  Returning a RepeatController 
+	 * command at this point will result in an exception.
 	 * @return TurnCommand
 	 */
-	public TurnCommand init() {
+	public TurnCommand preActionCommand() {
 		return null;
 	}
 	
@@ -87,7 +86,7 @@ public abstract class Controller {
 	}
 	
 	/**
-	 * Perform any upkeep for this controller, post-action.
+	 * Perform any post-action upkeep for this controller.
 	 * @param result
 	 */
 	public void onExecute(ActionResult result) {
@@ -95,11 +94,12 @@ public abstract class Controller {
 	}
 	
 	/**
-	 * Translate the ActionResult to a TurnCommand, thereby either finalizing the turn, or continuing it.
+	 * Translate the ActionResult to a TurnCommand, thereby either finalizing the turn, or continuing it. 
+	 * If null is returned, it will reroute to the default controller.
 	 * @param result
 	 * @return
 	 */
-	public TurnCommand close(ActionResult result) {
+	public TurnCommand postActionCommand(ActionResult result) {
 		// default to error
 		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
 		switch (code) {
@@ -123,6 +123,10 @@ public abstract class Controller {
 		}
 	}
 	
+	/**
+	 * Returns the injected ControlSet.
+	 * @return
+	 */
 	protected ControlSet getControls() {
 		return this.controls;
 	}
@@ -221,7 +225,7 @@ public abstract class Controller {
 				// unsupported DecisionBuilderNode type
 				else {
 					String err = String.format(
-							"The legoata.engine.decision.DecisionBuilderNode sub-class %s is not supported.",
+							"The org.legoata.decision.DecisionBuilderNode sub-class %s is not supported.",
 							nextNode.getClass());
 					throw new UnsupportedOperationException(err);
 				}
