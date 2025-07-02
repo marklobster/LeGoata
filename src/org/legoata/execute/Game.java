@@ -1,16 +1,16 @@
 package org.legoata.execute;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.legoata.config.LGConfig;
-import org.legoata.model.LGObject;
+import org.legoata.model.structure.LGCollection;
 
 class Game {
 
 	private Phase phase = Phase.INIT_GAME;
-	private ArrayList<LGObject> players = new ArrayList<LGObject>();
+	private LGCollection players = new LGCollection();
+	private LGCollection objects = new LGCollection();
 	private Clock clock;
 	private Round round = null;
 	private Turn turn = null;
@@ -27,8 +27,12 @@ class Game {
 		this.phase = phase;
 	}
 
-	ArrayList<LGObject> getPlayers() {
+	LGCollection getPlayers() {
 		return this.players;
+	}
+	
+	LGCollection getLooseObjections() {
+		return this.objects;
 	}
 
 	public Clock getClock() {

@@ -172,11 +172,12 @@ public class GameRunner {
 		}
 		
 		// execute turns
-		while (!game.getExitFlag() && game.getRound().getIndex() < game.getPlayers().size()) {
+		while (!game.getExitFlag() && !game.getRound().isComplete() && game.getRound().getIndex() < game.getPlayers().size()) {
 			
-			LGObject player = game.getPlayers().get(game.getRound().getIndex());
+			UUID playerKey = round.getTurnOrder().get(round.getIndex());
+			LGObject player = game.getPlayers().get(playerKey);
 			executeTurn(player, game, controls, eventHandlers);
-			game.getRound().incrementIndex();
+			round.incrementIndex();
 
 		}
 		
@@ -185,6 +186,7 @@ public class GameRunner {
 		}
 		
 		// POST_ROUND
+		game.getRound().complete(); // mark round complete
 		game.setPhase(Phase.POST_ROUND);
 		fireGameCycleEvent(Phase.POST_ROUND, controls, eventHandlers);
 		

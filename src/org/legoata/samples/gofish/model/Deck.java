@@ -1,7 +1,8 @@
 package org.legoata.samples.gofish.model;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import org.legoata.utils.Utils;
 
 public class Deck {
 	
@@ -33,12 +34,6 @@ public class Deck {
 	}
 	
 	public void shuffle() {
-		Random rand = new Random();
-		ArrayList<Card> shuffled = new ArrayList<Card>();
-		while (!this.cards.isEmpty()) {
-			int index = rand.nextInt(this.cards.size());
-			shuffled.add(this.cards.remove(index));
-		}
-		this.cards = shuffled;
+		this.cards = Utils.shuffle(this.cards);
 	}
 }

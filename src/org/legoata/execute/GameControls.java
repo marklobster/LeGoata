@@ -1,11 +1,10 @@
 package org.legoata.execute;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.legoata.config.LGConfig;
-import org.legoata.model.LGObject;
+import org.legoata.model.structure.LGCollection;
 
 public class GameControls {
 
@@ -15,7 +14,7 @@ public class GameControls {
 		this.game = game;
 	}
 	
-	public ArrayList<LGObject> getPlayers() {
+	public LGCollection getPlayers() {
 		return this.game.getPlayers();
 	}
 	
