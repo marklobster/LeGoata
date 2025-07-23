@@ -118,6 +118,8 @@ public class GameRunner {
 		MutableControlSet controls = new MutableControlSet();
 		EventHandlerSet eventHandlers = this.initializeEventHandlerSet();
 		Clock gameClock = new Clock();
+		gameClock.setMoment(0);
+		gameClock.setNextIncrement(0); // first increment should be 0
 		gameClock.setOnMomentStrike(new LongConsumer() {
 			@Override
 			public void accept(long moment) {
