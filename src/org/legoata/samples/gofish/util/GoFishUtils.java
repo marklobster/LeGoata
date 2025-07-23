@@ -1,7 +1,7 @@
 package org.legoata.samples.gofish.util;
 
-import org.legoata.samples.gofish.model.Rank;
-import org.legoata.samples.gofish.model.Suit;
+import org.legoata.samples.gofish.asset.Rank;
+import org.legoata.samples.gofish.asset.Suit;
 
 public class GoFishUtils {
 	public static String getString(Rank rank) {

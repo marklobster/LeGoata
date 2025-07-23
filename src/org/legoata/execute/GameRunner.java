@@ -144,7 +144,10 @@ public class GameRunner {
 		}
 	}
 	
-	private void executeRound(Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
+	private void executeRound(
+			Game game,
+			MutableControlSet controls,
+			EventHandlerSet eventHandlers) {
 		
 		// PRE_ROUND
 		game.setPhase(Phase.PRE_ROUND);
@@ -172,9 +175,9 @@ public class GameRunner {
 		}
 		
 		// execute turns
-		while (!game.getExitFlag() && !game.getRound().isComplete() && game.getRound().getIndex() < game.getPlayers().size()) {
+		while (!game.getExitFlag() && !round.isComplete() && round.getIndex() < game.getPlayers().size()) {
 			
-			UUID playerKey = round.getTurnOrder().get(round.getIndex());
+			UUID playerKey = game.getTurnOrder().get(round.getIndex());
 			LGObject player = game.getPlayers().get(playerKey);
 			executeTurn(player, game, controls, eventHandlers);
 			round.incrementIndex();
@@ -201,7 +204,7 @@ public class GameRunner {
 		game.setPhase(Phase.PRE_TURN);
 		fireGameCycleEvent(Phase.PRE_TURN, controls, eventHandlers);
 		
-		if (game.getExitFlag()) {
+		if (isTurnCancelled(game)) {
 			return TurnResultCode.TurnCancelled;
 		}
 		
@@ -215,7 +218,7 @@ public class GameRunner {
 		}
 		fireGameCycleEvent(Phase.INIT_TURN, controls, eventHandlers);
 		
-		if (game.getExitFlag()) {
+		if (isTurnCancelled(game)) {
 			return TurnResultCode.TurnCancelled;
 		}
 
@@ -242,17 +245,17 @@ public class GameRunner {
 			// look up controller
 			Controller ctrl = this.controllerProvider.getController(ctrlName, player, controls);
 			
-			// init phase
+			// pre-action phase
 			TurnCommand tcmd = ctrl.preActionCommand();
 			
-			if (game.getExitFlag()) {
+			if (isTurnCancelled(game)) {
 				code = TurnResultCode.TurnCancelled;
 				return code;
 			} else if (tcmd instanceof CompleteTurn) {
 				code = TurnResultCode.TurnFinished;
 				break;
 			} else if (tcmd instanceof RepeatController) {
-				throw new IllegalStateException("Cannot use RepeatController command during init phase.");
+				throw new IllegalStateException("Cannot use RepeatController command during pre-action phase.");
 			} else if (tcmd instanceof ChangeController) {
 				ChangeController changeCmd = (ChangeController)tcmd;
 				ctrlName = changeCmd.getControllerName();
@@ -285,7 +288,10 @@ public class GameRunner {
 			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
 				return code;
-			} else if (tcmd instanceof CompleteTurn){
+			} else if (game.getRound().isComplete() && !(tcmd instanceof CompleteTurn)) {
+				throw new IllegalStateException(
+						"When round is complete, the post-action turn command must be of type CompleteTurn, because the turn may not continue.");
+			} else if (tcmd instanceof CompleteTurn) {
 				code = TurnResultCode.TurnFinished;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
@@ -455,5 +461,9 @@ public class GameRunner {
 			}
 		}
 		scheduledEventHandlers.removeAll(discards);
+	}
+	
+	private boolean isTurnCancelled(Game game) {
+		return game.getExitFlag() || game.getRound().isComplete();
 	}
 }

@@ -1,4 +1,4 @@
-package org.legoata.samples.gofish.model;
+package org.legoata.samples.gofish.asset;
 
 public enum Rank {
 	ACE,

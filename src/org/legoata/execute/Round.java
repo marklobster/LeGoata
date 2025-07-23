@@ -1,14 +1,10 @@
 package org.legoata.execute;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 class Round {
 
 	private int index = 0;
 	private int nextIncrement = 0;
 	private boolean completeFlag = false;
-	private ArrayList<UUID> turnOrder = null;
 
 	public int getIndex() {
 		return index;
@@ -45,11 +41,4 @@ class Round {
 		this.completeFlag = true;
 	}
 
-	public ArrayList<UUID> getTurnOrder() {
-		return turnOrder;
-	}
-
-	public void setTurnOrder(ArrayList<UUID> turnOrder) {
-		this.turnOrder = turnOrder;
-	}
 }

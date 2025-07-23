@@ -1,7 +1,9 @@
 package org.legoata.execute;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.legoata.config.LGConfig;
 import org.legoata.model.structure.LGCollection;
@@ -16,6 +18,18 @@ public class GameControls {
 	
 	public LGCollection getPlayers() {
 		return this.game.getPlayers();
+	}
+	
+	public ArrayList<UUID> getTurnOrder() {
+		return this.game.getTurnOrder();
+	}
+	
+	public void setTurnOrder(ArrayList<UUID> turnOrder) {
+		this.game.setTurnOrder(turnOrder);
+	}
+	
+	public LGCollection getLooseObjects() {
+		return this.game.getLooseObjections();
 	}
 	
 	public Scanner getScanner() {

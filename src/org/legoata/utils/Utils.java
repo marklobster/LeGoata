@@ -3,8 +3,6 @@ package org.legoata.utils;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.legoata.samples.gofish.model.Card;
-
 public class Utils {
 	private static Random rand = new Random();
 	

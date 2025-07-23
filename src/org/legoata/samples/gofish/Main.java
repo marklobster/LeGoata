@@ -4,6 +4,7 @@ import org.legoata.event.GameCycleEvent;
 import org.legoata.event.GameCycleEventHandler;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameRunner;
+import org.legoata.samples.gofish.eventhandler.InitGame;
 
 public class Main {
 
@@ -12,11 +13,12 @@ public class Main {
 		try {
 			// configure game
 			GameRunner game = new GameRunner();
-			game.setInitializer(new GameCycleEventHandler() {
+			game.setInitializer(new InitGame());
+			game.addPreRoundEventHandler(new GameCycleEventHandler() {
 
 				@Override
 				public void consume(GameCycleEvent event, ControlSet controls) {
-					controls.getGameControls().getOutStream().print("Hello! Time to exit!");
+					controls.getGameControls().getOutStream().print("Exiting game before first round starts!");
 					controls.getGameControls().setExitFlag(true);
 				}
 				
