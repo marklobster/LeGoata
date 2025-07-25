@@ -1,6 +1,8 @@
 package org.legoata.samples.gofish.eventhandler;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.UUID;
 
 import org.legoata.event.GameCycleEvent;
@@ -23,10 +25,13 @@ public class InitGame implements GameCycleEventHandler {
 		
 		GameControls gameControls = controls.getGameControls();
 		
+		// get user name
+		String name = getName(gameControls.getScanner(), gameControls.getOutStream());
+		
 		// add players to game and to turn order
 		LGCollection playerSet = gameControls.getPlayers();
 		ArrayList<UUID> turnOrder = gameControls.getTurnOrder();
-		Player[] players = new Player[] { new User(), new NiceBot(), new MeanBot() };
+		Player[] players = new Player[] { new User(name), new NiceBot(), new MeanBot() };
 		for (Player player : players) {
 			playerSet.put(player);
 			turnOrder.add(player.getId());
@@ -48,6 +53,15 @@ public class InitGame implements GameCycleEventHandler {
 		}
 		
 		gameControls.getOutStream().println("Game initialized!");
+	}
+	
+	private String getName(Scanner in, PrintStream out) {
+		String name;
+		do {
+			out.println("What is your name?");
+			name = in.nextLine();
+		} while (name == null || name == "");
+		return name;
 	}
 
 }

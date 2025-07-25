@@ -30,7 +30,7 @@ public class Deck {
 	}
 	
 	public Card draw() {
-		return cards.remove(0);
+		return cards.size() > 0 ? cards.remove(0) : null;
 	}
 	
 	public void shuffle() {

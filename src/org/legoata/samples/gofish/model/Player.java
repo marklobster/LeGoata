@@ -5,12 +5,14 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 import org.legoata.model.LGObject;
+import org.legoata.samples.gofish.asset.Book;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.asset.Rank;
 
-public class Player extends LGObject {
+public abstract class Player extends LGObject {
 	
 	private ArrayList<Card> hand = new ArrayList<Card>();
+	private ArrayList<Book> books = new ArrayList<Book>();
 
 	public Player(UUID uuid) {
 		super(uuid);
@@ -42,4 +44,11 @@ public class Player extends LGObject {
 	public int getHandSize() {
 		return this.hand.size();
 	}
+	
+	public Book[] getBooksAsImmutable() {
+		return (Book[]) this.books.toArray();
+	}
+	
+	public abstract String getName();
+	
 }

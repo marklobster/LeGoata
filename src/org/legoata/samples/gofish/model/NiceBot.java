@@ -8,4 +8,9 @@ public class NiceBot extends Player {
 		super(Keys.getNiceBotKey());
 	}
 
+	@Override
+	public String getName() {
+		return "Nice Bot";
+	}
+
 }

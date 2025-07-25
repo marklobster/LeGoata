@@ -7,4 +7,9 @@ public class MeanBot extends Player {
 	public MeanBot() {
 		super(Keys.getMeanBotKey());
 	}
+
+	@Override
+	public String getName() {
+		return "Mean Bot";
+	}
 }

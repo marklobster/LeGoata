@@ -5,11 +5,11 @@ package org.legoata.action;
  */
 public abstract class Action {
 
-	protected ActionResult actionCompleteWithConsequence() {
+	protected ActionResult actionCompletedWithConsequence() {
 		return new ActionResult(ActionResultCode.Consequential);
 	}
 	
-	protected ActionResult actionCompleteWithoutConsequence() {
+	protected ActionResult actionCompletedWithoutConsequence() {
 		return new ActionResult(ActionResultCode.Inconsequential);
 	}
 

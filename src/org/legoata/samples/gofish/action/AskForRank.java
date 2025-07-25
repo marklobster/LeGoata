@@ -1,0 +1,59 @@
+package org.legoata.samples.gofish.action;
+
+import java.io.PrintStream;
+
+import org.legoata.action.ActionResult;
+import org.legoata.action.ModelAction;
+import org.legoata.execute.ControlSet;
+import org.legoata.execute.GameControls;
+import org.legoata.model.LGObject;
+import org.legoata.samples.gofish.Keys;
+import org.legoata.samples.gofish.asset.Card;
+import org.legoata.samples.gofish.asset.Deck;
+import org.legoata.samples.gofish.asset.Rank;
+import org.legoata.samples.gofish.decision.CardRequest;
+import org.legoata.samples.gofish.model.GoFishGame;
+import org.legoata.samples.gofish.model.Player;
+import org.legoata.samples.gofish.util.GoFishUtils;
+
+public class AskForRank extends ModelAction<CardRequest> {
+
+	@Override
+	public ActionResult execute(LGObject actor, CardRequest input, ControlSet controls) {
+		GameControls gameControls = controls.getGameControls();
+		PrintStream out = gameControls.getOutStream();
+		
+		// get cards from opponent
+		Player player = (Player) actor;
+		Player opponent = (Player) gameControls.getPlayers().get(input.getOpponent());
+		Rank rank = input.getRank();
+		out.printf("%s asks %s for %s.%s",
+				player.getName(),
+				opponent.getName(),
+				GoFishUtils.getPluralString(rank),
+				System.lineSeparator());
+		Card[] cards = opponent.giveAwayCards(rank);
+		
+		GoFishGame gameState = (GoFishGame) gameControls.getLooseObjects().get(Keys.getGameKey());
+		Deck deck = gameState.getDeck();
+		if (cards.length == 0) { // go fish!
+			out.println("Go fish!");
+			Card draw = deck.draw();
+			if (draw == null) {
+				out.println("There's nothing left to draw.");
+			} else {
+				player.acceptCard(draw);
+			}
+		} else { // take cards
+			player.acceptCards(cards);
+			out.printf("%s takes %i %s!%s",
+					player.getName(),
+					cards.length,
+					cards.length > 1 ? GoFishUtils.getPluralString(rank) : GoFishUtils.getString(rank),
+					System.lineSeparator());
+		}
+		
+		return this.actionCompletedWithConsequence();
+	}
+
+}
