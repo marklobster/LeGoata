@@ -6,8 +6,6 @@ import org.legoata.samples.gofish.asset.Deck;
 
 public class GoFishGame extends LGObject {
 	
-	public final int INITIAL_HAND_SIZE = 5;
-	
 	private Deck deck = new Deck();
 
 	public GoFishGame() {
