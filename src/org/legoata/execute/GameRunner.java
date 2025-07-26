@@ -289,11 +289,7 @@ public class GameRunner {
 			tcmd = ctrl.postActionCommand(actionResult);
 			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
-				return code;
-			} else if (game.getRound().isComplete() && !(tcmd instanceof CompleteTurn)) {
-				throw new IllegalStateException(
-						"When round is complete, the post-action turn command must be of type CompleteTurn, because the turn may not continue.");
-			} else if (tcmd instanceof CompleteTurn) {
+			} else if (game.getRound().isComplete() || tcmd instanceof CompleteTurn) {
 				code = TurnResultCode.TurnFinished;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();

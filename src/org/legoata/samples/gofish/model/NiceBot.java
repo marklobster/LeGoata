@@ -13,4 +13,9 @@ public class NiceBot extends Player {
 		return "Nice Bot";
 	}
 
+	@Override
+	public String getCatchphrase() {
+		return "How fortunate!";
+	}
+
 }

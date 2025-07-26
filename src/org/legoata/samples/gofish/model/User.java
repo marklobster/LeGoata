@@ -5,8 +5,9 @@ import org.legoata.samples.gofish.Keys;
 public class User extends Player {
 	
 	private String name;
+	private String catchphrase;
 
-	public User(String name) {
+	public User(String name, String catchphrase) {
 		super(Keys.getUserKey());
 		this.name = name;
 	}
@@ -14,6 +15,10 @@ public class User extends Player {
 	@Override
 	public String getName() {
 		return name;
+	}
+	
+	public String getCatchphrase() {
+		return this.catchphrase;
 	}
 
 }

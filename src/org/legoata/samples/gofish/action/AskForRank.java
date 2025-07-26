@@ -8,6 +8,7 @@ import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
 import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.Keys;
+import org.legoata.samples.gofish.asset.Book;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.asset.Deck;
 import org.legoata.samples.gofish.asset.Rank;
@@ -36,20 +37,29 @@ public class AskForRank extends ModelAction<CardRequest> {
 		
 		GoFishGame gameState = (GoFishGame) gameControls.getLooseObjects().get(Keys.getGameKey());
 		Deck deck = gameState.getDeck();
+		Book[] newBooks = null;
 		if (cards.length == 0) { // go fish!
 			out.println("Go fish!");
 			Card draw = deck.draw();
 			if (draw == null) {
 				out.println("There's nothing left to draw.");
 			} else {
-				player.acceptCard(draw);
+				newBooks = player.acceptCard(draw);
 			}
 		} else { // take cards
-			player.acceptCards(cards);
+			newBooks = player.acceptCards(cards);
 			out.printf("%s takes %i %s!%s",
 					player.getName(),
 					cards.length,
 					cards.length > 1 ? GoFishUtils.getPluralString(rank) : GoFishUtils.getString(rank),
+					System.lineSeparator());
+		}
+		
+		// check for books
+		if (newBooks != null && newBooks.length > 0) {
+			out.printf("%s just got a book of %s!%s",
+					player.getName(),
+					GoFishUtils.getPluralString(newBooks[0].getRank()),
 					System.lineSeparator());
 		}
 		

@@ -12,4 +12,9 @@ public class MeanBot extends Player {
 	public String getName() {
 		return "Mean Bot";
 	}
+
+	@Override
+	public String getCatchphrase() {
+		return "I'm the best!!";
+	}
 }
