@@ -18,6 +18,8 @@ import org.legoata.samples.gofish.model.Player;
 import org.legoata.samples.gofish.util.GoFishUtils;
 
 public class AskForRank extends ModelAction<CardRequest> {
+	
+	public static final String LABEL = "AskForRank";
 
 	@Override
 	public ActionResult execute(LGObject actor, CardRequest input, ControlSet controls) {
@@ -35,6 +37,7 @@ public class AskForRank extends ModelAction<CardRequest> {
 				System.lineSeparator());
 		Card[] cards = opponent.giveAwayCards(rank);
 		
+		// take card from player or go fish
 		GoFishGame gameState = (GoFishGame) gameControls.getLooseObjects().get(Keys.getGameKey());
 		Deck deck = gameState.getDeck();
 		Book[] newBooks = null;

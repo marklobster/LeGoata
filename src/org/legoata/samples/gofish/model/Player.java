@@ -72,8 +72,12 @@ public abstract class Player extends LGObject {
 		return this.hand.size();
 	}
 	
-	public Book[] getBooksAsImmutable() {
+	public Book[] getBooksArrayCopy() {
 		return (Book[]) this.books.toArray();
+	}
+	
+	public int getNumberBooks() {
+		return this.books.size();
 	}
 	
 	public abstract String getName();
