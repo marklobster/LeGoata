@@ -38,7 +38,7 @@ public class CheckForWin implements ActionEventHandler {
 		out.println("Final stats:");
 		out.println();
 		for (Player player : players) {
-			out.printf("%s: %i book(s)%s", player.getName(), player.getBooksArrayCopy().length, System.lineSeparator());
+			out.printf("%s: %d book(s)%s", player.getName(), player.getNumberBooks(), System.lineSeparator());
 		}
 	}
 

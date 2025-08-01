@@ -53,6 +53,7 @@ public class InitGame implements GameCycleEventHandler {
 		// deal hands
 		out.println("Time to deal.");
 		Deck deck = goFishGame.getDeck();
+		deck.shuffle();
 		Card[][] hands = new Card[][] {
 			new Card[GoFishConstants.INITIAL_HAND_SIZE],
 			new Card[GoFishConstants.INITIAL_HAND_SIZE],

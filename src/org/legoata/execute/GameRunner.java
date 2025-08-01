@@ -297,7 +297,7 @@ public class GameRunner {
 				ctrlName = Constants.DEFAULT_CTRL;
 			}
 			
-		} while (code != TurnResultCode.TurnInProgress);
+		} while (code == TurnResultCode.TurnInProgress);
 		
 		// POST_TURN
 		game.setPhase(Phase.POST_TURN);

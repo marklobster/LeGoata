@@ -30,7 +30,7 @@ public class AskForRank extends ModelAction<CardRequest> {
 		Player player = (Player) actor;
 		Player opponent = (Player) gameControls.getPlayers().get(input.getOpponent());
 		Rank rank = input.getRank();
-		out.printf("%s asks %s for %s.%s",
+		out.printf("%s asks %s, \"Got any %s?\"%s",
 				player.getName(),
 				opponent.getName(),
 				GoFishUtils.getPluralString(rank),
@@ -51,7 +51,7 @@ public class AskForRank extends ModelAction<CardRequest> {
 			}
 		} else { // take cards
 			newBooks = player.acceptCards(cards);
-			out.printf("%s takes %i %s!%s",
+			out.printf("%s takes %d %s!%s",
 					player.getName(),
 					cards.length,
 					cards.length > 1 ? GoFishUtils.getPluralString(rank) : GoFishUtils.getString(rank),

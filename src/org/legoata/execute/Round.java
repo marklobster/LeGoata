@@ -3,7 +3,7 @@ package org.legoata.execute;
 class Round {
 
 	private int index = 0;
-	private int nextIncrement = 0;
+	private int nextIncrement = 1;
 	private boolean completeFlag = false;
 
 	public int getIndex() {

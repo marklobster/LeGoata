@@ -20,7 +20,7 @@ public class ShowStatus extends ModelActionNullData {
 		
 		for (LGObject lgPlayer : gameControls.getPlayers()) {
 			Player goFishPlayer = (Player) lgPlayer;
-			out.printf("%s: %i book(s), %i card(s) left%s",
+			out.printf("%s: %d book(s), %d card(s) left%s",
 					goFishPlayer.getName(),
 					goFishPlayer.getNumberBooks(),
 					goFishPlayer.getHandSize(),

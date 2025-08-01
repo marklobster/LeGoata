@@ -56,7 +56,7 @@ public abstract class Player extends LGObject {
 	}
 
 	public Card[] giveAwayCards(Rank rank) {
-		LinkedList<Card> list = new LinkedList<Card>();
+		ArrayList<Card> list = new ArrayList<Card>();
 		for (Card card : hand) {
 			if (card.getRank() == rank) {
 				list.add(card);
@@ -65,15 +65,15 @@ public abstract class Player extends LGObject {
 		for (Card card : list) {
 			hand.remove(card);
 		}
-		return (Card[]) list.toArray();
+		return list.toArray(new Card[list.size()]);
 	}
 	
 	public int getHandSize() {
 		return this.hand.size();
 	}
 	
-	public Book[] getBooksArrayCopy() {
-		return (Book[]) this.books.toArray();
+	public Card[] getCardsArrayCopy() {
+		return this.hand.toArray(new Card[this.hand.size()]);
 	}
 	
 	public int getNumberBooks() {
