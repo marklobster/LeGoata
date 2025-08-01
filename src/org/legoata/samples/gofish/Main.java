@@ -14,6 +14,7 @@ import org.legoata.execute.provider.controller.SingleControllerProvider;
 import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.action.ShowStatus;
+import org.legoata.samples.gofish.controller.BotController;
 import org.legoata.samples.gofish.controller.DefaultController;
 import org.legoata.samples.gofish.controller.UserController;
 import org.legoata.samples.gofish.eventhandler.CheckForWin;
@@ -57,19 +58,16 @@ public class Main {
 					return new UserController(turnTaker, controls);
 				}
 			});
+			controllers.registerController(BotController.LABEL, new SingleControllerProvider() {
+				@Override
+				public Controller constructController(LGObject turnTaker, ControlSet controls) {
+					return new BotController(turnTaker, controls);
+				}
+			});
 			game.setControllerProvider(controllers);
 			
 			// event handlers
 			game.setInitializer(new InitGame());
-//			game.addPreRoundEventHandler(new GameCycleEventHandler() {
-//				// this event handler just ends the game bc it can't actually run yet
-//				@Override
-//				public void consume(GameCycleEvent event, ControlSet controls) {
-//					controls.getGameControls().getOutStream().print("Exiting game before first round starts!");
-//					controls.getGameControls().setExitFlag(true);
-//				}
-//				
-//			});
 			game.addActionEventHandler(new CheckForWin());
 			
 			// start game

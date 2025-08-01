@@ -5,6 +5,7 @@ import org.legoata.controller.command.ChangeController;
 import org.legoata.controller.command.TurnCommand;
 import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
+import org.legoata.samples.gofish.model.User;
 
 public class DefaultController extends Controller {
 
@@ -14,7 +15,12 @@ public class DefaultController extends Controller {
 	
 	@Override
 	public TurnCommand preActionCommand() {
-		return new ChangeController(UserController.LABEL);
+		LGObject player = this.getControls().getTurnControls().getTurnTaker();
+		if (player instanceof User) {
+			return new ChangeController(UserController.LABEL);
+		} else {
+			return new ChangeController(BotController.LABEL);
+		}
 	}
 
 }
