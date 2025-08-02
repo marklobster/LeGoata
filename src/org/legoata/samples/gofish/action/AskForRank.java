@@ -6,7 +6,9 @@ import org.legoata.action.ActionResult;
 import org.legoata.action.ModelAction;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
+import org.legoata.execute.RoundControls;
 import org.legoata.model.LGObject;
+import org.legoata.model.structure.LGCollection;
 import org.legoata.samples.gofish.Keys;
 import org.legoata.samples.gofish.asset.Book;
 import org.legoata.samples.gofish.asset.Card;
@@ -65,9 +67,28 @@ public class AskForRank extends ModelAction<CardRequest> {
 					GoFishUtils.getPluralString(newBooks[0].getRank()),
 					System.lineSeparator());
 			out.printf("\"%s\"%s", player.getCatchphrase(), System.lineSeparator());
+			
+			// add follow-up turn, unless game is over
+			if (!winnerFound(gameControls.getPlayers())) {
+				out.printf("%s gets another turn!%s", player.getName(), System.lineSeparator());
+				
+				// repeat turn by setting next increment to current increment
+				RoundControls roundControls = controls.getRoundControls();
+				roundControls.setNextIncrement(roundControls.getIndex());
+			}
 		}
 		
 		return this.actionCompletedWithConsequence();
+	}
+	
+	private boolean winnerFound(LGCollection players) {
+		for (LGObject lgPlayer : players) {
+			Player player = (Player) lgPlayer;
+			if (player.getHandSize() == 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
