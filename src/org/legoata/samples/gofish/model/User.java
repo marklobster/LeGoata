@@ -10,6 +10,7 @@ public class User extends Player {
 	public User(String name, String catchphrase) {
 		super(Keys.getUserKey());
 		this.name = name;
+		this.catchphrase = catchphrase;
 	}
 
 	@Override

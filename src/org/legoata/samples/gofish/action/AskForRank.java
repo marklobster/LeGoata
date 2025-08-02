@@ -64,6 +64,7 @@ public class AskForRank extends ModelAction<CardRequest> {
 					player.getName(),
 					GoFishUtils.getPluralString(newBooks[0].getRank()),
 					System.lineSeparator());
+			out.printf("\"%s\"%s", player.getCatchphrase(), System.lineSeparator());
 		}
 		
 		return this.actionCompletedWithConsequence();
