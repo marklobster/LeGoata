@@ -6,7 +6,7 @@ import org.legoata.action.ActionResult;
 import org.legoata.action.ModelAction;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
-import org.legoata.execute.RoundControls;
+import org.legoata.execute.TurnControls;
 import org.legoata.model.LGObject;
 import org.legoata.model.structure.LGCollection;
 import org.legoata.samples.gofish.Keys;
@@ -72,9 +72,9 @@ public class AskForRank extends ModelAction<CardRequest> {
 			if (!winnerFound(gameControls.getPlayers())) {
 				out.printf("%s gets another turn!%s", player.getName(), System.lineSeparator());
 				
-				// repeat turn by setting next increment to current increment
-				RoundControls roundControls = controls.getRoundControls();
-				roundControls.setNextIncrement(roundControls.getIndex());
+				// take another action this turn by increasing action limit
+				TurnControls turnControls = controls.getTurnControls();
+				turnControls.setActionLimit(turnControls.getActionLimit() + 1);
 			}
 		}
 		

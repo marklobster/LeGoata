@@ -2,6 +2,7 @@ package org.legoata.samples.gofish;
 
 import org.legoata.Constants;
 import org.legoata.action.Action;
+import org.legoata.config.GameConfig;
 import org.legoata.controller.Controller;
 import org.legoata.event.GameCycleEvent;
 import org.legoata.event.GameCycleEventHandler;
@@ -27,6 +28,11 @@ public class Main {
 		try {
 			// configure game
 			GameRunner game = new GameRunner();
+			
+			// configure default 1 action per turn; increasing action limit during a turn allows for additional actions
+			GameConfig config = game.getConfig();
+			config.setActionCountingEnabled(true);
+			config.setDefaultActionLimit(1);
 			
 			// register actions
 			ActionRegistry actions = new ActionRegistry();
