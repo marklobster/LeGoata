@@ -4,8 +4,6 @@ import org.legoata.Constants;
 import org.legoata.action.Action;
 import org.legoata.config.GameConfig;
 import org.legoata.controller.Controller;
-import org.legoata.event.GameCycleEvent;
-import org.legoata.event.GameCycleEventHandler;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameRunner;
 import org.legoata.execute.provider.action.ActionRegistry;
