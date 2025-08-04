@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.legoata.decision.Decision;
 import org.legoata.decision.node.DecisionBuilderNode;
-import org.legoata.gamecharacter.GameCharacter;
 import org.legoata.model.LGObject;
 
 /**

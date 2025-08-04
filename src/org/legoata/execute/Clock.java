@@ -5,6 +5,7 @@ import java.util.function.LongConsumer;
 public class Clock {
 
 	private long moment;
+	private long nextIncrement;
 	private LongConsumer onMomentStrike;
 
 	public long getMoment() {
@@ -13,13 +14,23 @@ public class Clock {
 
 	public void setMoment(long moment) {
 		this.moment = moment;
+		this.nextIncrement = moment + 1;
 		if (this.onMomentStrike != null) {
 			this.onMomentStrike.accept(moment);
 		}
 	}
 	
+	public long getNextIncrement() {
+		return nextIncrement;
+	}
+
+	public void setNextIncrement(long nextIncrement) {
+		this.nextIncrement = nextIncrement;
+	}
+
 	public long increment() {
-		this.moment += 1;
+		this.moment = this.nextIncrement;
+		this.nextIncrement = moment + 1;
 		if (this.onMomentStrike != null) {
 			this.onMomentStrike.accept(this.moment);
 		}

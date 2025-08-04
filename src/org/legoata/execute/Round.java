@@ -3,6 +3,7 @@ package org.legoata.execute;
 class Round {
 
 	private int index = 0;
+	private int nextIncrement = 1;
 	private boolean completeFlag = false;
 
 	public int getIndex() {
@@ -10,18 +11,34 @@ class Round {
 	}
 
 	public void setIndex(int index) {
-		this.index = index;
+		setIndex(index, true);
 	}
 	
-	public void incrementIndex() {
-		this.index += 1;
+	public void setIndex(int index, boolean updateNextIncrement) {
+		this.index = index;
+		if (updateNextIncrement) {
+			this.nextIncrement = index + 1;
+		}
+	}
+	
+	public int getNextIncrement() {
+		return nextIncrement;
 	}
 
-	public boolean isRoundComplete() {
+	public void setNextIncrement(int nextIncrement) {
+		this.nextIncrement = nextIncrement;
+	}
+
+	public void incrementIndex() {
+		setIndex(this.nextIncrement);
+	}
+
+	public boolean isComplete() {
 		return this.completeFlag;
 	}
 
-	public void completeRound() {
+	public void complete() {
 		this.completeFlag = true;
 	}
+
 }

@@ -118,6 +118,8 @@ public class GameRunner {
 		MutableControlSet controls = new MutableControlSet();
 		EventHandlerSet eventHandlers = this.initializeEventHandlerSet();
 		Clock gameClock = new Clock();
+		gameClock.setMoment(0);
+		gameClock.setNextIncrement(0); // first increment should be 0
 		gameClock.setOnMomentStrike(new LongConsumer() {
 			@Override
 			public void accept(long moment) {
@@ -144,7 +146,10 @@ public class GameRunner {
 		}
 	}
 	
-	private void executeRound(Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
+	private void executeRound(
+			Game game,
+			MutableControlSet controls,
+			EventHandlerSet eventHandlers) {
 		
 		// PRE_ROUND
 		game.setPhase(Phase.PRE_ROUND);
@@ -172,11 +177,12 @@ public class GameRunner {
 		}
 		
 		// execute turns
-		while (!game.getExitFlag() && game.getRound().getIndex() < game.getPlayers().size()) {
+		while (!game.getExitFlag() && !round.isComplete() && round.getIndex() < game.getPlayers().size()) {
 			
-			LGObject player = game.getPlayers().get(game.getRound().getIndex());
+			UUID playerKey = game.getTurnOrder().get(round.getIndex());
+			LGObject player = game.getPlayers().get(playerKey);
 			executeTurn(player, game, controls, eventHandlers);
-			game.getRound().incrementIndex();
+			round.incrementIndex();
 
 		}
 		
@@ -185,6 +191,7 @@ public class GameRunner {
 		}
 		
 		// POST_ROUND
+		game.getRound().complete(); // mark round complete
 		game.setPhase(Phase.POST_ROUND);
 		fireGameCycleEvent(Phase.POST_ROUND, controls, eventHandlers);
 		
@@ -199,7 +206,7 @@ public class GameRunner {
 		game.setPhase(Phase.PRE_TURN);
 		fireGameCycleEvent(Phase.PRE_TURN, controls, eventHandlers);
 		
-		if (game.getExitFlag()) {
+		if (isTurnCancelled(game)) {
 			return TurnResultCode.TurnCancelled;
 		}
 		
@@ -213,7 +220,7 @@ public class GameRunner {
 		}
 		fireGameCycleEvent(Phase.INIT_TURN, controls, eventHandlers);
 		
-		if (game.getExitFlag()) {
+		if (isTurnCancelled(game)) {
 			return TurnResultCode.TurnCancelled;
 		}
 
@@ -240,17 +247,17 @@ public class GameRunner {
 			// look up controller
 			Controller ctrl = this.controllerProvider.getController(ctrlName, player, controls);
 			
-			// init phase
-			TurnCommand tcmd = ctrl.init();
+			// pre-action phase
+			TurnCommand tcmd = ctrl.preActionCommand();
 			
-			if (game.getExitFlag()) {
+			if (isTurnCancelled(game)) {
 				code = TurnResultCode.TurnCancelled;
 				return code;
 			} else if (tcmd instanceof CompleteTurn) {
 				code = TurnResultCode.TurnFinished;
 				break;
 			} else if (tcmd instanceof RepeatController) {
-				throw new IllegalStateException("Cannot use RepeatController command during init phase.");
+				throw new IllegalStateException("Cannot use RepeatController command during pre-action phase.");
 			} else if (tcmd instanceof ChangeController) {
 				ChangeController changeCmd = (ChangeController)tcmd;
 				ctrlName = changeCmd.getControllerName();
@@ -279,17 +286,18 @@ public class GameRunner {
 			ctrl.onExecute(actionResult);
 
 			// check if turn is ending
-			tcmd = ctrl.close(actionResult);
+			tcmd = ctrl.postActionCommand(actionResult);
 			if (game.getExitFlag()) {
 				code = TurnResultCode.TurnCancelled;
-				return code;
-			} else if (tcmd instanceof CompleteTurn){
+			} else if (game.getRound().isComplete() || tcmd instanceof CompleteTurn) {
 				code = TurnResultCode.TurnFinished;
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
+			} else if (tcmd == null) {
+				ctrlName = Constants.DEFAULT_CTRL;
 			}
 			
-		} while (code != TurnResultCode.TurnInProgress);
+		} while (code == TurnResultCode.TurnInProgress);
 		
 		// POST_TURN
 		game.setPhase(Phase.POST_TURN);
@@ -451,5 +459,9 @@ public class GameRunner {
 			}
 		}
 		scheduledEventHandlers.removeAll(discards);
+	}
+	
+	private boolean isTurnCancelled(Game game) {
+		return game.getExitFlag() || game.getRound().isComplete();
 	}
 }

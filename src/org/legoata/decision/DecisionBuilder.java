@@ -4,7 +4,7 @@ import org.legoata.decision.node.branching.OptionSet;
 
 /**
  * Provides a means of navigating a menu with or without sub-menus which will ultimately 
- * result in the user building an action.
+ * result in the user building an decision.
  * @author Mark
  *
  */

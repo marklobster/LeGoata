@@ -8,4 +8,13 @@ public class ClockControls {
 	public long getMoment() {
 		return this.clock.getMoment();
 	}
+	public void setMoment(long moment) {
+		this.clock.setMoment(moment);
+	}
+	public long getNextIncrement() {
+		return this.clock.getNextIncrement();
+	}
+	public void setNextIncrement(long nextIncrement) {
+		this.clock.setNextIncrement(nextIncrement);
+	}
 }
