@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.legoata.action.Action;
+import org.legoata.execute.ControlSet;
 
 /**
  * Default implementation of ActionProvoider.  Register a SingleActionProvider for each Action you want to 
@@ -14,8 +15,8 @@ public class ActionRegistry implements ActionProvider {
 	private Map<String, SingleActionProvider> providerMap = new HashMap<String, SingleActionProvider>();
 	
 	@Override
-	public Action getAction(String name) {
-		return providerMap.get(name).constructAction();
+	public Action getAction(String name, ControlSet controls) {
+		return providerMap.get(name).constructAction(controls);
 	}
 
 	/**

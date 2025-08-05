@@ -66,7 +66,7 @@ public abstract class Controller {
 	 * @return
 	 */
 	public Action resolveActionName(ActionProvider provider, Decision decision) {
-		return provider.getAction(decision.getAction());
+		return provider.getAction(decision.getAction(), this.getControls());
 	}
 	
 	/**
@@ -79,10 +79,10 @@ public abstract class Controller {
 		ActionResult result = null;
 		if (action instanceof ModelAction) {
 			ModelAction ma = (ModelAction)action;
-			result = ma.execute(this.getTurnControls().getTurnTaker(), input, this.controls);
+			result = ma.execute(input);
 		} else {
 			ModelActionNullData ma = (ModelActionNullData)action;
-			result = ma.execute(this.getTurnControls().getTurnTaker(), this.controls);
+			result = ma.execute();
 		}
 		return result;
 	}

@@ -35,14 +35,14 @@ public class Main {
 			ActionRegistry actions = new ActionRegistry();
 			actions.registerAction(AskForRank.LABEL, new SingleActionProvider() {
 				@Override
-				public Action constructAction() {
-					return new AskForRank();
+				public Action constructAction(ControlSet controls) {
+					return new AskForRank(controls);
 				}
 			});
 			actions.registerAction(ShowStatus.LABEL, new SingleActionProvider() {
 				@Override
-				public Action constructAction() {
-					return new ShowStatus();
+				public Action constructAction(ControlSet controls) {
+					return new ShowStatus(controls);
 				}
 			});
 			game.setActionProvider(actions);

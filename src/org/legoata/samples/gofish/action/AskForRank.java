@@ -21,15 +21,19 @@ import org.legoata.samples.gofish.util.GoFishUtils;
 
 public class AskForRank extends ModelAction<CardRequest> {
 	
+	public AskForRank(ControlSet controls) {
+		super(controls);
+	}
+
 	public static final String LABEL = "AskForRank";
 
 	@Override
-	public ActionResult execute(LGObject actor, CardRequest input, ControlSet controls) {
-		GameControls gameControls = controls.getGameControls();
+	public ActionResult execute(CardRequest input) {
+		GameControls gameControls = this.getGameControls();
 		PrintStream out = gameControls.getOutStream();
 		
 		// get cards from opponent
-		Player player = (Player) actor;
+		Player player = (Player) this.getTurnControls().getTurnTaker();
 		Player opponent = (Player) gameControls.getPlayers().get(input.getOpponent());
 		Rank rank = input.getRank();
 		out.printf("%s asks %s, \"Got any %s?\"%s",
@@ -73,7 +77,7 @@ public class AskForRank extends ModelAction<CardRequest> {
 				out.printf("%s gets another turn!%s", player.getName(), System.lineSeparator());
 				
 				// take another action this turn by increasing action limit
-				TurnControls turnControls = controls.getTurnControls();
+				TurnControls turnControls = this.getTurnControls();
 				turnControls.setActionLimit(turnControls.getActionLimit() + 1);
 			}
 		}
