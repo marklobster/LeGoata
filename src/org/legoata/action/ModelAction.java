@@ -9,6 +9,13 @@ import org.legoata.model.LGObject;
  */
 public abstract class ModelAction<T> extends Action {
 
+	/**
+	 * Execute the action.
+	 * @param actor
+	 * @param input
+	 * @param controls
+	 * @return
+	 */
 	public abstract ActionResult execute(LGObject actor, T input, ControlSet controls);
 	
 }

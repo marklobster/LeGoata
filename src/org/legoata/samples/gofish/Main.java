@@ -1,6 +1,6 @@
 package org.legoata.samples.gofish;
 
-import org.legoata.Constants;
+import org.legoata.LGConstants;
 import org.legoata.action.Action;
 import org.legoata.config.GameConfig;
 import org.legoata.controller.Controller;
@@ -10,7 +10,6 @@ import org.legoata.execute.provider.action.ActionRegistry;
 import org.legoata.execute.provider.action.SingleActionProvider;
 import org.legoata.execute.provider.controller.ControllerRegistry;
 import org.legoata.execute.provider.controller.SingleControllerProvider;
-import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.action.ShowStatus;
 import org.legoata.samples.gofish.controller.BotController;
@@ -50,22 +49,22 @@ public class Main {
 			
 			// register controllers
 			ControllerRegistry controllers = new ControllerRegistry();
-			controllers.registerController(Constants.DEFAULT_CTRL, new SingleControllerProvider() {
+			controllers.registerController(LGConstants.DEFAULT_CTRL, new SingleControllerProvider() {
 				@Override
-				public Controller constructController(LGObject turnTaker, ControlSet controls) {
-					return new DefaultController(turnTaker, controls);
+				public Controller constructController(ControlSet controls) {
+					return new DefaultController(controls);
 				}
 			});
 			controllers.registerController(UserController.LABEL, new SingleControllerProvider() {
 				@Override
-				public Controller constructController(LGObject turnTaker, ControlSet controls) {
-					return new UserController(turnTaker, controls);
+				public Controller constructController(ControlSet controls) {
+					return new UserController(controls);
 				}
 			});
 			controllers.registerController(BotController.LABEL, new SingleControllerProvider() {
 				@Override
-				public Controller constructController(LGObject turnTaker, ControlSet controls) {
-					return new BotController(turnTaker, controls);
+				public Controller constructController(ControlSet controls) {
+					return new BotController(controls);
 				}
 			});
 			game.setControllerProvider(controllers);

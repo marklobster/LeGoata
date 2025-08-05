@@ -22,7 +22,11 @@ import org.legoata.decision.node.branching.OptionSet;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.decision.node.nonbranching.GoBack;
 import org.legoata.decision.node.nonbranching.ReturnToRoot;
+import org.legoata.execute.ClockControls;
 import org.legoata.execute.ControlSet;
+import org.legoata.execute.GameControls;
+import org.legoata.execute.RoundControls;
+import org.legoata.execute.SchedulingControls;
 import org.legoata.execute.TurnControls;
 import org.legoata.execute.provider.action.ActionProvider;
 import org.legoata.model.LGObject;
@@ -32,11 +36,9 @@ import org.legoata.model.LGObject;
  */
 public abstract class Controller {
 	
-	private LGObject turnTaker = null;
 	private ControlSet controls = null;
 
-	public Controller(LGObject turnTaker, ControlSet controls) {
-		this.turnTaker = turnTaker;
+	public Controller(ControlSet controls) {
 		this.controls = controls;
 	}
 	
@@ -77,10 +79,10 @@ public abstract class Controller {
 		ActionResult result = null;
 		if (action instanceof ModelAction) {
 			ModelAction ma = (ModelAction)action;
-			result = ma.execute(turnTaker, input, this.controls);
+			result = ma.execute(this.getTurnControls().getTurnTaker(), input, this.controls);
 		} else {
 			ModelActionNullData ma = (ModelActionNullData)action;
-			result = ma.execute(turnTaker, this.controls);
+			result = ma.execute(this.getTurnControls().getTurnTaker(), this.controls);
 		}
 		return result;
 	}
@@ -104,9 +106,9 @@ public abstract class Controller {
 		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
 		switch (code) {
 			case Consequential:
-				LGConfig settings = this.getControls().getGameControls().getSettings();
+				LGConfig settings = this.getGameControls().getSettings();
 				if (settings.isActionCountingEnabled()) {
-					TurnControls turnControls = this.getControls().getTurnControls();
+					TurnControls turnControls = this.getTurnControls();
 					turnControls.setActionCount(turnControls.getActionCount() + 1);
 					if (turnControls.getActionCount() < turnControls.getActionLimit()) {
 						return new RepeatController();
@@ -118,17 +120,57 @@ public abstract class Controller {
 				return new RepeatController();
 			// if exit requested, or if in error state, exit the game
 			default:
-				this.getControls().getGameControls().setExitFlag(true);
+				this.getGameControls().setExitFlag(true);
 				return new CompleteTurn();
 		}
 	}
 	
 	/**
-	 * Returns the injected ControlSet.
-	 * @return
+	 * The whole set of controls.
+	 * @return ControlSet
 	 */
 	protected ControlSet getControls() {
 		return this.controls;
+	}
+	
+	/**
+	 * Reference to the GameControls.
+	 * @return GameControls
+	 */
+	protected GameControls getGameControls() {
+		return this.controls.getGameControls();
+	}
+	
+	/**
+	 * Reference to the ClockControls.
+	 * @return ClockControls
+	 */
+	protected ClockControls getClockControls() {
+		return this.controls.getClockControls();
+	}
+	
+	/**
+	 * Reference to the SchedulingControls.
+	 * @return SchedulingControls
+	 */
+	protected SchedulingControls getSchedulingControls() {
+		return this.controls.getSchedulingControls();
+	}
+	
+	/**
+	 * Reference to the RoundControls.
+	 * @return RoundControls
+	 */
+	protected RoundControls getRoundControls() {
+		return this.controls.getRoundControls();
+	}
+	
+	/**
+	 * Reference to the TurnControls.
+	 * @return TurnControls
+	 */
+	protected TurnControls getTurnControls() {
+		return this.controls.getTurnControls();
 	}
 	
 	/**

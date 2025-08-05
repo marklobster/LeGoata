@@ -17,13 +17,13 @@ public class BotController extends Controller {
 	
 	public static final String LABEL = "BotController";
 
-	public BotController(LGObject turnTaker, ControlSet controls) {
-		super(turnTaker, controls);
+	public BotController(ControlSet controls) {
+		super(controls);
 	}
 	
 	@Override
 	public Decision getDecision() {
-		Player player = (Player) this.getControls().getTurnControls().getTurnTaker();
+		Player player = (Player) this.getTurnControls().getTurnTaker();
 		CardRequest request = new CardRequest();
 		
 		// randomize rank
@@ -33,7 +33,7 @@ public class BotController extends Controller {
 		
 		// randomize opponent
 		ArrayList<UUID> opponents = new ArrayList<UUID>();
-		for (LGObject lgPlayer : this.getControls().getGameControls().getPlayers()) {
+		for (LGObject lgPlayer : this.getGameControls().getPlayers()) {
 			if (lgPlayer.getId() != player.getId()) {
 				opponents.add(lgPlayer.getId());
 			}
