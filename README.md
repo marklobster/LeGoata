@@ -28,3 +28,4 @@ Coming soon:
 - input controls
 - more sample projects
 - jar artifact support
+- built-ins - awareness (visual, sound, and scent)
