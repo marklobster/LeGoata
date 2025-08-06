@@ -11,7 +11,7 @@ import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.decision.CardRequest;
 import org.legoata.samples.gofish.model.Player;
-import org.legoata.utils.Utils;
+import org.legoata.utils.LGUtils;
 
 public class BotController extends Controller {
 	
@@ -28,7 +28,7 @@ public class BotController extends Controller {
 		
 		// randomize rank
 		Card[] hand = player.getCardsArrayCopy();
-		int index = Utils.getRandom(0, hand.length - 1);
+		int index = LGUtils.getRandom(0, hand.length - 1);
 		request.setRank(hand[index].getRank());
 		
 		// randomize opponent
@@ -38,7 +38,7 @@ public class BotController extends Controller {
 				opponents.add(lgPlayer.getId());
 			}
 		}
-		request.setOpponent(Utils.pickRandom(opponents));
+		request.setOpponent(LGUtils.pickRandom(opponents));
 		
 		// instantiate decision
 		Decision decision = new Decision();

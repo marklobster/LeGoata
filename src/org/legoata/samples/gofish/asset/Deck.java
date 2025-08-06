@@ -2,7 +2,7 @@ package org.legoata.samples.gofish.asset;
 
 import java.util.ArrayList;
 
-import org.legoata.utils.Utils;
+import org.legoata.utils.LGUtils;
 
 public class Deck {
 	
@@ -34,6 +34,6 @@ public class Deck {
 	}
 	
 	public void shuffle() {
-		this.cards = Utils.shuffle(this.cards);
+		this.cards = (ArrayList<Card>)LGUtils.shuffle(this.cards);
 	}
 }

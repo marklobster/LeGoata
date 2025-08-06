@@ -8,7 +8,7 @@ import java.util.List;
 import org.legoata.equipment.Item;
 import org.legoata.equipment.Shield;
 import org.legoata.equipment.Weapon;
-import org.legoata.utils.Utils;
+import org.legoata.utils.LGUtils;
 
 public class GameCharacter {
 	
@@ -234,7 +234,7 @@ public class GameCharacter {
 	}
 	
 	public int getInitiative() {
-		int init = Utils.getRandom(-5, 5) + awareness;
+		int init = LGUtils.getRandom(-5, 5) + awareness;
 		if (init < 0) {
 			init = 0;
 		}
@@ -242,7 +242,7 @@ public class GameCharacter {
 	}
 	
 	public int calculateDamageSent() {
-		int damage = getWeapon().getPower() + strength + dexterity + Utils.getRandom(-3, 3);
+		int damage = getWeapon().getPower() + strength + dexterity + LGUtils.getRandom(-3, 3);
 		if (damage < 0) {
 			damage = 0;
 		}
@@ -250,7 +250,7 @@ public class GameCharacter {
 	}
 	
 	public int calculateDamageReduction() {
-		int reduction = Utils.getRandom(-4, 4) + strength + resolve / 2;
+		int reduction = LGUtils.getRandom(-4, 4) + strength + resolve / 2;
 		if (reduction < 0) {
 			reduction = 0;
 		}
@@ -259,28 +259,28 @@ public class GameCharacter {
 
 	// Attempts
 	public boolean attemptMeleeStrike() {
-		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
+		int strikeAttempt = LGUtils.getRandom(-4, 4) + dexterity;
 		return strikeAttempt > 4;
 	}
 	public boolean attemptCriticalMeleeStrike() {
 		return false;
 	}
 	public boolean attemptRangedStrike() {
-		int strikeAttempt = Utils.getRandom(-4, 4) + dexterity;
+		int strikeAttempt = LGUtils.getRandom(-4, 4) + dexterity;
 		return strikeAttempt > 6;
 	}
 	public boolean attemptCriticalRangedStrike() {
 		return false;
 	}
 	public boolean attemptDodge() {
-		int dodgeAttempt = Utils.getRandom(-4, 4) + awareness + agility + quickness;
+		int dodgeAttempt = LGUtils.getRandom(-4, 4) + awareness + agility + quickness;
 		return dodgeAttempt > 28;
 	}
 	public boolean attemptDeflection() {
 		if (this.shield == null) {
 			return false;
 		}
-		int deflectionAttempt = Utils.getRandom(-5, 5) + dexterity * 2 + awareness + agility + quickness;
+		int deflectionAttempt = LGUtils.getRandom(-5, 5) + dexterity * 2 + awareness + agility + quickness;
 		return deflectionAttempt > 42;
 	}
 	
@@ -292,7 +292,7 @@ public class GameCharacter {
 				livingOpponents.add(gc);
 			}
 		}
-		return Utils.pickRandom(livingOpponents);
+		return LGUtils.pickRandom(livingOpponents);
 	}
 	
 	public void printStats(PrintStream stream) {

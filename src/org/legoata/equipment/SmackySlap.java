@@ -3,7 +3,7 @@ package org.legoata.equipment;
 import java.io.PrintStream;
 
 import org.legoata.gamecharacter.GameCharacter;
-import org.legoata.utils.Utils;
+import org.legoata.utils.LGUtils;
 
 public class SmackySlap extends Item {
 	
@@ -38,7 +38,7 @@ public class SmackySlap extends Item {
 		}
 		
 		// do damage
-		int damage = 25 + user.getBaseDexterity() + Utils.getRandom(-3, 3);
+		int damage = 25 + user.getBaseDexterity() + LGUtils.getRandom(-3, 3);
 		damage = damage	- target.calculateDamageReduction();
 		if (damage < 0) {
 			damage = 0;

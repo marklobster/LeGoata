@@ -2,6 +2,7 @@ package org.legoata.execute;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ class Game {
 	private Phase phase = Phase.INIT_GAME;
 	private LGCollection players = new LGCollection();
 	private LGCollection objects = new LGCollection();
-	private ArrayList<UUID> turnOrder = new ArrayList<UUID>();
+	private List<UUID> turnOrder = new ArrayList<UUID>();
 	private Clock clock;
 	private Round round = null;
 	private Turn turn = null;
@@ -38,11 +39,11 @@ class Game {
 		return this.objects;
 	}
 
-	public ArrayList<UUID> getTurnOrder() {
+	public List<UUID> getTurnOrder() {
 		return turnOrder;
 	}
 
-	public void setTurnOrder(ArrayList<UUID> turnOrder) {
+	public void setTurnOrder(List<UUID> turnOrder) {
 		this.turnOrder = turnOrder;
 	}
 
