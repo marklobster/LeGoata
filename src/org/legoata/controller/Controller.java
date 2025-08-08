@@ -96,33 +96,101 @@ public abstract class Controller {
 	}
 	
 	/**
-	 * Translate the ActionResult to a TurnCommand, thereby either finalizing the turn, or continuing it. 
-	 * If null is returned, it will reroute to the default controller.
-	 * @param result
-	 * @return
+	 * Translate the ActionResult to a TurnCommand, thereby either finalizing the turn, or continuing it.
+	 * By default, this calls the corresponding method for each type of action result: onNullResult, 
+	 * onConsequentialResult, onInconsequentialResult, onIncompleteResult, onErrorResult, or onExitGameResult.
+	 * @param result - ActionResult
+	 * @return TurnCommand
 	 */
 	public TurnCommand postActionCommand(ActionResult result) {
-		// default to error
-		ActionResultCode code = result == null ? ActionResultCode.Error : result.getCode();
-		switch (code) {
-			case Consequential:
-				LGConfig settings = this.getGameControls().getSettings();
-				if (settings.isActionCountingEnabled()) {
-					TurnControls turnControls = this.getTurnControls();
-					turnControls.setActionCount(turnControls.getActionCount() + 1);
-					if (turnControls.getActionCount() < turnControls.getActionLimit()) {
-						return new RepeatController();
-					}
-				}
-				return new CompleteTurn();
-			case Inconsequential:
-			case Incomplete:
-				return new RepeatController();
-			// if exit requested, or if in error state, exit the game
-			default:
-				this.getGameControls().setExitFlag(true);
-				return new CompleteTurn();
+		if (result == null) {
+			return this.onNullResult();
 		}
+		switch (result.getCode()) {
+			case Consequential:
+				return this.onConsequentialResult(result);
+			case Inconsequential:
+				return this.onInconsequentialResult(result);
+			case Incomplete:
+				return this.onIncompleteResult(result);
+			case Error:
+				return this.onErrorResult(result);
+			default:
+				return this.onExitGameResult(result);
+		}
+	}
+	
+	/**
+	 * Translates Consequential ActionResult to a TurnCommand.
+	 * Default behavior:
+	 * A) If action counting is enabled: Action count is incremented. If action limit 
+	 * is reached, CompleteTurn is returned. Otherwise, RepeatController is returned.
+	 * B) If action counting is disabled, CompleteTurn is returned.
+	 * @param result - ActionResult
+	 * @return TurnCommand
+	 */
+	protected TurnCommand onConsequentialResult(ActionResult result) {
+		LGConfig settings = this.getGameControls().getSettings();
+		if (settings.isActionCountingEnabled()) {
+			TurnControls turnControls = this.getTurnControls();
+			turnControls.setActionCount(turnControls.getActionCount() + 1);
+			if (turnControls.getActionCount() < turnControls.getActionLimit()) {
+				return new RepeatController();
+			}
+		}
+		return new CompleteTurn();
+	}
+	
+	/**
+	 * Translates Inconsequential ActionResult to a TurnCommand.
+	 * Default behavior: Returns RepeatController.
+	 * @param result - ActionResult
+	 * @return TurnCommand
+	 */
+	protected TurnCommand onInconsequentialResult(ActionResult result) {
+		return new RepeatController();
+	}
+	
+	/**
+	 * Translates Incomplete ActionResult to a TurnCommand.
+	 * Default behavior: Returns RepeatController.
+	 * @param result - ActionResult
+	 * @return TurnCommand
+	 */
+	protected TurnCommand onIncompleteResult(ActionResult result) {
+		return new RepeatController();
+	}
+	
+	/**
+	 * Translates Error ActionResult to a TurnCommand.
+	 * Default behavior: Sets the exit flag, to exit the game.
+	 * @param result - ActionResult
+	 * @return TurnCommand
+	 */
+	protected TurnCommand onErrorResult(ActionResult result) {
+		this.getGameControls().setExitFlag(true);
+		return new CompleteTurn();
+	}
+	
+	/**
+	 * Translates ExitGame ActionResult to a TurnCommand.
+	 * Default behavior: Sets the exit flag, to exit the game.
+	 * @param result - ActionResult
+	 * @return TurnCommand
+	 */
+	protected TurnCommand onExitGameResult(ActionResult result) {
+		this.getGameControls().setExitFlag(true);
+		return new CompleteTurn();
+	}
+	
+	/**
+	 * Handles a null ActionResult returned by the execution of an Action.
+	 * Default behavior: Returns null, which causes the GameRunner to cycle back to the 
+	 * DefaultController.
+	 * @return TurnCommand
+	 */
+	protected TurnCommand onNullResult() {
+		return null;
 	}
 	
 	/**
@@ -281,7 +349,7 @@ public abstract class Controller {
 	private Option getUserSelection(String prompt, ArrayList<Option> options, boolean allowEscape, String emptyListText) {
 		
 		final String BACK = "b";
-		PrintStream out = this.controls.getGameControls().getOutStream();
+		PrintStream out = this.getGameControls().getOutStream();
 		Option selection = null;
 		boolean escape = false;
 				
@@ -308,7 +376,7 @@ public abstract class Controller {
 			
 			// get input, check if valid
 			selection = null;
-			String input = this.controls.getGameControls().getScanner().nextLine();
+			String input = this.getGameControls().getScanner().nextLine();
 			if (input.equalsIgnoreCase(BACK)) {
 				escape = allowEscape;
 			} else {

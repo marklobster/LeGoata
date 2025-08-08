@@ -41,7 +41,7 @@ public class LGUtils {
 			int index = rand.nextInt(list.size());
 			shuffled.add(list.remove(index));
 		}
-		Collections.copy(list, shuffled);
+		list.addAll(shuffled);
 		return list;
 	}
 }
