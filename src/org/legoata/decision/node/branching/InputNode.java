@@ -9,4 +9,6 @@ public interface InputNode extends DecisionBuilderNode {
 	
 	public DecisionBuilderNode getInput(ControlSet controls, Decision decision, LGObject actor);
 	
+	public void undo(ControlSet controls, Decision decision, LGObject actor);
+	
 }

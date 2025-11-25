@@ -1,6 +1,6 @@
 package org.legoata.decision;
 
-import org.legoata.decision.node.branching.OptionSet;
+import org.legoata.decision.node.branching.InputNode;
 
 /**
  * Provides a means of navigating a menu with or without sub-menus which will ultimately 
@@ -11,7 +11,7 @@ import org.legoata.decision.node.branching.OptionSet;
 public class DecisionBuilder {
 
 	private Decision decision;
-	private OptionSet optionSet;
+	private InputNode rootNode;
 	private String initialText;
 	
 	public DecisionBuilder() {
@@ -23,13 +23,13 @@ public class DecisionBuilder {
 		this.initialText = initialText;
 	}
 	
-	public DecisionBuilder(OptionSet optionSet) {
+	public DecisionBuilder(InputNode rootNode) {
 		this();
-		this.optionSet = optionSet;
+		this.rootNode = rootNode;
 	}
 	
-	public DecisionBuilder(OptionSet optionSet, String initialText) {
-		this(optionSet);
+	public DecisionBuilder(InputNode rootNode, String initialText) {
+		this(rootNode);
 		this.initialText = initialText;
 	}
 	
@@ -37,12 +37,12 @@ public class DecisionBuilder {
 		return this.decision;
 	}
 	
-	public OptionSet getRootMenu() {
-		return this.optionSet;
+	public InputNode getRootNode() {
+		return this.rootNode;
 	}
 	
-	public void setOptionSet(OptionSet optionSet) {
-		this.optionSet = optionSet;
+	public void setRootNode(InputNode rootNode) {
+		this.rootNode = rootNode;
 	}
 	
 	public String getInitialText() {

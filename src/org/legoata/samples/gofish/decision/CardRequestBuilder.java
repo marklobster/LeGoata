@@ -9,8 +9,10 @@ import java.util.UUID;
 import org.legoata.decision.Decision;
 import org.legoata.decision.DecisionBuilder;
 import org.legoata.decision.node.DecisionBuilderNode;
-import org.legoata.decision.node.branching.Option;
+import org.legoata.decision.node.branching.InputSpecificity;
+import org.legoata.decision.node.branching.ListDisplayMode;
 import org.legoata.decision.node.branching.OptionSet;
+import org.legoata.decision.node.branching.Option;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
@@ -27,7 +29,7 @@ public class CardRequestBuilder extends DecisionBuilder {
 
 	public CardRequestBuilder(Player player, ControlSet controls) {
 		this.controls = controls;
-		this.setOptionSet(new RootOptionSet());
+		this.setRootNode(new RootOptionSet());
 		String txt = String.join(
 				System.lineSeparator(),
 				player.getName() + "'s turn!",
@@ -36,22 +38,26 @@ public class CardRequestBuilder extends DecisionBuilder {
 	}
 	
 	private String printHand(Player player) {
-		StringBuilder bs = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		Card[] cards = player.getCardsArrayCopy();
 		for (int i = 0; i < cards.length; i++) {
 			Card card = cards[i];
-			bs.append(GoFishUtils.getString(card.getRank()));
-			bs.append("/");
-			bs.append(GoFishUtils.getString(card.getSuit()));
+			sb.append(GoFishUtils.getString(card.getRank()));
+			sb.append("/");
+			sb.append(GoFishUtils.getString(card.getSuit()));
 			if (i < cards.length - 1) {
-				bs.append('\t');
+				sb.append('\t');
 			}
 		}
-		return bs.toString();
+		return sb.toString();
 	}
 	
-	private class RootOptionSet implements OptionSet {
+	private class RootOptionSet extends OptionSet {
 		
+		public RootOptionSet() {
+			super(ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH);
+		}
+
 		private static final String SELECT_OPPONENT = "Select Opponent";
 		private static final String INFO = "Check Player Status";
 
@@ -71,7 +77,7 @@ public class CardRequestBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision, LGObject actor) {
+		public void undo(ControlSet controls, Decision decision, LGObject actor) {
 			decision.setActionName(null);
 			decision.setData(null);
 		}
@@ -89,14 +95,13 @@ public class CardRequestBuilder extends DecisionBuilder {
 			return "Select an action.";
 		}
 
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
 	}
 	
-	private class OpponentSelectOptionSet implements OptionSet {
+	private class OpponentSelectOptionSet extends OptionSet {
+
+		public OpponentSelectOptionSet() {
+			super(ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH, true);
+		}
 
 		@Override
 		public DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out) {
@@ -106,7 +111,7 @@ public class CardRequestBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision, LGObject actor) {
+		public void undo(ControlSet controls, Decision decision, LGObject actor) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setOpponent(null);
 		}
@@ -128,14 +133,13 @@ public class CardRequestBuilder extends DecisionBuilder {
 			return "Select opponent.";
 		}
 
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
 	}
 	
-	private class RankSelectOptionSet implements OptionSet {
+	private class RankSelectOptionSet extends OptionSet {
+
+		public RankSelectOptionSet() {
+			super(ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.EXACT_MATCH, true);
+		}
 
 		@Override
 		public DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out) {
@@ -146,7 +150,7 @@ public class CardRequestBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision, LGObject actor) {
+		public void undo(ControlSet controls, Decision decision, LGObject actor) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setRank(null);
 		}
@@ -162,7 +166,26 @@ public class CardRequestBuilder extends DecisionBuilder {
 			Arrays.sort(ranksHeld);
 			ArrayList<Option> options = new ArrayList<Option>();
 			for (Rank rank : ranksHeld) {
-				options.add(new Option(GoFishUtils.getString(rank), rank.toString()));
+				String key;
+				int ordinal = rank.ordinal();
+				switch (ordinal) {
+				case 0:
+					key = "A";
+					break;
+				case 10:
+					key = "J";
+					break;
+				case 11:
+					key = "Q";
+					break;
+				case 12:
+					key = "K";
+					break;
+				default:
+					key = Integer.toString(ordinal + 1);
+					break;
+				}
+				options.add(new Option(GoFishUtils.getString(rank), rank.toString(), key));
 			}
 			return options;
 		}
@@ -172,11 +195,6 @@ public class CardRequestBuilder extends DecisionBuilder {
 			return "Select a rank.";
 		}
 
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
 	}
 
 }
