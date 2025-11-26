@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.legoata.decision.Decision;
 import org.legoata.decision.node.DecisionBuilderNode;
 import org.legoata.decision.node.nonbranching.GoBack;
-import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
 
-public abstract class OptionSet implements InputNode {
+public abstract class OptionSet<T> implements InputNode<T> {
 	
 	public final static String DEFAULT_SEPARATOR = ") ";
 	
@@ -41,20 +39,18 @@ public abstract class OptionSet implements InputNode {
 	}
 
 	@Override
-	public DecisionBuilderNode getInput(ControlSet controls, Decision decision, LGObject actor) {
+	public DecisionBuilderNode getInput(LGObject actor, T decisionData, Scanner in, PrintStream out) {
 		final String KEY_FORMAT = "%s%s";
 		final String NUMBERED_FORMAT = "%d%s%s%s";
 		final String TITLE_FORMAT = "%s%s%s%s";
 		final String BACK_KEY = "b";
 		final String BACK_TEXT = "Back";
 		final String BACK_TEXT_KEYS_ONLY = "[B]ack";
-		PrintStream out = controls.getGameControls().getOutStream();
-		Scanner in = controls.getGameControls().getScanner();
 		Option selection = null;
 		Option backOption = null;
 		
 		do {
-			List<Option> options = getOptions(decision, actor);
+			List<Option> options = getOptions(decisionData, actor);
 			
 			// show prompt
 			out.println(this.getPrompt());
@@ -119,12 +115,12 @@ public abstract class OptionSet implements InputNode {
 		
 		return selection == backOption ?
 				new GoBack() :
-				this.select(decision, selection, actor, out);
+				this.select(actor, decisionData, selection, out);
 	}
 	
-	public abstract DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out);
+	public abstract DecisionBuilderNode select(LGObject actor, T decisionData, Option selection, PrintStream out);
 	
-	public abstract List<Option> getOptions(Decision decision, LGObject actor);
+	public abstract List<Option> getOptions(T decisionData, LGObject actor);
 	
 	public abstract String getPrompt();
 	

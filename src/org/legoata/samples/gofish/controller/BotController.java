@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.legoata.controller.Controller;
-import org.legoata.decision.Decision;
+import org.legoata.decision.ActionDecision;
 import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.action.AskForRank;
@@ -22,7 +22,7 @@ public class BotController extends Controller {
 	}
 	
 	@Override
-	public Decision getDecision() {
+	public ActionDecision getDecision() {
 		Player player = (Player) this.getTurnControls().getTurnTaker();
 		CardRequest request = new CardRequest();
 		
@@ -41,7 +41,7 @@ public class BotController extends Controller {
 		request.setOpponent(LGUtils.pickRandom(opponents));
 		
 		// instantiate decision
-		Decision decision = new Decision();
+		ActionDecision decision = new ActionDecision();
 		decision.setActionName(AskForRank.LABEL);
 		decision.setData(request);
 		return decision;

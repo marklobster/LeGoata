@@ -1,8 +1,9 @@
 package org.legoata.samples.gofish.controller;
 
 import org.legoata.controller.Controller;
-import org.legoata.decision.Decision;
+import org.legoata.decision.ActionDecision;
 import org.legoata.execute.ControlSet;
+import org.legoata.execute.GameControls;
 import org.legoata.samples.gofish.decision.CardRequestBuilder;
 import org.legoata.samples.gofish.model.Player;
 
@@ -15,9 +16,11 @@ public class UserController extends Controller {
 	}
 	
 	@Override
-	public Decision getDecision() {
+	public ActionDecision getDecision() {
 		Player user = (Player) this.getTurnControls().getTurnTaker();
-		return this.getUserDecision(new CardRequestBuilder(user, this.getControls()), user);
+		CardRequestBuilder decisionBuilder = new CardRequestBuilder(user, this.getControls());
+		GameControls gameControls = this.getGameControls();
+		return decisionBuilder.getUserDecision(user, new ActionDecision(), gameControls.getScanner(), gameControls.getOutStream());
 	}
 
 }

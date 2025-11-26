@@ -1,10 +1,5 @@
 package org.legoata.controller;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Stack;
-
 import org.legoata.action.Action;
 import org.legoata.action.ActionResult;
 import org.legoata.action.ModelAction;
@@ -13,14 +8,7 @@ import org.legoata.config.LGConfig;
 import org.legoata.controller.command.CompleteTurn;
 import org.legoata.controller.command.RepeatController;
 import org.legoata.controller.command.TurnCommand;
-import org.legoata.decision.Decision;
-import org.legoata.decision.DecisionBuilder;
-import org.legoata.decision.node.DecisionBuilderNode;
-import org.legoata.decision.node.branching.InputNode;
-import org.legoata.decision.node.branching.Option;
-import org.legoata.decision.node.nonbranching.DecisionComplete;
-import org.legoata.decision.node.nonbranching.GoBack;
-import org.legoata.decision.node.nonbranching.ReturnToRoot;
+import org.legoata.decision.ActionDecision;
 import org.legoata.execute.ClockControls;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
@@ -28,7 +16,6 @@ import org.legoata.execute.RoundControls;
 import org.legoata.execute.SchedulingControls;
 import org.legoata.execute.TurnControls;
 import org.legoata.execute.provider.action.ActionProvider;
-import org.legoata.model.LGObject;
 
 /**
  * Class for handling a given situation for a player, or designating a different controller for the job.
@@ -54,7 +41,7 @@ public abstract class Controller {
 	 * Instantiate a Decision for the player.
 	 * @return
 	 */
-	public Decision getDecision() {
+	public ActionDecision getDecision() {
 		return null;
 	}
 	
@@ -64,7 +51,7 @@ public abstract class Controller {
 	 * @param decision
 	 * @return
 	 */
-	public Action resolveActionName(ActionProvider provider, Decision decision) {
+	public Action resolveActionName(ActionProvider provider, ActionDecision decision) {
 		return provider.getAction(decision.getAction(), this.getControls());
 	}
 	
@@ -238,127 +225,6 @@ public abstract class Controller {
 	 */
 	protected TurnControls getTurnControls() {
 		return this.controls.getTurnControls();
-	}
-	
-	/**
-	 * Obtain input from a player who is a user. Use a DecisionBuilder to present options and obtain the selection.
-	 * @param builder
-	 * @param actor
-	 * @return
-	 */
-	protected Decision getUserDecision(DecisionBuilder builder, LGObject actor) {
-		
-		PrintStream out = this.controls.getGameControls().getOutStream();
-		
-		// put root level menu onto stack
-		Stack<InputNode> nodeStack = new Stack<InputNode>();
-		nodeStack.push(builder.getRootNode());
-		boolean decisionComplete = false;
-		
-		// print initial text of menu tree
-		String initialText = builder.getInitialText();
-		if (initialText != null && initialText != "") {
-			out.println(initialText);
-		}
-		
-		do {
-			// get current menu
-			InputNode currentNode = nodeStack.peek();
-			//ArrayList<Option> options = currentMenu.getOptions(builder.getDecision(), actor);
-			//boolean isSubMenu = nodeStack.size() > 1;
-			
-			// get option from user input
-			DecisionBuilderNode nextNode = currentNode.getInput(controls, builder.getDecision(), actor);
-			
-			// repeat same decision
-			if (nextNode == null) {
-				currentNode.undo(controls, builder.getDecision(), actor);
-			}
-			
-			// decision completed
-			else if (nextNode instanceof DecisionComplete) {
-				decisionComplete = true;
-			}
-			
-			// go back n number of nodes
-			else if (nextNode instanceof GoBack) {
-				GoBack goBackSignal = (GoBack)nextNode;
-				nodeStack.peek().undo(controls, builder.getDecision(), actor);
-				int counter = 0;
-				while (counter++ < goBackSignal.getNumberOfStepsBack()
-						&& nodeStack.size() > 1) {
-					nodeStack.pop();
-					nodeStack.peek().undo(controls, builder.getDecision(), actor);
-				}
-			}
-			
-			// return to menu root
-			else if (nextNode instanceof ReturnToRoot) {
-				nodeStack.peek().undo(controls, builder.getDecision(), actor);
-				while (nodeStack.size() > 1) {
-					nodeStack.pop();
-					nodeStack.peek().undo(controls, builder.getDecision(), actor);
-				}
-			}
-			
-			// sub-menu
-			else if (nextNode instanceof InputNode) {
-				nodeStack.push((InputNode)nextNode);
-			}
-			
-			// unsupported DecisionBuilderNode type
-			else {
-				String err = String.format(
-						"The org.legoata.decision.DecisionBuilderNode sub-class %s is not supported.",
-						nextNode.getClass());
-				throw new UnsupportedOperationException(err);
-			}
-			
-		} while (!decisionComplete);
-		
-		return builder.getDecision();
-	}
-	
-	private Option getUserSelection(String prompt, ArrayList<Option> options, boolean allowEscape, String emptyListText) {
-		
-		final String BACK = "b";
-		PrintStream out = this.getGameControls().getOutStream();
-		Option selection = null;
-		boolean escape = false;
-				
-		do {
-			// show prompt
-			out.println(prompt);
-			
-			// show options
-			Hashtable<String, Option> map = new Hashtable<String, Option>();
-			if (options.isEmpty() && emptyListText != null && emptyListText != "") {
-				out.println(emptyListText);
-			} else {
-				int counter = 0;
-				for (Option option : options) {
-					map.put(String.valueOf(counter), option);
-					out.println(String.format("[%d] %s", counter++, option.getTitle()));
-				}
-			}
-			
-			// show 'back' option, when applicable
-			if (allowEscape) {
-				out.println("[b] Back");
-			}
-			
-			// get input, check if valid
-			selection = null;
-			String input = this.getGameControls().getScanner().nextLine();
-			if (input.equalsIgnoreCase(BACK)) {
-				escape = allowEscape;
-			} else {
-				selection = map.get(input);
-			}
-			
-		} while (selection == null && !escape);
-		
-		return selection;
 	}
 	
 }

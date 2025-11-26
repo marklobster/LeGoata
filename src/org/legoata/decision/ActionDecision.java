@@ -1,6 +1,6 @@
 package org.legoata.decision;
 
-public class Decision {
+public class ActionDecision {
 
 	private String actionName;
 	

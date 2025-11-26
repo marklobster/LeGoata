@@ -15,7 +15,7 @@ import org.legoata.controller.command.ChangeController;
 import org.legoata.controller.command.CompleteTurn;
 import org.legoata.controller.command.RepeatController;
 import org.legoata.controller.command.TurnCommand;
-import org.legoata.decision.Decision;
+import org.legoata.decision.ActionDecision;
 import org.legoata.event.ActionEvent;
 import org.legoata.event.ActionEventHandler;
 import org.legoata.event.GameCycleEvent;
@@ -268,7 +268,7 @@ public class GameRunner {
 			trackedControllerNames.clear();
 			
 			// get decision
-			Decision decision = ctrl.getDecision();
+			ActionDecision decision = ctrl.getDecision();
 			
 			// get action
 			Action action = ctrl.resolveActionName(actionProvider, decision);
