@@ -1,7 +1,6 @@
 package org.legoata.decision;
 
 import java.io.PrintStream;
-import java.util.Scanner;
 import java.util.Stack;
 
 import org.legoata.decision.node.DecisionBuilderNode;
@@ -9,7 +8,12 @@ import org.legoata.decision.node.branching.InputNode;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.decision.node.nonbranching.GoBack;
 import org.legoata.decision.node.nonbranching.ReturnToRoot;
-import org.legoata.model.LGObject;
+import org.legoata.execute.ClockControls;
+import org.legoata.execute.ControlSet;
+import org.legoata.execute.GameControls;
+import org.legoata.execute.RoundControls;
+import org.legoata.execute.SchedulingControls;
+import org.legoata.execute.TurnControls;
 
 /**
  * Provides a means of navigating a menu with or without sub-menus which will ultimately 
@@ -19,24 +23,12 @@ import org.legoata.model.LGObject;
  */
 public class DecisionBuilder<T> {
 
+	private ControlSet controls;
 	private InputNode<T> rootNode;
 	private String initialText;
 	
-	public DecisionBuilder() {
-		
-	}
-	
-	public DecisionBuilder(String initialText) {
-		this.initialText = initialText;
-	}
-	
-	public DecisionBuilder(InputNode<T> rootNode) {
-		this.rootNode = rootNode;
-	}
-	
-	public DecisionBuilder(InputNode<T> rootNode, String initialText) {
-		this(rootNode);
-		this.initialText = initialText;
+	public DecisionBuilder(ControlSet controls) {
+		this.controls = controls;
 	}
 	
 	public InputNode<T> getRootNode() {
@@ -57,13 +49,12 @@ public class DecisionBuilder<T> {
 	
 	/**
 	 * Obtain input from a player who is a user by navigating the DecisionBuilder and building a Decision.
-	 * @param actor
 	 * @param decision
-	 * @param in
-	 * @param out
 	 * @return
 	 */
-	public T getUserDecision(LGObject actor, T decision, Scanner in, PrintStream out) {
+	public T getUserDecision(T decision) {
+		
+		PrintStream out = this.getGameControls().getOutStream();
 		
 		// put root level menu onto stack
 		Stack<InputNode<T>> nodeStack = new Stack<InputNode<T>>();
@@ -78,11 +69,11 @@ public class DecisionBuilder<T> {
 		do {
 			// process current node
 			InputNode<T> currentNode = nodeStack.peek();
-			DecisionBuilderNode nextNode = currentNode.getInput(actor, decision, in, out);
+			DecisionBuilderNode nextNode = currentNode.getInput(decision);
 			
 			// repeat same decision
 			if (nextNode == null) {
-				currentNode.undo(actor, decision, out);
+				currentNode.undo(decision);
 			}
 			
 			// decision completed
@@ -93,21 +84,21 @@ public class DecisionBuilder<T> {
 			// go back n number of nodes
 			else if (nextNode instanceof GoBack) {
 				GoBack goBackSignal = (GoBack)nextNode;
-				nodeStack.peek().undo(actor, decision, out);
+				nodeStack.peek().undo(decision);
 				int counter = 0;
 				while (counter++ < goBackSignal.getNumberOfStepsBack()
 						&& nodeStack.size() > 1) {
 					nodeStack.pop();
-					nodeStack.peek().undo(actor, decision, out);
+					nodeStack.peek().undo(decision);
 				}
 			}
 			
 			// return to menu root
 			else if (nextNode instanceof ReturnToRoot) {
-				nodeStack.peek().undo(actor, decision, out);
+				nodeStack.peek().undo(decision);
 				while (nodeStack.size() > 1) {
 					nodeStack.pop();
-					nodeStack.peek().undo(actor, decision, out);
+					nodeStack.peek().undo(decision);
 				}
 			}
 			
@@ -127,5 +118,53 @@ public class DecisionBuilder<T> {
 		} while (!decisionComplete);
 		
 		return decision;
+	}
+	
+	/**
+	 * The whole set of controls.
+	 * @return ControlSet
+	 */
+	protected ControlSet getControls() {
+		return this.controls;
+	}
+	
+	/**
+	 * Reference to the GameControls.
+	 * @return GameControls
+	 */
+	protected GameControls getGameControls() {
+		return this.controls.getGameControls();
+	}
+	
+	/**
+	 * Reference to the ClockControls.
+	 * @return ClockControls
+	 */
+	protected ClockControls getClockControls() {
+		return this.controls.getClockControls();
+	}
+	
+	/**
+	 * Reference to the SchedulingControls.
+	 * @return SchedulingControls
+	 */
+	protected SchedulingControls getSchedulingControls() {
+		return this.controls.getSchedulingControls();
+	}
+	
+	/**
+	 * Reference to the RoundControls.
+	 * @return RoundControls
+	 */
+	protected RoundControls getRoundControls() {
+		return this.controls.getRoundControls();
+	}
+	
+	/**
+	 * Reference to the TurnControls.
+	 * @return TurnControls
+	 */
+	protected TurnControls getTurnControls() {
+		return this.controls.getTurnControls();
 	}
 }

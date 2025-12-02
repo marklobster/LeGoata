@@ -22,7 +22,7 @@ import org.legoata.execute.provider.action.ActionProvider;
  */
 public abstract class Controller {
 	
-	private ControlSet controls = null;
+	private ControlSet controls;
 
 	public Controller(ControlSet controls) {
 		this.controls = controls;

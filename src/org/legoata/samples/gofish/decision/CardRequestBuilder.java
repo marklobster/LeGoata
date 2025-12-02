@@ -1,6 +1,5 @@
 package org.legoata.samples.gofish.decision;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,11 +24,10 @@ import org.legoata.samples.gofish.util.GoFishUtils;
 
 public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 	
-	private ControlSet controls;
-
-	public CardRequestBuilder(Player player, ControlSet controls) {
-		this.controls = controls;
-		this.setRootNode(new RootOptionSet());
+	public CardRequestBuilder(ControlSet controls) {
+		super(controls);
+		Player player = (Player)controls.getTurnControls().getTurnTaker();
+		this.setRootNode(new RootOptionSet(controls));
 		String txt = String.join(
 				System.lineSeparator(),
 				player.getName() + "'s turn!",
@@ -54,15 +52,15 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 	
 	private class RootOptionSet extends OptionSet<ActionDecision> {
 		
-		public RootOptionSet() {
-			super(ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH);
+		public RootOptionSet(ControlSet controls) {
+			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH);
 		}
 
 		private static final String SELECT_OPPONENT = "Select Opponent";
 		private static final String INFO = "Check Player Status";
 
 		@Override
-		public DecisionBuilderNode select(LGObject actor, ActionDecision decision, Option selection, PrintStream out) {
+		public DecisionBuilderNode select(ActionDecision decision, Option selection) {
 			String title = selection.getTitle();
 			DecisionBuilderNode node = null;
 			if (title == INFO) {
@@ -71,19 +69,19 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 			} else if (title == SELECT_OPPONENT) {
 				decision.setActionName(AskForRank.LABEL);
 				decision.setData(new CardRequest());
-				node = new OpponentSelectOptionSet();
+				node = new OpponentSelectOptionSet(this.getControls());
 			}
 			return node;
 		}
 
 		@Override
-		public void undo(LGObject actor, ActionDecision decision, PrintStream out) {
+		public void undo(ActionDecision decision) {
 			decision.setActionName(null);
 			decision.setData(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(ActionDecision decision, LGObject actor) {
+		public ArrayList<Option> getOptions(ActionDecision decision) {
 			ArrayList<Option> options = new ArrayList<Option>();
 			options.add(new Option(SELECT_OPPONENT));
 			options.add(new Option(INFO));
@@ -99,28 +97,29 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 	
 	private class OpponentSelectOptionSet extends OptionSet<ActionDecision> {
 
-		public OpponentSelectOptionSet() {
-			super(ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH, true);
+		public OpponentSelectOptionSet(ControlSet controls) {
+			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH, true);
 		}
 
 		@Override
-		public DecisionBuilderNode select(LGObject actor, ActionDecision decision, Option selection, PrintStream out) {
+		public DecisionBuilderNode select(ActionDecision decision, Option selection) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setOpponent((UUID)selection.getAttachedData());
-			return new RankSelectOptionSet();
+			return new RankSelectOptionSet(this.getControls());
 		}
 
 		@Override
-		public void undo(LGObject actor, ActionDecision decision, PrintStream out) {
+		public void undo(ActionDecision decision) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setOpponent(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(ActionDecision decision, LGObject actor) {
+		public ArrayList<Option> getOptions(ActionDecision decision) {
+			LGObject turnTaker = this.getTurnControls().getTurnTaker();
 			ArrayList<Option> options = new ArrayList<Option>();
-			for (LGObject lgPlayer : controls.getGameControls().getPlayers()) {
-				if (lgPlayer != actor) {
+			for (LGObject lgPlayer : this.getGameControls().getPlayers()) {
+				if (lgPlayer != turnTaker) {
 					Player player = (Player) lgPlayer;
 					options.add(new Option(player.getName(), player.getId()));
 				}
@@ -137,12 +136,12 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 	
 	private class RankSelectOptionSet extends OptionSet<ActionDecision> {
 
-		public RankSelectOptionSet() {
-			super(ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.EXACT_MATCH, true);
+		public RankSelectOptionSet(ControlSet controls) {
+			super(controls, ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.EXACT_MATCH, true);
 		}
 
 		@Override
-		public DecisionBuilderNode select(LGObject actor, ActionDecision decision, Option selection, PrintStream out) {
+		public DecisionBuilderNode select(ActionDecision decision, Option selection) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			String rankString = (String)selection.getAttachedData();
 			cardRequest.setRank(Rank.valueOf(rankString));
@@ -150,14 +149,14 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 		}
 
 		@Override
-		public void undo(LGObject actor, ActionDecision decision, PrintStream out) {
+		public void undo(ActionDecision decision) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setRank(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(ActionDecision decision, LGObject actor) {
-			Player player = (Player) actor;
+		public ArrayList<Option> getOptions(ActionDecision decision) {
+			Player player = (Player)this.getTurnControls().getTurnTaker();
 			HashSet<Rank> hashSet = new HashSet<Rank>();
 			for (Card card : player.getCardsArrayCopy()) {
 				hashSet.add(card.getRank());

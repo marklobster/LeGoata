@@ -8,30 +8,37 @@ import java.util.Scanner;
 
 import org.legoata.decision.node.DecisionBuilderNode;
 import org.legoata.decision.node.nonbranching.GoBack;
-import org.legoata.model.LGObject;
+import org.legoata.execute.ClockControls;
+import org.legoata.execute.ControlSet;
+import org.legoata.execute.GameControls;
+import org.legoata.execute.RoundControls;
+import org.legoata.execute.SchedulingControls;
+import org.legoata.execute.TurnControls;
 
 public abstract class OptionSet<T> implements InputNode<T> {
 	
 	public final static String DEFAULT_SEPARATOR = ") ";
 	
+	private ControlSet controls;
 	private ListDisplayMode displayMode;
 	private InputSpecificity specificity;
 	boolean showBackOption;
 	private String separator;
 
-	public OptionSet(ListDisplayMode displayOption, InputSpecificity specificityOption) {
-		this(displayOption, specificityOption, false, DEFAULT_SEPARATOR);
+	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption) {
+		this(controls, displayOption, specificityOption, false, DEFAULT_SEPARATOR);
 	}
 	
-	public OptionSet(ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption) {
-		this(displayOption, specificityOption, supplyBackOption, DEFAULT_SEPARATOR);
+	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption) {
+		this(controls, displayOption, specificityOption, supplyBackOption, DEFAULT_SEPARATOR);
 	}
 	
-	public OptionSet(ListDisplayMode displayOption, InputSpecificity specificityOption, String separator) {
-		this(displayOption, specificityOption, false, separator);
+	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, String separator) {
+		this(controls, displayOption, specificityOption, false, separator);
 	}
 	
-	public OptionSet(ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption, String separator) {
+	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption, String separator) {
+		this.controls = controls;
 		this.displayMode = displayOption;
 		this.specificity = specificityOption;
 		this.showBackOption = supplyBackOption;
@@ -39,7 +46,7 @@ public abstract class OptionSet<T> implements InputNode<T> {
 	}
 
 	@Override
-	public DecisionBuilderNode getInput(LGObject actor, T decisionData, Scanner in, PrintStream out) {
+	public DecisionBuilderNode getInput(T decisionData) {
 		final String KEY_FORMAT = "%s%s";
 		final String NUMBERED_FORMAT = "%d%s%s%s";
 		final String TITLE_FORMAT = "%s%s%s%s";
@@ -48,9 +55,11 @@ public abstract class OptionSet<T> implements InputNode<T> {
 		final String BACK_TEXT_KEYS_ONLY = "[B]ack";
 		Option selection = null;
 		Option backOption = null;
+		PrintStream out = this.getGameControls().getOutStream();
+		Scanner in = this.getGameControls().getScanner();
 		
 		do {
-			List<Option> options = getOptions(decisionData, actor);
+			List<Option> options = getOptions(decisionData);
 			
 			// show prompt
 			out.println(this.getPrompt());
@@ -115,17 +124,65 @@ public abstract class OptionSet<T> implements InputNode<T> {
 		
 		return selection == backOption ?
 				new GoBack() :
-				this.select(actor, decisionData, selection, out);
+				this.select(decisionData, selection);
 	}
 	
-	public abstract DecisionBuilderNode select(LGObject actor, T decisionData, Option selection, PrintStream out);
+	public abstract DecisionBuilderNode select(T decisionData, Option selection);
 	
-	public abstract List<Option> getOptions(T decisionData, LGObject actor);
+	public abstract List<Option> getOptions(T decisionData);
 	
 	public abstract String getPrompt();
 	
 	public String getEmptySetText() {
 		return null;
+	}
+	
+	/**
+	 * The whole set of controls.
+	 * @return ControlSet
+	 */
+	protected ControlSet getControls() {
+		return this.controls;
+	}
+	
+	/**
+	 * Reference to the GameControls.
+	 * @return GameControls
+	 */
+	protected GameControls getGameControls() {
+		return this.controls.getGameControls();
+	}
+	
+	/**
+	 * Reference to the ClockControls.
+	 * @return ClockControls
+	 */
+	protected ClockControls getClockControls() {
+		return this.controls.getClockControls();
+	}
+	
+	/**
+	 * Reference to the SchedulingControls.
+	 * @return SchedulingControls
+	 */
+	protected SchedulingControls getSchedulingControls() {
+		return this.controls.getSchedulingControls();
+	}
+	
+	/**
+	 * Reference to the RoundControls.
+	 * @return RoundControls
+	 */
+	protected RoundControls getRoundControls() {
+		return this.controls.getRoundControls();
+	}
+	
+	/**
+	 * Reference to the TurnControls.
+	 * @return TurnControls
+	 */
+	protected TurnControls getTurnControls() {
+		return this.controls.getTurnControls();
 	}
 
 }
