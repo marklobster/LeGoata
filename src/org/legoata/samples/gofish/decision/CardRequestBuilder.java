@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 
-import org.legoata.decision.ActionDecision;
-import org.legoata.decision.DecisionBuilder;
+import org.legoata.action.decision.ActionBuilder;
+import org.legoata.action.decision.ActionDecision;
+import org.legoata.action.decision.ActionMenu;
 import org.legoata.decision.node.DecisionBuilderNode;
 import org.legoata.decision.node.branching.InputSpecificity;
 import org.legoata.decision.node.branching.ListDisplayMode;
-import org.legoata.decision.node.branching.OptionSet;
 import org.legoata.decision.node.branching.Option;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.execute.ControlSet;
@@ -22,7 +22,7 @@ import org.legoata.samples.gofish.asset.Rank;
 import org.legoata.samples.gofish.model.Player;
 import org.legoata.samples.gofish.util.GoFishUtils;
 
-public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
+public class CardRequestBuilder extends ActionBuilder {
 	
 	public CardRequestBuilder(ControlSet controls) {
 		super(controls);
@@ -50,7 +50,7 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 		return sb.toString();
 	}
 	
-	private class RootOptionSet extends OptionSet<ActionDecision> {
+	private class RootOptionSet extends ActionMenu {
 		
 		public RootOptionSet(ControlSet controls) {
 			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH);
@@ -95,7 +95,7 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 
 	}
 	
-	private class OpponentSelectOptionSet extends OptionSet<ActionDecision> {
+	private class OpponentSelectOptionSet extends ActionMenu {
 
 		public OpponentSelectOptionSet(ControlSet controls) {
 			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH, true);
@@ -134,7 +134,7 @@ public class CardRequestBuilder extends DecisionBuilder<ActionDecision> {
 
 	}
 	
-	private class RankSelectOptionSet extends OptionSet<ActionDecision> {
+	private class RankSelectOptionSet extends ActionMenu {
 
 		public RankSelectOptionSet(ControlSet controls) {
 			super(controls, ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.EXACT_MATCH, true);

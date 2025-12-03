@@ -3,8 +3,8 @@ package org.legoata.samples.gofish.controller;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.legoata.action.decision.ActionDecision;
 import org.legoata.controller.Controller;
-import org.legoata.decision.ActionDecision;
 import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.action.AskForRank;
