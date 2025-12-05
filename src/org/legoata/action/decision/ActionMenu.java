@@ -2,13 +2,13 @@ package org.legoata.action.decision;
 
 import org.legoata.decision.node.branching.InputSpecificity;
 import org.legoata.decision.node.branching.ListDisplayMode;
-import org.legoata.decision.node.branching.OptionSet;
+import org.legoata.decision.node.branching.Menu;
 import org.legoata.execute.ControlSet;
 
 /**
  * An OptionSet for convenient use with the ActionBuilder.
  */
-public abstract class ActionMenu extends OptionSet<ActionDecision> {
+public abstract class ActionMenu extends Menu<ActionDecision> {
 
 	public ActionMenu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption) {
 		super(controls, displayOption, specificityOption);

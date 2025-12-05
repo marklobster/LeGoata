@@ -18,9 +18,20 @@ import org.legoata.execute.RoundControls;
 import org.legoata.execute.SchedulingControls;
 import org.legoata.execute.TurnControls;
 
-public abstract class OptionSet<T> implements InputNode<T> {
+/**
+ * A DecisionBuilderNode implementation which can display options to a user and process their selection.
+ * @param <T> The type of decision being built
+ */
+public abstract class Menu<T> implements InputNode<T> {
 	
 	public final static String DEFAULT_SEPARATOR = ") ";
+	
+	private final String KEY_FORMAT = "%s%s";
+	private final String NUMBERED_FORMAT = "%d%s%s%s";
+	private final String TITLE_FORMAT = "%s%s%s%s";
+	private final String BACK_KEY = "b";
+	private final String BACK_TEXT = "Back";
+	private final String BACK_TEXT_KEYS_ONLY = "[B]ack";
 	
 	private ControlSet controls;
 	private ListDisplayMode displayMode;
@@ -28,19 +39,19 @@ public abstract class OptionSet<T> implements InputNode<T> {
 	boolean showBackOption;
 	private String separator;
 
-	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption) {
+	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption) {
 		this(controls, displayOption, specificityOption, false, DEFAULT_SEPARATOR);
 	}
 	
-	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption) {
+	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption) {
 		this(controls, displayOption, specificityOption, supplyBackOption, DEFAULT_SEPARATOR);
 	}
 	
-	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, String separator) {
+	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, String separator) {
 		this(controls, displayOption, specificityOption, false, separator);
 	}
 	
-	public OptionSet(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption, String separator) {
+	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption, String separator) {
 		this.controls = controls;
 		this.displayMode = displayOption;
 		this.specificity = specificityOption;
@@ -50,12 +61,7 @@ public abstract class OptionSet<T> implements InputNode<T> {
 
 	@Override
 	public DecisionBuilderNode getInput(T decisionData) {
-		final String KEY_FORMAT = "%s%s";
-		final String NUMBERED_FORMAT = "%d%s%s%s";
-		final String TITLE_FORMAT = "%s%s%s%s";
-		final String BACK_KEY = "b";
-		final String BACK_TEXT = "Back";
-		final String BACK_TEXT_KEYS_ONLY = "[B]ack";
+		
 		Option selection = null;
 		Option backOption = null;
 		PrintStream out = this.getGameControls().getOutStream();
@@ -145,26 +151,26 @@ public abstract class OptionSet<T> implements InputNode<T> {
 	 * @param selection The selected option
 	 * @return
 	 */
-	public abstract DecisionBuilderNode select(T decisionData, Option selection);
+	protected abstract DecisionBuilderNode select(T decisionData, Option selection);
 	
 	/**
 	 * Return the list of options to display.
 	 * @param decisionData The decision object being built
 	 * @return The list of options
 	 */
-	public abstract List<Option> getOptions(T decisionData);
+	protected abstract List<Option> getOptions(T decisionData);
 	
 	/**
 	 * Text to display before listing the options.
 	 * @return
 	 */
-	public abstract String getPrompt();
+	protected abstract String getPrompt();
 	
 	/**
 	 * Text to be displayed when there are no options to select.  Null by default.
 	 * @return
 	 */
-	public String getEmptySetText() {
+	protected String getEmptySetText() {
 		return null;
 	}
 	
@@ -271,7 +277,7 @@ public abstract class OptionSet<T> implements InputNode<T> {
 		scores.sort(new Comparator<LikenessScore>() {
 
 			@Override
-			public int compare(OptionSet<T>.LikenessScore o1, OptionSet<T>.LikenessScore o2) {
+			public int compare(Menu<T>.LikenessScore o1, Menu<T>.LikenessScore o2) {
 				return Integer.compare(o1.score, o2.score);
 			}
 			

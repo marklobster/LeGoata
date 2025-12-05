@@ -1,9 +1,9 @@
 package org.legoata.config;
 
 /**
- * Configurations for the GameRunner.
+ * Configurations for the GameRunner. Use this to configure the GameRunner before starting the game.
  */
-public class GameConfig implements LGConfig {
+public class GameRunnerConfig implements LGConfig {
 
 	private boolean actionCountingEnabled = false;
 	private int defaultActionlimit = 0;

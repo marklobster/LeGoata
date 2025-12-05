@@ -9,7 +9,7 @@ import org.legoata.LGConstants;
 import org.legoata.action.Action;
 import org.legoata.action.ActionResult;
 import org.legoata.action.decision.ActionDecision;
-import org.legoata.config.GameConfig;
+import org.legoata.config.GameRunnerConfig;
 import org.legoata.config.ReadOnlyGameConfig;
 import org.legoata.controller.Controller;
 import org.legoata.controller.command.ChangeController;
@@ -42,7 +42,7 @@ public class GameRunner {
 	private ControllerProvider controllerProvider = null;
 	private ActionProvider actionProvider = null;
 	
-	private GameConfig settings = new GameConfig();
+	private GameRunnerConfig settings = new GameRunnerConfig();
 	
 	private ArrayList<GameCycleEventHandler> preRound = new ArrayList<GameCycleEventHandler>();
 	private ArrayList<GameCycleEventHandler> initRound = new ArrayList<GameCycleEventHandler>();
@@ -105,7 +105,7 @@ public class GameRunner {
 		this.moment.add(op);
 	}
 	
-	public GameConfig getConfig() {
+	public GameRunnerConfig getConfig() {
 		return this.settings;
 	}
 	

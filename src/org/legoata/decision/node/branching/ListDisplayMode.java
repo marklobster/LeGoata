@@ -1,5 +1,8 @@
 package org.legoata.decision.node.branching;
 
+/**
+ * 
+ */
 public enum ListDisplayMode {
 	KEYS_AND_TITLES,
 	KEYS_ONLY,
