@@ -1,9 +1,10 @@
 package org.legoata.utils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-public class Utils {
+public class LGUtils {
 	private static Random rand = new Random();
 	
 	/**
@@ -22,24 +23,24 @@ public class Utils {
 	 * @param list
 	 * @return
 	 */
-	public static <T> T pickRandom(ArrayList<T> list) {
+	public static <T> T pickRandom(List<T> list) {
 		int i = rand.nextInt(list.size());
 		return list.get(i);
 	}
 	
 	/**
-	 * Returns a new ArrayList with the same items but in (pseudo) randomized order. Original 
-	 * list is cleared.
+	 * Shuffles an ArrayList into (pseudo) randomized order. Original list is returned.
 	 * @param <T>
 	 * @param list
 	 * @return
 	 */
-	public static <T> ArrayList<T> shuffle(ArrayList<T> list) {
+	public static <T> List<T> shuffle(List<T> list) {
 		ArrayList<T> shuffled = new ArrayList<T>();
 		while (!list.isEmpty()) {
 			int index = rand.nextInt(list.size());
 			shuffled.add(list.remove(index));
 		}
-		return shuffled;
+		list.addAll(shuffled);
+		return list;
 	}
 }

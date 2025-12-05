@@ -1,7 +1,6 @@
 package org.legoata.samples.gofish.model;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.UUID;
 
 import org.legoata.model.LGObject;

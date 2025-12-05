@@ -14,7 +14,7 @@ public final class GoBack implements DecisionBuilderNode {
 	private int steps = 0;
 	
 	public GoBack() {
-		
+		this(1);
 	}
 	
 	public GoBack(int steps) {

@@ -1,7 +1,7 @@
 package org.legoata.samples.gofish.eventhandler;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -19,7 +19,7 @@ import org.legoata.samples.gofish.model.MeanBot;
 import org.legoata.samples.gofish.model.NiceBot;
 import org.legoata.samples.gofish.model.Player;
 import org.legoata.samples.gofish.model.User;
-import org.legoata.utils.Utils;
+import org.legoata.utils.LGUtils;
 
 public class InitGame implements GameCycleEventHandler {
 
@@ -36,7 +36,7 @@ public class InitGame implements GameCycleEventHandler {
 		
 		// add players to game and to turn order
 		LGCollection playerSet = gameControls.getPlayers();
-		ArrayList<UUID> turnOrder = gameControls.getTurnOrder();
+		List<UUID> turnOrder = gameControls.getTurnOrder();
 		Player[] players = new Player[] { new User(name, phrase), new NiceBot(), new MeanBot() };
 		for (Player player : players) {
 			playerSet.put(player);
@@ -44,14 +44,13 @@ public class InitGame implements GameCycleEventHandler {
 		}
 		
 		// randomize turn order
-		gameControls.setTurnOrder(Utils.shuffle(turnOrder));
+		gameControls.setTurnOrder(LGUtils.shuffle(turnOrder));
 		
 		// add game state object to loose objects
 		GoFishGame goFishGame = new GoFishGame();
 		gameControls.getLooseObjects().put(goFishGame);
 		
 		// deal hands
-		out.println("Time to deal.");
 		Deck deck = goFishGame.getDeck();
 		deck.shuffle();
 		Card[][] hands = new Card[][] {

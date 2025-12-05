@@ -3,45 +3,45 @@ package org.legoata.samples.gofish.controller;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.legoata.action.decision.ActionDecision;
 import org.legoata.controller.Controller;
-import org.legoata.decision.Decision;
 import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.decision.CardRequest;
 import org.legoata.samples.gofish.model.Player;
-import org.legoata.utils.Utils;
+import org.legoata.utils.LGUtils;
 
 public class BotController extends Controller {
 	
 	public static final String LABEL = "BotController";
 
-	public BotController(LGObject turnTaker, ControlSet controls) {
-		super(turnTaker, controls);
+	public BotController(ControlSet controls) {
+		super(controls);
 	}
 	
 	@Override
-	public Decision getDecision() {
-		Player player = (Player) this.getControls().getTurnControls().getTurnTaker();
+	public ActionDecision getDecision() {
+		Player player = (Player) this.getTurnControls().getTurnTaker();
 		CardRequest request = new CardRequest();
 		
 		// randomize rank
 		Card[] hand = player.getCardsArrayCopy();
-		int index = Utils.getRandom(0, hand.length - 1);
+		int index = LGUtils.getRandom(0, hand.length - 1);
 		request.setRank(hand[index].getRank());
 		
 		// randomize opponent
 		ArrayList<UUID> opponents = new ArrayList<UUID>();
-		for (LGObject lgPlayer : this.getControls().getGameControls().getPlayers()) {
+		for (LGObject lgPlayer : this.getGameControls().getPlayers()) {
 			if (lgPlayer.getId() != player.getId()) {
 				opponents.add(lgPlayer.getId());
 			}
 		}
-		request.setOpponent(Utils.pickRandom(opponents));
+		request.setOpponent(LGUtils.pickRandom(opponents));
 		
 		// instantiate decision
-		Decision decision = new Decision();
+		ActionDecision decision = new ActionDecision();
 		decision.setActionName(AskForRank.LABEL);
 		decision.setData(request);
 		return decision;

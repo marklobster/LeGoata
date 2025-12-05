@@ -1,7 +1,7 @@
 package org.legoata.config;
 
 /**
- * Shows the framework configuration options.
+ * Shows the framework configuration options. This is a read-only configuration utilized during the game run.
  */
 public class ReadOnlyGameConfig implements LGConfig {
 	
@@ -10,7 +10,7 @@ public class ReadOnlyGameConfig implements LGConfig {
 	private boolean coolDownTrackingEnabled = false;
 	private boolean autoClockTickEnabled = true;
 
-	public ReadOnlyGameConfig(GameConfig config) {
+	public ReadOnlyGameConfig(GameRunnerConfig config) {
 		this.actionCountingEnabled = config.isActionCountingEnabled();
 		this.defaultActionLimit = config.getDefaultActionLimit();
 		this.coolDownTrackingEnabled = config.isCoolDownTrackingEnabled();

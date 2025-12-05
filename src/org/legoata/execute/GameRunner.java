@@ -5,17 +5,17 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.function.LongConsumer;
 
-import org.legoata.Constants;
+import org.legoata.LGConstants;
 import org.legoata.action.Action;
 import org.legoata.action.ActionResult;
-import org.legoata.config.GameConfig;
+import org.legoata.action.decision.ActionDecision;
+import org.legoata.config.GameRunnerConfig;
 import org.legoata.config.ReadOnlyGameConfig;
 import org.legoata.controller.Controller;
 import org.legoata.controller.command.ChangeController;
 import org.legoata.controller.command.CompleteTurn;
 import org.legoata.controller.command.RepeatController;
 import org.legoata.controller.command.TurnCommand;
-import org.legoata.decision.Decision;
 import org.legoata.event.ActionEvent;
 import org.legoata.event.ActionEventHandler;
 import org.legoata.event.GameCycleEvent;
@@ -42,7 +42,7 @@ public class GameRunner {
 	private ControllerProvider controllerProvider = null;
 	private ActionProvider actionProvider = null;
 	
-	private GameConfig settings = new GameConfig();
+	private GameRunnerConfig settings = new GameRunnerConfig();
 	
 	private ArrayList<GameCycleEventHandler> preRound = new ArrayList<GameCycleEventHandler>();
 	private ArrayList<GameCycleEventHandler> initRound = new ArrayList<GameCycleEventHandler>();
@@ -105,7 +105,7 @@ public class GameRunner {
 		this.moment.add(op);
 	}
 	
-	public GameConfig getConfig() {
+	public GameRunnerConfig getConfig() {
 		return this.settings;
 	}
 	
@@ -227,7 +227,7 @@ public class GameRunner {
 		// ACTION
 		game.setPhase(Phase.ACTION);
 		
-		String ctrlName = Constants.DEFAULT_CTRL;
+		String ctrlName = LGConstants.DEFAULT_CTRL;
 		ArrayList<String> trackedControllerNames = new ArrayList<String>();
 		TurnResultCode code = TurnResultCode.TurnInProgress;
 		
@@ -245,7 +245,7 @@ public class GameRunner {
 			}
 			
 			// look up controller
-			Controller ctrl = this.controllerProvider.getController(ctrlName, player, controls);
+			Controller ctrl = this.controllerProvider.getController(ctrlName, controls);
 			
 			// pre-action phase
 			TurnCommand tcmd = ctrl.preActionCommand();
@@ -264,11 +264,11 @@ public class GameRunner {
 				continue;
 			}
 			
-			// clear tracked names because we are exiting init phase
+			// clear tracked names because we are exiting pre-action phase
 			trackedControllerNames.clear();
 			
 			// get decision
-			Decision decision = ctrl.getDecision();
+			ActionDecision decision = ctrl.getDecision();
 			
 			// get action
 			Action action = ctrl.resolveActionName(actionProvider, decision);
@@ -277,7 +277,7 @@ public class GameRunner {
 			ActionResult actionResult = ctrl.executeAction(action, decision.getData());
 			fireActionEvent(
 					decision.getAction(),
-					action,
+					decision.getData(),
 					actionResult,
 					controls,
 					eventHandlers);
@@ -294,7 +294,7 @@ public class GameRunner {
 			} else if (tcmd instanceof ChangeController) {
 				ctrlName = ((ChangeController)tcmd).getControllerName();
 			} else if (tcmd == null) {
-				ctrlName = Constants.DEFAULT_CTRL;
+				ctrlName = LGConstants.DEFAULT_CTRL;
 			}
 			
 		} while (code == TurnResultCode.TurnInProgress);
@@ -382,7 +382,7 @@ public class GameRunner {
 				// discard past event handlers
 				discards.add(scheduledEvent);
 			} else if (scheduledTime == currentMoment && scheduledEvent.getObjectId() == turnTaker) {
-				// run then discard scheduled events which correspond to turnTaker, even if it is null
+				// run and then discard scheduled events which correspond to turnTaker, even if it is null
 				scheduledEvent.getEventHandler().consume(event, controls);
 				discards.add(scheduledEvent);
 			} else if (scheduledTime > currentMoment) {
@@ -395,12 +395,12 @@ public class GameRunner {
 	
 	private void fireActionEvent(
 			String actionName,
-			Action action,
+			Object actionData,
 			ActionResult result,
 			ControlSet controls,
 			EventHandlerSet eventHandlers) {
 		
-		ActionEvent event = new ActionEvent(actionName, action, result);
+		ActionEvent event = new ActionEvent(actionName, actionData, result);
 		
 		// run permanent event handlers
 		for (ActionEventHandler handler : eventHandlers.getPermanentActionHandlers()) {
@@ -417,7 +417,7 @@ public class GameRunner {
 				// remove any past events which are still in the queue
 				discards.add(scheduledEvent);
 			} else if (scheduledTime == currentMoment && scheduledEvent.getObjectId() == turnTaker) {
-				// run then discard events for the active player at this moment
+				// run and then discard events for the active player at this moment
 				scheduledEvent.getEventHandler().consume(event, controls);
 				discards.add(scheduledEvent);
 			} else if (scheduledTime > currentMoment) {
@@ -450,7 +450,7 @@ public class GameRunner {
 				// remove any past events which are still in the queue
 				discards.add(scheduledEvent);
 			} else if (scheduledTime == currentMoment) {
-				// run then discard events for this moment
+				// run and then discard events for this moment
 				scheduledEvent.getEventHandler().consume(event, controls);
 				discards.add(scheduledEvent);
 			} else {

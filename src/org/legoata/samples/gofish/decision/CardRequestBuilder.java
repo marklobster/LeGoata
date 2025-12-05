@@ -1,16 +1,17 @@
 package org.legoata.samples.gofish.decision;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 
-import org.legoata.decision.Decision;
-import org.legoata.decision.DecisionBuilder;
+import org.legoata.action.decision.ActionBuilder;
+import org.legoata.action.decision.ActionDecision;
+import org.legoata.action.decision.ActionMenu;
 import org.legoata.decision.node.DecisionBuilderNode;
+import org.legoata.decision.node.branching.InputSpecificity;
+import org.legoata.decision.node.branching.ListDisplayMode;
 import org.legoata.decision.node.branching.Option;
-import org.legoata.decision.node.branching.OptionSet;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.execute.ControlSet;
 import org.legoata.model.LGObject;
@@ -21,13 +22,12 @@ import org.legoata.samples.gofish.asset.Rank;
 import org.legoata.samples.gofish.model.Player;
 import org.legoata.samples.gofish.util.GoFishUtils;
 
-public class CardRequestBuilder extends DecisionBuilder {
+public class CardRequestBuilder extends ActionBuilder {
 	
-	private ControlSet controls;
-
-	public CardRequestBuilder(Player player, ControlSet controls) {
-		this.controls = controls;
-		this.setOptionSet(new RootOptionSet());
+	public CardRequestBuilder(ControlSet controls) {
+		super(controls);
+		Player player = (Player)controls.getTurnControls().getTurnTaker();
+		this.setRootNode(new RootOptionSet(controls));
 		String txt = String.join(
 				System.lineSeparator(),
 				player.getName() + "'s turn!",
@@ -36,27 +36,31 @@ public class CardRequestBuilder extends DecisionBuilder {
 	}
 	
 	private String printHand(Player player) {
-		StringBuilder bs = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		Card[] cards = player.getCardsArrayCopy();
 		for (int i = 0; i < cards.length; i++) {
 			Card card = cards[i];
-			bs.append(GoFishUtils.getString(card.getRank()));
-			bs.append("/");
-			bs.append(GoFishUtils.getString(card.getSuit()));
+			sb.append(GoFishUtils.getString(card.getRank()));
+			sb.append("/");
+			sb.append(GoFishUtils.getString(card.getSuit()));
 			if (i < cards.length - 1) {
-				bs.append('\t');
+				sb.append('\t');
 			}
 		}
-		return bs.toString();
+		return sb.toString();
 	}
 	
-	private class RootOptionSet implements OptionSet {
+	private class RootOptionSet extends ActionMenu {
 		
+		public RootOptionSet(ControlSet controls) {
+			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.CASE_INSENSITIVE);
+		}
+
 		private static final String SELECT_OPPONENT = "Select Opponent";
 		private static final String INFO = "Check Player Status";
 
 		@Override
-		public DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out) {
+		public DecisionBuilderNode select(ActionDecision decision, Option selection) {
 			String title = selection.getTitle();
 			DecisionBuilderNode node = null;
 			if (title == INFO) {
@@ -65,19 +69,19 @@ public class CardRequestBuilder extends DecisionBuilder {
 			} else if (title == SELECT_OPPONENT) {
 				decision.setActionName(AskForRank.LABEL);
 				decision.setData(new CardRequest());
-				node = new OpponentSelectOptionSet();
+				node = new OpponentSelectOptionSet(this.getControls());
 			}
 			return node;
 		}
 
 		@Override
-		public void undoSelection(Decision decision, LGObject actor) {
+		public void undo(ActionDecision decision) {
 			decision.setActionName(null);
 			decision.setData(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(Decision decision, LGObject actor) {
+		public ArrayList<Option> getOptions(ActionDecision decision) {
 			ArrayList<Option> options = new ArrayList<Option>();
 			options.add(new Option(SELECT_OPPONENT));
 			options.add(new Option(INFO));
@@ -89,33 +93,33 @@ public class CardRequestBuilder extends DecisionBuilder {
 			return "Select an action.";
 		}
 
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
 	}
 	
-	private class OpponentSelectOptionSet implements OptionSet {
+	private class OpponentSelectOptionSet extends ActionMenu {
 
-		@Override
-		public DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out) {
-			CardRequest cardRequest = (CardRequest) decision.getData();
-			cardRequest.setOpponent((UUID)selection.getAttachedData());
-			return new RankSelectOptionSet();
+		public OpponentSelectOptionSet(ControlSet controls) {
+			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.CASE_INSENSITIVE, true);
 		}
 
 		@Override
-		public void undoSelection(Decision decision, LGObject actor) {
+		public DecisionBuilderNode select(ActionDecision decision, Option selection) {
+			CardRequest cardRequest = (CardRequest) decision.getData();
+			cardRequest.setOpponent((UUID)selection.getAttachedData());
+			return new RankSelectOptionSet(this.getControls());
+		}
+
+		@Override
+		public void undo(ActionDecision decision) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setOpponent(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(Decision decision, LGObject actor) {
+		public ArrayList<Option> getOptions(ActionDecision decision) {
+			LGObject turnTaker = this.getTurnControls().getTurnTaker();
 			ArrayList<Option> options = new ArrayList<Option>();
-			for (LGObject lgPlayer : controls.getGameControls().getPlayers()) {
-				if (lgPlayer != actor) {
+			for (LGObject lgPlayer : this.getGameControls().getPlayers()) {
+				if (lgPlayer != turnTaker) {
 					Player player = (Player) lgPlayer;
 					options.add(new Option(player.getName(), player.getId()));
 				}
@@ -128,17 +132,16 @@ public class CardRequestBuilder extends DecisionBuilder {
 			return "Select opponent.";
 		}
 
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
 	}
 	
-	private class RankSelectOptionSet implements OptionSet {
+	private class RankSelectOptionSet extends ActionMenu {
+
+		public RankSelectOptionSet(ControlSet controls) {
+			super(controls, ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.CASE_INSENSITIVE, true);
+		}
 
 		@Override
-		public DecisionBuilderNode select(Decision decision, Option selection, LGObject actor, PrintStream out) {
+		public DecisionBuilderNode select(ActionDecision decision, Option selection) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			String rankString = (String)selection.getAttachedData();
 			cardRequest.setRank(Rank.valueOf(rankString));
@@ -146,14 +149,14 @@ public class CardRequestBuilder extends DecisionBuilder {
 		}
 
 		@Override
-		public void undoSelection(Decision decision, LGObject actor) {
+		public void undo(ActionDecision decision) {
 			CardRequest cardRequest = (CardRequest) decision.getData();
 			cardRequest.setRank(null);
 		}
 
 		@Override
-		public ArrayList<Option> getOptions(Decision decision, LGObject actor) {
-			Player player = (Player) actor;
+		public ArrayList<Option> getOptions(ActionDecision decision) {
+			Player player = (Player)this.getTurnControls().getTurnTaker();
 			HashSet<Rank> hashSet = new HashSet<Rank>();
 			for (Card card : player.getCardsArrayCopy()) {
 				hashSet.add(card.getRank());
@@ -162,7 +165,26 @@ public class CardRequestBuilder extends DecisionBuilder {
 			Arrays.sort(ranksHeld);
 			ArrayList<Option> options = new ArrayList<Option>();
 			for (Rank rank : ranksHeld) {
-				options.add(new Option(GoFishUtils.getString(rank), rank.toString()));
+				String key;
+				int ordinal = rank.ordinal();
+				switch (ordinal) {
+				case 0:
+					key = "A";
+					break;
+				case 10:
+					key = "J";
+					break;
+				case 11:
+					key = "Q";
+					break;
+				case 12:
+					key = "K";
+					break;
+				default:
+					key = Integer.toString(ordinal + 1);
+					break;
+				}
+				options.add(new Option(GoFishUtils.getString(rank), rank.toString(), key));
 			}
 			return options;
 		}
@@ -172,11 +194,6 @@ public class CardRequestBuilder extends DecisionBuilder {
 			return "Select a rank.";
 		}
 
-		@Override
-		public String getEmptySetText() {
-			return null;
-		}
-		
 	}
 
 }

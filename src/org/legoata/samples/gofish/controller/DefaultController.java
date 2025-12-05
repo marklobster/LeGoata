@@ -9,13 +9,13 @@ import org.legoata.samples.gofish.model.User;
 
 public class DefaultController extends Controller {
 
-	public DefaultController(LGObject turnTaker, ControlSet controls) {
-		super(turnTaker, controls);
+	public DefaultController(ControlSet controls) {
+		super(controls);
 	}
 	
 	@Override
 	public TurnCommand preActionCommand() {
-		LGObject player = this.getControls().getTurnControls().getTurnTaker();
+		LGObject player = this.getTurnControls().getTurnTaker();
 		if (player instanceof User) {
 			return new ChangeController(UserController.LABEL);
 		} else {

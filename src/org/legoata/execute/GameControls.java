@@ -1,7 +1,7 @@
 package org.legoata.execute;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -20,11 +20,11 @@ public class GameControls {
 		return this.game.getPlayers();
 	}
 	
-	public ArrayList<UUID> getTurnOrder() {
+	public List<UUID> getTurnOrder() {
 		return this.game.getTurnOrder();
 	}
 	
-	public void setTurnOrder(ArrayList<UUID> turnOrder) {
+	public void setTurnOrder(List<UUID> turnOrder) {
 		this.game.setTurnOrder(turnOrder);
 	}
 	

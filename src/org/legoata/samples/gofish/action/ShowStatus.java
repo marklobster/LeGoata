@@ -11,11 +11,15 @@ import org.legoata.samples.gofish.model.Player;
 
 public class ShowStatus extends ModelActionNullData {
 	
+	public ShowStatus(ControlSet controls) {
+		super(controls);
+	}
+
 	public static final String LABEL = "ShowStatus";
 
 	@Override
-	public ActionResult execute(LGObject actor, ControlSet controls) {
-		GameControls gameControls = controls.getGameControls();
+	public ActionResult execute() {
+		GameControls gameControls = this.getGameControls();
 		PrintStream out = gameControls.getOutStream();
 		
 		for (LGObject lgPlayer : gameControls.getPlayers()) {
