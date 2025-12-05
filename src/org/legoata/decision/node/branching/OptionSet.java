@@ -1,10 +1,13 @@
 package org.legoata.decision.node.branching;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.legoata.decision.node.DecisionBuilderNode;
 import org.legoata.decision.node.nonbranching.GoBack;
@@ -79,24 +82,24 @@ public abstract class OptionSet<T> implements InputNode<T> {
 				for (Option option : options) {
 					String key = option.getKey();
 					out.printf(TITLE_FORMAT, key, separator, option.getTitle(), System.lineSeparator());
-					dictionary.put(key, option);
+					dictionary.put(transformKey(key), option);
 				}
 				if (this.showBackOption) {
 					backOption = new Option(BACK_TEXT, null, BACK_KEY);
 					out.printf(TITLE_FORMAT, BACK_KEY, separator, BACK_TEXT, System.lineSeparator());
-					dictionary.put(BACK_KEY, backOption);
+					dictionary.put(transformKey(BACK_KEY), backOption);
 				}
 				break;
 			case KEYS_ONLY:
 				for (Option option : options) {
 					String key = option.getKey();
 					out.printf(KEY_FORMAT, key, System.lineSeparator());
-					dictionary.put(key, option);
+					dictionary.put(transformKey(key), option);
 				}
 				if (this.showBackOption) {
 					backOption = new Option(BACK_TEXT_KEYS_ONLY, null, BACK_KEY);
 					out.printf(KEY_FORMAT, BACK_TEXT_KEYS_ONLY, System.lineSeparator());
-					dictionary.put(BACK_KEY, backOption);
+					dictionary.put(transformKey(BACK_KEY), backOption);
 				}
 				break;
 			default:
@@ -110,14 +113,23 @@ public abstract class OptionSet<T> implements InputNode<T> {
 				if (this.showBackOption) {
 					backOption = new Option(BACK_TEXT, null, BACK_KEY);
 					out.printf(TITLE_FORMAT, BACK_KEY, separator, BACK_TEXT, System.lineSeparator());
-					dictionary.put(BACK_KEY, backOption);
+					dictionary.put(transformKey(BACK_KEY), backOption);
 				}
 			}
 			
 			// check if input matches an option
 			String input = in.nextLine();
 			if (input != null) {
-				selection = dictionary.get(input);
+				input = transformKey(input);
+				if (this.specificity == InputSpecificity.CLOSEST_MATCH) {
+					ArrayList<LikenessScore> scores = calculateScores(input, dictionary.keySet());
+					String key = this.getTopScoringKey(scores);
+					if (key != null) {
+						selection = dictionary.get(key);
+					}
+				} else {
+					selection = dictionary.get(input);
+				}
 			}
 			
 		} while (selection == null);
@@ -127,12 +139,31 @@ public abstract class OptionSet<T> implements InputNode<T> {
 				this.select(decisionData, selection);
 	}
 	
+	/**
+	 * Process the selected option and return the appropriate DecisionBuilderNode.
+	 * @param decisionData The decision object being built
+	 * @param selection The selected option
+	 * @return
+	 */
 	public abstract DecisionBuilderNode select(T decisionData, Option selection);
 	
+	/**
+	 * Return the list of options to display.
+	 * @param decisionData The decision object being built
+	 * @return The list of options
+	 */
 	public abstract List<Option> getOptions(T decisionData);
 	
+	/**
+	 * Text to display before listing the options.
+	 * @return
+	 */
 	public abstract String getPrompt();
 	
+	/**
+	 * Text to be displayed when there are no options to select.  Null by default.
+	 * @return
+	 */
 	public String getEmptySetText() {
 		return null;
 	}
@@ -183,6 +214,97 @@ public abstract class OptionSet<T> implements InputNode<T> {
 	 */
 	protected TurnControls getTurnControls() {
 		return this.controls.getTurnControls();
+	}
+	
+	/**
+	 * Converts key to lower-case, unless InputSpecificity is set to EXACT_MATCH.
+	 * @param key
+	 * @return
+	 */
+	private String transformKey(String key) {
+		if (key != null && this.specificity != InputSpecificity.EXACT_MATCH) {
+			key = key.toLowerCase();
+		}
+		return key;
+	}
+	
+	/**
+	 * Calculate how like the input is to each key and return all keys/scores in a list
+	 * @param input
+	 * @param keys
+	 * @return
+	 */
+	private ArrayList<LikenessScore> calculateScores(String input, Set<String> keys) {
+		/**
+		 * For each consecutive character in a key that matches the input, starting from index 0, a point 
+		 * is added.  A perfect match gets an extra point so that it does not tie with a key that has 
+		 * more characters after the input.
+		 */
+		ArrayList<LikenessScore> scores = new ArrayList<LikenessScore>(keys.size());
+		for (String key : keys) {
+			int minLength = input.length() > key.length() ? key.length() : input.length();
+			int score = 0;
+			for (int j = 0; j < minLength; j++) {
+				if (Character.toLowerCase(input.charAt(j)) == Character.toLowerCase(key.charAt(j))) {
+					score++;
+				} else {
+					break;
+				}
+			}
+			// add extra point if exact match
+			if (input.equals(key)) {
+				score++;
+			}
+			scores.add(new LikenessScore(key, score));
+		}
+		return scores;
+	}
+	
+	/**
+	 * Finds the key with the highest score, where score is at least 1 and there is not a tie for highest score.
+	 * @param scores
+	 * @return key with highest score, or null if all scores are 0 or there is a tie for highest
+	 */
+	private String getTopScoringKey(List<LikenessScore> scores) {
+		
+		// sort highest scores to end
+		scores.sort(new Comparator<LikenessScore>() {
+
+			@Override
+			public int compare(OptionSet<T>.LikenessScore o1, OptionSet<T>.LikenessScore o2) {
+				return Integer.compare(o1.score, o2.score);
+			}
+			
+		});
+		
+		switch (scores.size()) {
+		case 0:
+			break;
+		case 1:
+			// make sure score is at least 1
+			if (scores.get(0).score > 0) {
+				return scores.get(0).key;
+			}
+			break;
+		default:
+			// check if score is at least 1 and make sure there is not a tie for highest score
+			if (scores.getLast().score > 0 && scores.getLast().score != scores.get(scores.size() - 2).score) {
+				return scores.getLast().key;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Contains a key and its calculated likeness score in regards to the current input
+	 */
+	private class LikenessScore {
+		private String key;
+		private int score;
+		private LikenessScore(String key, int score) {
+			this.key = key;
+			this.score = score;
+		}
 	}
 
 }

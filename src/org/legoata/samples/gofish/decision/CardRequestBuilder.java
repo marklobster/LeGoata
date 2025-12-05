@@ -53,7 +53,7 @@ public class CardRequestBuilder extends ActionBuilder {
 	private class RootOptionSet extends ActionMenu {
 		
 		public RootOptionSet(ControlSet controls) {
-			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH);
+			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.CASE_INSENSITIVE);
 		}
 
 		private static final String SELECT_OPPONENT = "Select Opponent";
@@ -98,7 +98,7 @@ public class CardRequestBuilder extends ActionBuilder {
 	private class OpponentSelectOptionSet extends ActionMenu {
 
 		public OpponentSelectOptionSet(ControlSet controls) {
-			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.EXACT_MATCH, true);
+			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.CASE_INSENSITIVE, true);
 		}
 
 		@Override
@@ -137,7 +137,7 @@ public class CardRequestBuilder extends ActionBuilder {
 	private class RankSelectOptionSet extends ActionMenu {
 
 		public RankSelectOptionSet(ControlSet controls) {
-			super(controls, ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.EXACT_MATCH, true);
+			super(controls, ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.CASE_INSENSITIVE, true);
 		}
 
 		@Override
