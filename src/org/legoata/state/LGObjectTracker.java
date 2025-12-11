@@ -2,7 +2,7 @@ package org.legoata.state;
 
 import java.util.UUID;
 
-import org.legoata.map.Coordinates;
+import org.legoata.map.LocationKey;
 import org.legoata.model.LGObject;
 
 /**
@@ -48,17 +48,17 @@ public interface LGObjectTracker {
 	 * @param id
 	 * @return
 	 */
-	public Coordinates getObjectLocation(UUID id);
+	public LocationKey getObjectLocation(UUID id);
 	/**
 	 * Sets the map location for an LGObject. This removes association to its owner.
 	 * @param id
-	 * @param coords
+	 * @param locationKey
 	 */
-	public void setObjectLocation(UUID id, Coordinates coords);
+	public void setObjectLocation(UUID id, LocationKey locationKey);
 	/**
 	 * Returns all LGObjects at particular coordinates.
-	 * @param coords
+	 * @param locationKey
 	 * @return
 	 */
-	public LGObject[] getObjectsAtLocation(Coordinates coords);
+	public LGObject[] getObjectsAtLocation(LocationKey locationKey);
 }

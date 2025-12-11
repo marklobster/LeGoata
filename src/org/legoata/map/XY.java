@@ -1,15 +1,15 @@
 package org.legoata.map;
 
-public class Coordinates {
+public class XY implements LocationKey {
 	
 	private int x;
 	private int y;
 
-	public Coordinates(int x, int y) {
+	public XY(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	public int getX() {
 		return this.x;
 	}
@@ -17,5 +17,4 @@ public class Coordinates {
 	public int getY() {
 		return this.y;
 	}
-
 }

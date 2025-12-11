@@ -1,26 +1,26 @@
 package org.legoata.map;
 
 /**
- * A game map composed of rooms at particular locations, where each 
- * room is type T.
+ * A game map composed of rooms at particular locations, where each room 
+ * is type T, and you can access the room using its key of type K.
  * @param <T>
  */
-public interface LGGameMap<T> {
+public interface LGGameMap<T, K> {
 	/**
-	 * Returns the room at the specified coordinates.
-	 * @param coords
+	 * Returns the room having the specified key.
+	 * @param cookeyds
 	 * @return
 	 */
-	public T getRoom(Coordinates coords);
+	public T getRoom(K key);
 	/**
-	 * Sets the value of a room at the specified coordinates.
+	 * Sets the value of a room having the specified key.
 	 * @param room
-	 * @param coords
+	 * @param key
 	 */
-	public void setRoom(T room, Coordinates coords);
+	public void setRoom(T room, K key);
 	/**
-	 * Sets the object at the specified coordinates to a null or default value.
-	 * @param coords
+	 * Sets the object with the specified key to a null or default value.
+	 * @param key
 	 */
-	public void deleteRoom(Coordinates coords);
+	public void deleteRoom(K key);
 }
