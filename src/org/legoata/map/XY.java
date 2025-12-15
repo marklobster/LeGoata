@@ -1,6 +1,6 @@
 package org.legoata.map;
 
-public class XY implements LocationKey {
+public class XY {
 	
 	private int x;
 	private int y;
