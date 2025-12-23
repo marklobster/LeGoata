@@ -1,6 +1,9 @@
 package org.legoata.execute;
 
+import java.util.UUID;
+
 import org.legoata.map.LGGameMap;
+import org.legoata.map.ObjectLocationInfo;
 import org.legoata.map.XY;
 import org.legoata.map.XYZ;
 import org.legoata.model.LGTrackable;
@@ -266,6 +269,37 @@ public class MapControls<R,K> {
 			this.objectTracker.putObject(obj);
 		}
 		this.objectTracker.setObjectsAtLocation(locationKey, objects);
+	}
+	
+	/**
+	 * Get information about an object's location, deriving it from the parent hierarchy if needed.
+	 * @param objectId
+	 * @return
+	 */
+	public ObjectLocationInfo<K> getObjectLocationInfo(UUID objectId) {
+		K locationKey = this.objectTracker.getObjectLocation(objectId);
+		LGTrackable immediateParent = this.objectTracker.getObjectOwner(objectId);
+		LGTrackable parentAtLocation = null;
+		if (immediateParent != null) {
+			LGTrackable current = immediateParent;
+			boolean topFound = false;
+			while (!topFound) {
+				LGTrackable next = this.objectTracker.getObjectOwner(current.getId());
+				if (next == null) {
+					topFound = true;
+					locationKey = this.objectTracker.getObjectLocation(current.getId());
+					if (locationKey != null) {
+						parentAtLocation = current;
+					}
+				}
+			}
+		}
+
+		return new ObjectLocationInfo<K>(
+				objectId,
+				immediateParent == null ? null : immediateParent.getId(),
+				parentAtLocation == null ? null : parentAtLocation.getId(),
+				locationKey);
 	}
 
 }
