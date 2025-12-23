@@ -2,6 +2,7 @@ package org.legoata.state;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,7 +22,11 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 
 	@Override
 	public void putObject(LGTrackable object) {
-		this.objectMap.put(object.getId(), new ObjectContainer(object));
+		ObjectContainer container = this.objectMap.get(object.getId());
+		if (container == null)
+			this.objectMap.put(object.getId(), new ObjectContainer(object));
+		else
+			container.obj = object;
 	}
 
 	@Override
@@ -34,9 +39,9 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 		this.removeFromOwner(container);
 		
 		if (recursiveDelete)
-			this.removeChildren(container);
-		else
 			this.recursivelyDeleteChildren(container);
+		else
+			this.removeChildren(container);
 		
 		this.removeFromLocation(container);
 	}
@@ -128,6 +133,33 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 	}
 	
 	@Override
+	public void setObjectsAtLocation(K locationKey, LGTrackable[] objects) {
+		// if objects array is empty, just delete contents at the location
+		if (objects == null || objects.length == 0) {
+			clearLocation(locationKey);
+			return;
+		}
+		
+		// remove objects currently at the location which are not in the objects array
+		List<UUID> objectIds = this.locationMap.get(locationKey);
+		List<UUID> removals = new ArrayList<UUID>();
+		HashSet<UUID> idSet = new HashSet<UUID>(objectIds);
+		for (UUID id : objectIds) {
+			if (!idSet.contains(id)) {
+				removals.add(id);
+			}
+		}
+		for (UUID id : removals) {
+			deleteObject(id, true);
+		}
+		
+		// add contents of objects array to location
+		for (LGTrackable obj : objects) {
+			setObjectLocation(obj.getId(), locationKey);
+		}
+	}
+	
+	@Override
 	public void clearLocation(K locationKey) {
 		List<UUID> ids = this.locationMap.remove(locationKey);
 		if (ids == null) {
@@ -139,6 +171,13 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 			this.removeFromOwner(container);
 			this.recursivelyDeleteChildren(container);
 		}
+	}
+	
+	@Override
+	public void makeOrphan(UUID id) {
+		ObjectContainer container = this.objectMap.get(id);
+		this.removeFromLocation(container);
+		this.removeFromOwner(container);
 	}
 	
 	private void removeFromOwner(ObjectContainer container) {
@@ -182,6 +221,9 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 		
 	}
 	
+	/**
+	 * Contains an LGTrackable, its location, and its owner.
+	 */
 	private class ObjectContainer {
 		private LGTrackable obj;
 		private UUID owner;
