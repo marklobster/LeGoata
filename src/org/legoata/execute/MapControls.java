@@ -280,6 +280,8 @@ public class MapControls<R,K> {
 		K locationKey = this.objectTracker.getObjectLocation(objectId);
 		LGTrackable immediateParent = this.objectTracker.getObjectOwner(objectId);
 		LGTrackable parentAtLocation = null;
+		
+		// navigate up to find topmost parent
 		if (immediateParent != null) {
 			LGTrackable current = immediateParent;
 			boolean topFound = false;
@@ -287,7 +289,11 @@ public class MapControls<R,K> {
 				LGTrackable next = this.objectTracker.getObjectOwner(current.getId());
 				if (next == null) {
 					topFound = true;
+					
+					// use locationKey of topmost parent
 					locationKey = this.objectTracker.getObjectLocation(current.getId());
+					
+					// only set the parentAtLocation value if that object does in fact have a location
 					if (locationKey != null) {
 						parentAtLocation = current;
 					}

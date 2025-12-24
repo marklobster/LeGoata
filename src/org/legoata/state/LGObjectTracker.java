@@ -1,5 +1,6 @@
 package org.legoata.state;
 
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.legoata.model.LGTrackable;
@@ -83,4 +84,9 @@ public interface LGObjectTracker<K> {
 	 * @param id
 	 */
 	public void makeOrphan(UUID id);
+	/**
+	 * Get an iterator for all tracked objects.
+	 * @return
+	 */
+	public Iterator<LGTrackable> getObjectIterator();
 }

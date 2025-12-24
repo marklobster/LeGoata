@@ -1,8 +1,10 @@
 package org.legoata.state;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -180,6 +182,16 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 		this.removeFromOwner(container);
 	}
 	
+	public Iterator<LGTrackable> getObjectIterator() {
+		Collection<ObjectContainer> values = this.objectMap.values();
+		LGTrackable[] array = new LGTrackable[values.size()];
+		int i = 0;
+		for (ObjectContainer container : values) {
+			array[i++] = container.obj;
+		}
+		return new ObjectIterator<LGTrackable>(array);
+	}
+	
 	private void removeFromOwner(ObjectContainer container) {
 		if (container.owner != null) {
 			List<UUID> idList = this.ownerMap.get(container.owner);
@@ -231,6 +243,27 @@ public class InMemoryObjectTracker<K> implements LGObjectTracker<K> {
 		private ObjectContainer(LGTrackable obj) {
 			this.obj = obj;
 		}
+	}
+	
+	private class ObjectIterator<T extends LGTrackable> implements Iterator<T> {
+		
+		private T[] array;
+		int index = 0;
+		
+		public ObjectIterator(T[] array) {
+			this.array = array;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return index < array.length;
+		}
+
+		@Override
+		public T next() {
+			return this.array[index++];
+		}
+		
 	}
 
 }
