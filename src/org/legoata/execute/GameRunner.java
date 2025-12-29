@@ -24,7 +24,7 @@ import org.legoata.event.TimeChangeEvent;
 import org.legoata.event.TimeChangeEventHandler;
 import org.legoata.execute.provider.action.ActionProvider;
 import org.legoata.execute.provider.controller.ControllerProvider;
-import org.legoata.model.LGObject;
+import org.legoata.model.LGTrackable;
 
 import java.util.Scanner;
 import java.util.TreeSet;
@@ -180,7 +180,7 @@ public class GameRunner {
 		while (!game.getExitFlag() && !round.isComplete() && round.getIndex() < game.getPlayers().size()) {
 			
 			UUID playerKey = game.getTurnOrder().get(round.getIndex());
-			LGObject player = game.getPlayers().get(playerKey);
+			LGTrackable player = game.getPlayers().get(playerKey);
 			executeTurn(player, game, controls, eventHandlers);
 			round.incrementIndex();
 
@@ -200,7 +200,7 @@ public class GameRunner {
 		controls.setRoundControls(null);
 	}
 	
-	private TurnResultCode executeTurn(LGObject player, Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
+	private TurnResultCode executeTurn(LGTrackable player, Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
 
 		// PRE_TURN
 		game.setPhase(Phase.PRE_TURN);

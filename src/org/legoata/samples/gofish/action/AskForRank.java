@@ -7,8 +7,8 @@ import org.legoata.action.ModelAction;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
 import org.legoata.execute.TurnControls;
-import org.legoata.model.LGObject;
-import org.legoata.model.structure.LGCollection;
+import org.legoata.model.LGTrackable;
+import org.legoata.model.structure.HashMapCollection;
 import org.legoata.samples.gofish.Keys;
 import org.legoata.samples.gofish.asset.Book;
 import org.legoata.samples.gofish.asset.Card;
@@ -85,8 +85,8 @@ public class AskForRank extends ModelAction<CardRequest> {
 		return this.actionCompletedWithConsequence();
 	}
 	
-	private boolean winnerFound(LGCollection players) {
-		for (LGObject lgPlayer : players) {
+	private boolean winnerFound(HashMapCollection players) {
+		for (LGTrackable lgPlayer : players) {
 			Player player = (Player) lgPlayer;
 			if (player.getHandSize() == 0) {
 				return true;

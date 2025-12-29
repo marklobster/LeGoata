@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import org.legoata.config.LGConfig;
-import org.legoata.model.structure.LGCollection;
+import org.legoata.model.structure.HashMapCollection;
 
 public class GameControls {
 
@@ -16,7 +16,7 @@ public class GameControls {
 		this.game = game;
 	}
 	
-	public LGCollection getPlayers() {
+	public HashMapCollection getPlayers() {
 		return this.game.getPlayers();
 	}
 	
@@ -28,7 +28,7 @@ public class GameControls {
 		this.game.setTurnOrder(turnOrder);
 	}
 	
-	public LGCollection getLooseObjects() {
+	public HashMapCollection getLooseObjects() {
 		return this.game.getLooseObjections();
 	}
 	

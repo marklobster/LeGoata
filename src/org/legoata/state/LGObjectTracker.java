@@ -68,7 +68,7 @@ public interface LGObjectTracker<K> {
 	 */
 	public LGTrackable[] getObjectsAtLocation(K locationKey);
 	/**
-	 * Sets the contents of a location, deleting anything which is not found in the objects array.
+	 * Sets the contents of a location, deleting the room's current contents except for objects found in the objects array.
 	 * @param locationKey
 	 * @param objects
 	 */

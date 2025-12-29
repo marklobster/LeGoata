@@ -2,7 +2,7 @@ package org.legoata.execute;
 
 import java.util.Map;
 
-import org.legoata.model.LGObject;
+import org.legoata.model.LGTrackable;
 
 public class TurnControls {
 	
@@ -32,7 +32,7 @@ public class TurnControls {
 		this.turn.setActionLimit(actionLimit);
 	}
 	
-	public LGObject getTurnTaker() {
+	public LGTrackable getTurnTaker() {
 		return this.turn.getTurnTaker();
 	}
 }

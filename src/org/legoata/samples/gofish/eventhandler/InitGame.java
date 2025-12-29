@@ -9,7 +9,7 @@ import org.legoata.event.GameCycleEvent;
 import org.legoata.event.GameCycleEventHandler;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
-import org.legoata.model.structure.LGCollection;
+import org.legoata.model.structure.HashMapCollection;
 import org.legoata.samples.gofish.GoFishConstants;
 import org.legoata.samples.gofish.asset.Book;
 import org.legoata.samples.gofish.asset.Card;
@@ -35,7 +35,7 @@ public class InitGame implements GameCycleEventHandler {
 		String phrase = getCatchphrase(gameControls.getScanner(), out);
 		
 		// add players to game and to turn order
-		LGCollection playerSet = gameControls.getPlayers();
+		HashMapCollection playerSet = gameControls.getPlayers();
 		List<UUID> turnOrder = gameControls.getTurnOrder();
 		Player[] players = new Player[] { new User(name, phrase), new NiceBot(), new MeanBot() };
 		for (Player player : players) {

@@ -1,6 +1,6 @@
 package org.legoata.execute;
 
-class Round {
+public class Round {
 
 	private int index = 0;
 	private int nextIncrement = 1;

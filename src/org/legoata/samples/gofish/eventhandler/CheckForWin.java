@@ -6,7 +6,7 @@ import org.legoata.event.ActionEvent;
 import org.legoata.event.ActionEventHandler;
 import org.legoata.execute.ControlSet;
 import org.legoata.execute.GameControls;
-import org.legoata.model.LGObject;
+import org.legoata.model.LGTrackable;
 import org.legoata.samples.gofish.model.Player;
 
 public class CheckForWin implements ActionEventHandler {
@@ -17,7 +17,7 @@ public class CheckForWin implements ActionEventHandler {
 		Player[] players = new Player[gameControls.getPlayers().size()];
 		int i = 0;
 		boolean winnerFound = false;
-		for (LGObject playerObj : gameControls.getPlayers()) {
+		for (LGTrackable playerObj : gameControls.getPlayers()) {
 			Player player = (Player) playerObj;
 			players[i++] = player;
 			if (player.getHandSize() == 0) {

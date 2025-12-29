@@ -7,13 +7,13 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import org.legoata.config.LGConfig;
-import org.legoata.model.structure.LGCollection;
+import org.legoata.model.structure.HashMapCollection;
 
 class Game {
 
 	private Phase phase = Phase.INIT_GAME;
-	private LGCollection players = new LGCollection();
-	private LGCollection objects = new LGCollection();
+	private HashMapCollection players = new HashMapCollection();
+	private HashMapCollection objects = new HashMapCollection();
 	private List<UUID> turnOrder = new ArrayList<UUID>();
 	private Clock clock;
 	private Round round = null;
@@ -31,11 +31,11 @@ class Game {
 		this.phase = phase;
 	}
 
-	LGCollection getPlayers() {
+	HashMapCollection getPlayers() {
 		return this.players;
 	}
 	
-	LGCollection getLooseObjections() {
+	HashMapCollection getLooseObjections() {
 		return this.objects;
 	}
 

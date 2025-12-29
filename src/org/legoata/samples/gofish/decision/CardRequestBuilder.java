@@ -14,7 +14,7 @@ import org.legoata.decision.node.branching.ListDisplayMode;
 import org.legoata.decision.node.branching.Option;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.execute.ControlSet;
-import org.legoata.model.LGObject;
+import org.legoata.model.LGTrackable;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.action.ShowStatus;
 import org.legoata.samples.gofish.asset.Card;
@@ -116,9 +116,9 @@ public class CardRequestBuilder extends ActionBuilder {
 
 		@Override
 		public ArrayList<Option> getOptions(ActionDecision decision) {
-			LGObject turnTaker = this.getTurnControls().getTurnTaker();
+			LGTrackable turnTaker = this.getTurnControls().getTurnTaker();
 			ArrayList<Option> options = new ArrayList<Option>();
-			for (LGObject lgPlayer : this.getGameControls().getPlayers()) {
+			for (LGTrackable lgPlayer : this.getGameControls().getPlayers()) {
 				if (lgPlayer != turnTaker) {
 					Player player = (Player) lgPlayer;
 					options.add(new Option(player.getName(), player.getId()));

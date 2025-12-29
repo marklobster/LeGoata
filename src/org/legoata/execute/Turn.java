@@ -3,20 +3,20 @@ package org.legoata.execute;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.legoata.model.LGObject;
+import org.legoata.model.LGTrackable;
 
-class Turn {
+public class Turn {
 
-	private LGObject turnTaker;
+	private LGTrackable turnTaker;
 	private Map<String, Object> data = new HashMap<String, Object>();
 	private int actionCount;
 	private int actionLimit;
 	
-	Turn(LGObject turnTaker) {
+	Turn(LGTrackable turnTaker) {
 		this.turnTaker = turnTaker;
 	}
 
-	public LGObject getTurnTaker() {
+	public LGTrackable getTurnTaker() {
 		return turnTaker;
 	}
 

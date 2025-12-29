@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.legoata.action.decision.ActionDecision;
 import org.legoata.controller.Controller;
 import org.legoata.execute.ControlSet;
-import org.legoata.model.LGObject;
+import org.legoata.model.LGTrackable;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.decision.CardRequest;
@@ -33,7 +33,7 @@ public class BotController extends Controller {
 		
 		// randomize opponent
 		ArrayList<UUID> opponents = new ArrayList<UUID>();
-		for (LGObject lgPlayer : this.getGameControls().getPlayers()) {
+		for (LGTrackable lgPlayer : this.getGameControls().getPlayers()) {
 			if (lgPlayer.getId() != player.getId()) {
 				opponents.add(lgPlayer.getId());
 			}
