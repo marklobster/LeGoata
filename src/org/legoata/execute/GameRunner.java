@@ -24,7 +24,7 @@ import org.legoata.event.TimeChangeEvent;
 import org.legoata.event.TimeChangeEventHandler;
 import org.legoata.execute.provider.action.ActionProvider;
 import org.legoata.execute.provider.controller.ControllerProvider;
-import org.legoata.model.LGTrackable;
+import org.legoata.tracking.LGTrackable;
 
 import java.util.Scanner;
 import java.util.TreeSet;
@@ -37,6 +37,7 @@ public class GameRunner {
 	
 	private InputStream input = System.in;
 	private PrintStream out = System.out;
+	private PrintStream logging = System.err;
 	
 	private GameCycleEventHandler initializer = null;
 	private ControllerProvider controllerProvider = null;
@@ -52,6 +53,14 @@ public class GameRunner {
 	private ArrayList<GameCycleEventHandler> postTurn = new ArrayList<GameCycleEventHandler>();
 	private ArrayList<GameCycleEventHandler> postRound = new ArrayList<GameCycleEventHandler>();
 	private ArrayList<TimeChangeEventHandler> moment = new ArrayList<TimeChangeEventHandler>();
+	
+	public void setInputStream(InputStream stream) {
+		this.input = stream;
+	}
+	
+	public void setOutputStream(PrintStream stream) {
+		this.out = stream;
+	}
 	
 	public void setInitializer(GameCycleEventHandler initializer) {
 		this.initializer = initializer;
@@ -116,7 +125,8 @@ public class GameRunner {
 		
 		// set up
 		MutableControlSet controls = new MutableControlSet();
-		EventHandlerSet eventHandlers = this.initializeEventHandlerSet();
+		EventHandlerUnit eventHandlers = this.initializeEventHandlerSet();
+		StreamUnit streams = new StreamUnit(new Scanner(this.input), this.out, this.logging);
 		Clock gameClock = new Clock();
 		gameClock.setMoment(0);
 		gameClock.setNextIncrement(0); // first increment should be 0
@@ -128,11 +138,9 @@ public class GameRunner {
 		});
 		Game game = new Game();
 		game.setClock(gameClock);
-		game.setScanner(new Scanner(this.input));
-		game.setOutStream(this.out);
 		game.setSettings(new ReadOnlyGameConfig(this.settings));
 
-		controls.setGameControls(new GameControls(game));
+		controls.setGameControls(new GameControls(game, streams));
 		controls.setClockControls(new ClockControls(gameClock));
 		controls.setSchedulingControls(new SchedulingControls(eventHandlers));
 		
@@ -149,7 +157,7 @@ public class GameRunner {
 	private void executeRound(
 			Game game,
 			MutableControlSet controls,
-			EventHandlerSet eventHandlers) {
+			EventHandlerUnit eventHandlers) {
 		
 		// PRE_ROUND
 		game.setPhase(Phase.PRE_ROUND);
@@ -200,7 +208,7 @@ public class GameRunner {
 		controls.setRoundControls(null);
 	}
 	
-	private TurnResultCode executeTurn(LGTrackable player, Game game, MutableControlSet controls, EventHandlerSet eventHandlers) {
+	private TurnResultCode executeTurn(LGTrackable player, Game game, MutableControlSet controls, EventHandlerUnit eventHandlers) {
 
 		// PRE_TURN
 		game.setPhase(Phase.PRE_TURN);
@@ -309,9 +317,9 @@ public class GameRunner {
 		return code;
 	}
 	
-	private EventHandlerSet initializeEventHandlerSet() {
+	private EventHandlerUnit initializeEventHandlerSet() {
 		
-		EventHandlerSet eventHandlers = new EventHandlerSet();
+		EventHandlerUnit eventHandlers = new EventHandlerUnit();
 		
 		eventHandlers.getPermanentPreRoundHandlers().addAll(this.preRound);
 		eventHandlers.getPermanentInitRoundHandlers().addAll(this.initRound);
@@ -327,8 +335,8 @@ public class GameRunner {
 	
 	private void fireGameCycleEvent(
 			Phase phase,
-			ControlSet controls,
-			EventHandlerSet eventHandlers) {
+			ControlUnit controls,
+			EventHandlerUnit eventHandlers) {
 		
 		ArrayList<GameCycleEventHandler> permanentEventHandlers = null;
 		TreeSet<ScheduledEvent<GameCycleEventHandler>> scheduledEventHandlers = null;
@@ -397,8 +405,8 @@ public class GameRunner {
 			String actionName,
 			Object actionData,
 			ActionResult result,
-			ControlSet controls,
-			EventHandlerSet eventHandlers) {
+			ControlUnit controls,
+			EventHandlerUnit eventHandlers) {
 		
 		ActionEvent event = new ActionEvent(actionName, actionData, result);
 		
@@ -430,8 +438,8 @@ public class GameRunner {
 	
 	private void fireTimeChangeEvent(
 			long currentMoment,
-			ControlSet controls,
-			EventHandlerSet eventHandlers) {
+			ControlUnit controls,
+			EventHandlerUnit eventHandlers) {
 		
 		TimeChangeEvent event = new TimeChangeEvent(currentMoment);
 		

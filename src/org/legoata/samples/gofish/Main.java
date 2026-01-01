@@ -4,7 +4,7 @@ import org.legoata.LGConstants;
 import org.legoata.action.Action;
 import org.legoata.config.GameRunnerConfig;
 import org.legoata.controller.Controller;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameRunner;
 import org.legoata.execute.provider.action.ActionRegistry;
 import org.legoata.execute.provider.action.SingleActionProvider;
@@ -35,13 +35,13 @@ public class Main {
 			ActionRegistry actions = new ActionRegistry();
 			actions.registerAction(AskForRank.LABEL, new SingleActionProvider() {
 				@Override
-				public Action constructAction(ControlSet controls) {
+				public Action constructAction(ControlUnit controls) {
 					return new AskForRank(controls);
 				}
 			});
 			actions.registerAction(ShowStatus.LABEL, new SingleActionProvider() {
 				@Override
-				public Action constructAction(ControlSet controls) {
+				public Action constructAction(ControlUnit controls) {
 					return new ShowStatus(controls);
 				}
 			});
@@ -51,19 +51,19 @@ public class Main {
 			ControllerRegistry controllers = new ControllerRegistry();
 			controllers.registerController(LGConstants.DEFAULT_CTRL, new SingleControllerProvider() {
 				@Override
-				public Controller constructController(ControlSet controls) {
+				public Controller constructController(ControlUnit controls) {
 					return new DefaultController(controls);
 				}
 			});
 			controllers.registerController(UserController.LABEL, new SingleControllerProvider() {
 				@Override
-				public Controller constructController(ControlSet controls) {
+				public Controller constructController(ControlUnit controls) {
 					return new UserController(controls);
 				}
 			});
 			controllers.registerController(BotController.LABEL, new SingleControllerProvider() {
 				@Override
-				public Controller constructController(ControlSet controls) {
+				public Controller constructController(ControlUnit controls) {
 					return new BotController(controls);
 				}
 			});

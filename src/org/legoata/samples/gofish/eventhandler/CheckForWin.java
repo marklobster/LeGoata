@@ -4,15 +4,15 @@ import java.io.PrintStream;
 
 import org.legoata.event.ActionEvent;
 import org.legoata.event.ActionEventHandler;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
-import org.legoata.model.LGTrackable;
 import org.legoata.samples.gofish.model.Player;
+import org.legoata.tracking.LGTrackable;
 
 public class CheckForWin implements ActionEventHandler {
 
 	@Override
-	public void consume(ActionEvent event, ControlSet controls) {
+	public void consume(ActionEvent event, ControlUnit controls) {
 		GameControls gameControls = controls.getGameControls();
 		Player[] players = new Player[gameControls.getPlayers().size()];
 		int i = 0;

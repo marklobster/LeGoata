@@ -13,18 +13,18 @@ import org.legoata.decision.node.branching.InputSpecificity;
 import org.legoata.decision.node.branching.ListDisplayMode;
 import org.legoata.decision.node.branching.Option;
 import org.legoata.decision.node.nonbranching.DecisionComplete;
-import org.legoata.execute.ControlSet;
-import org.legoata.model.LGTrackable;
+import org.legoata.execute.ControlUnit;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.action.ShowStatus;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.asset.Rank;
 import org.legoata.samples.gofish.model.Player;
 import org.legoata.samples.gofish.util.GoFishUtils;
+import org.legoata.tracking.LGTrackable;
 
 public class CardRequestBuilder extends ActionBuilder {
 	
-	public CardRequestBuilder(ControlSet controls) {
+	public CardRequestBuilder(ControlUnit controls) {
 		super(controls);
 		Player player = (Player)controls.getTurnControls().getTurnTaker();
 		this.setRootNode(new RootOptionSet(controls));
@@ -52,7 +52,7 @@ public class CardRequestBuilder extends ActionBuilder {
 	
 	private class RootOptionSet extends ActionMenu {
 		
-		public RootOptionSet(ControlSet controls) {
+		public RootOptionSet(ControlUnit controls) {
 			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.CASE_INSENSITIVE);
 		}
 
@@ -97,7 +97,7 @@ public class CardRequestBuilder extends ActionBuilder {
 	
 	private class OpponentSelectOptionSet extends ActionMenu {
 
-		public OpponentSelectOptionSet(ControlSet controls) {
+		public OpponentSelectOptionSet(ControlUnit controls) {
 			super(controls, ListDisplayMode.NUMBER_FROM_ONE, InputSpecificity.CASE_INSENSITIVE, true);
 		}
 
@@ -136,7 +136,7 @@ public class CardRequestBuilder extends ActionBuilder {
 	
 	private class RankSelectOptionSet extends ActionMenu {
 
-		public RankSelectOptionSet(ControlSet controls) {
+		public RankSelectOptionSet(ControlUnit controls) {
 			super(controls, ListDisplayMode.KEYS_AND_TITLES, InputSpecificity.CASE_INSENSITIVE, true);
 		}
 

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.legoata.controller.Controller;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 
 /**
  * Default implementation of a ControllerProvider.  Register a SingleControllerProvider for each Controller 
@@ -15,7 +15,7 @@ public class ControllerRegistry implements ControllerProvider {
 	private Map<String, SingleControllerProvider> providerMap = new HashMap<String, SingleControllerProvider>();
 
 	@Override
-	public Controller getController(String name, ControlSet controls) {
+	public Controller getController(String name, ControlUnit controls) {
 		return providerMap.get(name).constructController(controls);
 	}
 	

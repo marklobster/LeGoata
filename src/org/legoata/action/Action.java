@@ -1,7 +1,7 @@
 package org.legoata.action;
 
 import org.legoata.execute.ClockControls;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
 import org.legoata.execute.RoundControls;
 import org.legoata.execute.SchedulingControls;
@@ -12,9 +12,9 @@ import org.legoata.execute.TurnControls;
  */
 public abstract class Action {
 	
-	private ControlSet controls;
+	private ControlUnit controls;
 	
-	public Action(ControlSet controls) {
+	public Action(ControlUnit controls) {
 		this.controls = controls;
 	}
 
@@ -62,7 +62,7 @@ public abstract class Action {
 	 * The whole set of controls.
 	 * @return ControlSet
 	 */
-	protected ControlSet getControls() {
+	protected ControlUnit getControls() {
 		return this.controls;
 	}
 	

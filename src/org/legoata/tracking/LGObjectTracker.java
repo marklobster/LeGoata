@@ -1,9 +1,7 @@
-package org.legoata.state;
+package org.legoata.tracking;
 
 import java.util.Iterator;
 import java.util.UUID;
-
-import org.legoata.model.LGTrackable;
 
 /**
  * Tracks LGObjects, whether on a map, belonging to another object, or independent.

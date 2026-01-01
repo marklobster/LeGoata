@@ -7,8 +7,8 @@ import org.legoata.event.GameCycleEventHandler;
 import org.legoata.event.TimeChangeEventHandler;
 
 public class SchedulingControls {
-	private EventHandlerSet eventHandlers;
-	SchedulingControls(EventHandlerSet eventHandlers) {
+	private EventHandlerUnit eventHandlers;
+	SchedulingControls(EventHandlerUnit eventHandlers) {
 		this.eventHandlers = eventHandlers;
 	}
 	public void schedulePreRoundEvent(long moment, GameCycleEventHandler event) {

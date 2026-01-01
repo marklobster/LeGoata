@@ -2,6 +2,8 @@ package org.legoata.model;
 
 import java.util.UUID;
 
+import org.legoata.tracking.LGTrackable;
+
 /**
  * The base class for players and other game objects.
  */

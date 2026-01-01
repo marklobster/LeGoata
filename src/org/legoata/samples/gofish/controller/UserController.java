@@ -2,14 +2,14 @@ package org.legoata.samples.gofish.controller;
 
 import org.legoata.action.decision.ActionDecision;
 import org.legoata.controller.Controller;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.samples.gofish.decision.CardRequestBuilder;
 
 public class UserController extends Controller {
 	
 	public static final String LABEL = "User";
 
-	public UserController(ControlSet controls) {
+	public UserController(ControlUnit controls) {
 		super(controls);
 	}
 	

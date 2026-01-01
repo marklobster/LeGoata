@@ -1,6 +1,6 @@
 package org.legoata.execute;
 
-class MutableControlSet implements ControlSet {
+class MutableControlSet implements ControlUnit {
 	
 	private GameControls gameControls;
 	private ClockControls clockControls;

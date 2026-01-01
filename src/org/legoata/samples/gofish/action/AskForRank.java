@@ -4,10 +4,9 @@ import java.io.PrintStream;
 
 import org.legoata.action.ActionResult;
 import org.legoata.action.ModelAction;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
 import org.legoata.execute.TurnControls;
-import org.legoata.model.LGTrackable;
 import org.legoata.model.structure.HashMapCollection;
 import org.legoata.samples.gofish.Keys;
 import org.legoata.samples.gofish.asset.Book;
@@ -18,10 +17,11 @@ import org.legoata.samples.gofish.decision.CardRequest;
 import org.legoata.samples.gofish.model.GoFishGame;
 import org.legoata.samples.gofish.model.Player;
 import org.legoata.samples.gofish.util.GoFishUtils;
+import org.legoata.tracking.LGTrackable;
 
 public class AskForRank extends ModelAction<CardRequest> {
 	
-	public AskForRank(ControlSet controls) {
+	public AskForRank(ControlUnit controls) {
 		super(controls);
 	}
 

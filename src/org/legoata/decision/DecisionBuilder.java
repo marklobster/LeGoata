@@ -9,7 +9,7 @@ import org.legoata.decision.node.nonbranching.DecisionComplete;
 import org.legoata.decision.node.nonbranching.GoBack;
 import org.legoata.decision.node.nonbranching.ReturnToRoot;
 import org.legoata.execute.ClockControls;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
 import org.legoata.execute.RoundControls;
 import org.legoata.execute.SchedulingControls;
@@ -23,11 +23,11 @@ import org.legoata.execute.TurnControls;
  */
 public class DecisionBuilder<T> {
 
-	private ControlSet controls;
+	private ControlUnit controls;
 	private InputNode<T> rootNode;
 	private String initialText;
 	
-	public DecisionBuilder(ControlSet controls) {
+	public DecisionBuilder(ControlUnit controls) {
 		this.controls = controls;
 	}
 	
@@ -124,7 +124,7 @@ public class DecisionBuilder<T> {
 	 * The whole set of controls.
 	 * @return ControlSet
 	 */
-	protected ControlSet getControls() {
+	protected ControlUnit getControls() {
 		return this.controls;
 	}
 	

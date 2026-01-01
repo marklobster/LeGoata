@@ -3,7 +3,7 @@ package org.legoata.execute;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.legoata.model.LGTrackable;
+import org.legoata.tracking.LGTrackable;
 
 public class Turn {
 

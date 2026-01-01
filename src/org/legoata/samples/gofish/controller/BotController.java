@@ -5,19 +5,19 @@ import java.util.UUID;
 
 import org.legoata.action.decision.ActionDecision;
 import org.legoata.controller.Controller;
-import org.legoata.execute.ControlSet;
-import org.legoata.model.LGTrackable;
+import org.legoata.execute.ControlUnit;
 import org.legoata.samples.gofish.action.AskForRank;
 import org.legoata.samples.gofish.asset.Card;
 import org.legoata.samples.gofish.decision.CardRequest;
 import org.legoata.samples.gofish.model.Player;
+import org.legoata.tracking.LGTrackable;
 import org.legoata.utils.LGUtils;
 
 public class BotController extends Controller {
 	
 	public static final String LABEL = "BotController";
 
-	public BotController(ControlSet controls) {
+	public BotController(ControlUnit controls) {
 		super(controls);
 	}
 	

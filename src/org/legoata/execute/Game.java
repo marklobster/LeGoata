@@ -1,9 +1,7 @@
 package org.legoata.execute;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.UUID;
 
 import org.legoata.config.LGConfig;
@@ -18,8 +16,6 @@ class Game {
 	private Clock clock;
 	private Round round = null;
 	private Turn turn = null;
-	private Scanner scanner = null;
-	private PrintStream outStream = null;
 	private LGConfig settings;
 	private boolean exitFlag;
 	
@@ -61,22 +57,6 @@ class Game {
 
 	public void setExitFlag(boolean value) {
 		this.exitFlag = value;
-	}
-
-	public Scanner getScanner() {
-		return scanner;
-	}
-
-	public void setScanner(Scanner scanner) {
-		this.scanner = scanner;
-	}
-
-	public PrintStream getOutStream() {
-		return outStream;
-	}
-
-	public void setOutStream(PrintStream outStream) {
-		this.outStream = outStream;
 	}
 
 	public Round getRound() {

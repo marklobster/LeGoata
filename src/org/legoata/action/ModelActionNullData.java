@@ -1,13 +1,13 @@
 package org.legoata.action;
 
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 
 /**
  * An Action done by a player without a data parameter.
  */
 public abstract class ModelActionNullData extends Action {
 
-	public ModelActionNullData(ControlSet controls) {
+	public ModelActionNullData(ControlUnit controls) {
 		super(controls);
 	}
 

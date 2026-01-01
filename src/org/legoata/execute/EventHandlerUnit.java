@@ -10,7 +10,7 @@ import org.legoata.event.TimeChangeEventHandler;
 /**
  * Contains every active Game Event Handler.
  */
-class EventHandlerSet {
+class EventHandlerUnit {
 	
 	private ArrayList<GameCycleEventHandler> preRound = new ArrayList<GameCycleEventHandler>();
 	private ArrayList<GameCycleEventHandler> initRound = new ArrayList<GameCycleEventHandler>();

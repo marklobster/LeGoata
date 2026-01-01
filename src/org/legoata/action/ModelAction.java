@@ -1,6 +1,6 @@
 package org.legoata.action;
 
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 
 /**
  * An Action with a data parameter done by a player.
@@ -8,7 +8,7 @@ import org.legoata.execute.ControlSet;
  */
 public abstract class ModelAction<T> extends Action {
 	
-	public ModelAction(ControlSet controls) {
+	public ModelAction(ControlUnit controls) {
 		super(controls);
 	}
 

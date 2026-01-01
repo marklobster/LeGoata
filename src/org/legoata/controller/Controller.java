@@ -10,7 +10,7 @@ import org.legoata.controller.command.CompleteTurn;
 import org.legoata.controller.command.RepeatController;
 import org.legoata.controller.command.TurnCommand;
 import org.legoata.execute.ClockControls;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
 import org.legoata.execute.RoundControls;
 import org.legoata.execute.SchedulingControls;
@@ -22,9 +22,9 @@ import org.legoata.execute.provider.action.ActionProvider;
  */
 public abstract class Controller {
 	
-	private ControlSet controls;
+	private ControlUnit controls;
 
-	public Controller(ControlSet controls) {
+	public Controller(ControlUnit controls) {
 		this.controls = controls;
 	}
 	
@@ -183,7 +183,7 @@ public abstract class Controller {
 	 * The whole set of controls.
 	 * @return ControlSet
 	 */
-	protected ControlSet getControls() {
+	protected ControlUnit getControls() {
 		return this.controls;
 	}
 	

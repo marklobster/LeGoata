@@ -12,7 +12,7 @@ import java.util.Set;
 import org.legoata.decision.node.DecisionBuilderNode;
 import org.legoata.decision.node.nonbranching.GoBack;
 import org.legoata.execute.ClockControls;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
 import org.legoata.execute.RoundControls;
 import org.legoata.execute.SchedulingControls;
@@ -33,25 +33,25 @@ public abstract class Menu<T> implements InputNode<T> {
 	private final String BACK_TEXT = "Back";
 	private final String BACK_TEXT_KEYS_ONLY = "[B]ack";
 	
-	private ControlSet controls;
+	private ControlUnit controls;
 	private ListDisplayMode displayMode;
 	private InputSpecificity specificity;
 	boolean showBackOption;
 	private String separator;
 
-	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption) {
+	public Menu(ControlUnit controls, ListDisplayMode displayOption, InputSpecificity specificityOption) {
 		this(controls, displayOption, specificityOption, false, DEFAULT_SEPARATOR);
 	}
 	
-	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption) {
+	public Menu(ControlUnit controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption) {
 		this(controls, displayOption, specificityOption, supplyBackOption, DEFAULT_SEPARATOR);
 	}
 	
-	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, String separator) {
+	public Menu(ControlUnit controls, ListDisplayMode displayOption, InputSpecificity specificityOption, String separator) {
 		this(controls, displayOption, specificityOption, false, separator);
 	}
 	
-	public Menu(ControlSet controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption, String separator) {
+	public Menu(ControlUnit controls, ListDisplayMode displayOption, InputSpecificity specificityOption, boolean supplyBackOption, String separator) {
 		this.controls = controls;
 		this.displayMode = displayOption;
 		this.specificity = specificityOption;
@@ -178,7 +178,7 @@ public abstract class Menu<T> implements InputNode<T> {
 	 * The whole set of controls.
 	 * @return ControlSet
 	 */
-	protected ControlSet getControls() {
+	protected ControlUnit getControls() {
 		return this.controls;
 	}
 	

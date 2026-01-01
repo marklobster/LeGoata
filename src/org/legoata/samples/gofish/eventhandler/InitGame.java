@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.legoata.event.GameCycleEvent;
 import org.legoata.event.GameCycleEventHandler;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
 import org.legoata.model.structure.HashMapCollection;
 import org.legoata.samples.gofish.GoFishConstants;
@@ -24,7 +24,7 @@ import org.legoata.utils.LGUtils;
 public class InitGame implements GameCycleEventHandler {
 
 	@Override
-	public void consume(GameCycleEvent event, ControlSet controls) {
+	public void consume(GameCycleEvent event, ControlUnit controls) {
 		
 		GameControls gameControls = controls.getGameControls();
 		PrintStream out = gameControls.getOutStream();

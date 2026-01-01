@@ -2,7 +2,7 @@ package org.legoata.model.structure;
 
 import java.util.UUID;
 
-import org.legoata.model.LGTrackable;
+import org.legoata.tracking.LGTrackable;
 
 public interface LGCollection extends Iterable<LGTrackable> {
 	

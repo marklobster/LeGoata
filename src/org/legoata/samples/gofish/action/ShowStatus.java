@@ -4,14 +4,14 @@ import java.io.PrintStream;
 
 import org.legoata.action.ActionResult;
 import org.legoata.action.ModelActionNullData;
-import org.legoata.execute.ControlSet;
+import org.legoata.execute.ControlUnit;
 import org.legoata.execute.GameControls;
-import org.legoata.model.LGObject;
 import org.legoata.samples.gofish.model.Player;
+import org.legoata.tracking.LGTrackable;
 
 public class ShowStatus extends ModelActionNullData {
 	
-	public ShowStatus(ControlSet controls) {
+	public ShowStatus(ControlUnit controls) {
 		super(controls);
 	}
 
@@ -22,7 +22,7 @@ public class ShowStatus extends ModelActionNullData {
 		GameControls gameControls = this.getGameControls();
 		PrintStream out = gameControls.getOutStream();
 		
-		for (LGObject lgPlayer : gameControls.getPlayers()) {
+		for (LGTrackable lgPlayer : gameControls.getPlayers()) {
 			Player goFishPlayer = (Player) lgPlayer;
 			out.printf("%s: %d book(s), %d card(s) left%s",
 					goFishPlayer.getName(),

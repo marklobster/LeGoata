@@ -11,9 +11,11 @@ import org.legoata.model.structure.HashMapCollection;
 public class GameControls {
 
 	private Game game = null;
+	private StreamUnit streamUnit = null;
 	
-	GameControls(Game game) {
+	GameControls(Game game, StreamUnit streamUnit) {
 		this.game = game;
+		this.streamUnit = streamUnit;
 	}
 	
 	public HashMapCollection getPlayers() {
@@ -33,11 +35,11 @@ public class GameControls {
 	}
 	
 	public Scanner getScanner() {
-		return game.getScanner();
+		return this.streamUnit.getIn();
 	}
 	
 	public PrintStream getOutStream() {
-		return game.getOutStream();
+		return this.streamUnit.getOut();
 	}
 	
 	public LGConfig getSettings() {

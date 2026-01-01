@@ -6,8 +6,8 @@ import org.legoata.map.LGGameMap;
 import org.legoata.map.ObjectLocationInfo;
 import org.legoata.map.XY;
 import org.legoata.map.XYZ;
-import org.legoata.model.LGTrackable;
-import org.legoata.state.LGObjectTracker;
+import org.legoata.tracking.LGObjectTracker;
+import org.legoata.tracking.LGTrackable;
 
 /**
  * Controls for manipulating the map as well as placement of objects within the map.

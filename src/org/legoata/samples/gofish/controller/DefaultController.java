@@ -3,13 +3,13 @@ package org.legoata.samples.gofish.controller;
 import org.legoata.controller.Controller;
 import org.legoata.controller.command.ChangeController;
 import org.legoata.controller.command.TurnCommand;
-import org.legoata.execute.ControlSet;
-import org.legoata.model.LGTrackable;
+import org.legoata.execute.ControlUnit;
 import org.legoata.samples.gofish.model.User;
+import org.legoata.tracking.LGTrackable;
 
 public class DefaultController extends Controller {
 
-	public DefaultController(ControlSet controls) {
+	public DefaultController(ControlUnit controls) {
 		super(controls);
 	}
 	

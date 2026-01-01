@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-import org.legoata.model.LGTrackable;
+import org.legoata.tracking.LGTrackable;
 
 public class HashMapCollection implements LGCollection {
 	

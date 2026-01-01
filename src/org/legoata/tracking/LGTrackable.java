@@ -1,4 +1,4 @@
-package org.legoata.model;
+package org.legoata.tracking;
 
 import java.util.UUID;
 
